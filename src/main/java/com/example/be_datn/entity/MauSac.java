@@ -1,17 +1,18 @@
-package com.example.be_datn.Entity;
+package com.example.be_datn.entity;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
 import lombok.*;
+import lombok.experimental.Accessors;
 import lombok.experimental.FieldDefaults;
 
 @Entity
-@Getter
-@Setter
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "MauSac")
 @Builder
+@Accessors(chain = true)
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class MauSac extends BaseEntity{
     @Id
@@ -24,5 +25,4 @@ public class MauSac extends BaseEntity{
 
     @Column(name = "trang_thai")
     int trangThai;
-
 }

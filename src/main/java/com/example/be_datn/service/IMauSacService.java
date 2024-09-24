@@ -1,6 +1,6 @@
-package com.example.be_datn.Service;
+package com.example.be_datn.service;
 
-import com.example.be_datn.Entity.MauSac;
+import com.example.be_datn.entity.MauSac;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 

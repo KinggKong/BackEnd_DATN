@@ -1,4 +1,4 @@
-package com.example.be_datn.Entity;
+package com.example.be_datn.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.MappedSuperclass;
@@ -21,5 +21,4 @@ public class BaseEntity {
 
     @Column(name = "updated_at")
     private LocalDateTime updated_at;
-
 }
