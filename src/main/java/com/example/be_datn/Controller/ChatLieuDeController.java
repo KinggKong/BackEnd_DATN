@@ -19,9 +19,9 @@ public class ChatLieuDeController {
     IChatLieuDeService chatLieuDeService;
 
     @GetMapping("")
-    ApiResponse<List<ChatLieuDe>> getAllChatLieuDe() {
+    ApiResponse<List<ChatLieuDe>> getAllChatLieuDe(@RequestParam(defaultValue = "", name = "search") String name) {
         ApiResponse<List<ChatLieuDe>> apiResponse = new ApiResponse<>();
-        apiResponse.setData(chatLieuDeService.getAll());
+        apiResponse.setData(chatLieuDeService.getByName(name));
         return apiResponse;
     }
     @PostMapping("")

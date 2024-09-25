@@ -9,6 +9,7 @@ import java.util.List;
 
 public interface IChatLieuDeService {
     List<ChatLieuDe> getAll();
+    List<ChatLieuDe> getByName(String name);
 
     Page<ChatLieuDe> getAll(Pageable pageable);
 
@@ -19,5 +20,6 @@ public interface IChatLieuDeService {
     ChatLieuDe update(Long id, ChatLieuDe chatLieuDe);
 
     String delete(Long id);
+
 
 }

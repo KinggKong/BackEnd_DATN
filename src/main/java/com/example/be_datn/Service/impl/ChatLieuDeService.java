@@ -25,6 +25,11 @@ public class ChatLieuDeService implements IChatLieuDeService {
     }
 
     @Override
+    public List<ChatLieuDe> getByName(String name) {
+        return chatLieuDeRepository.findByTenChatLieuContaining(name);
+    }
+
+    @Override
     public Page<ChatLieuDe> getAll(Pageable pageable) {
         return chatLieuDeRepository.findAll(pageable);
     }
