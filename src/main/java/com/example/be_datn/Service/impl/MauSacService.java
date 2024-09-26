@@ -11,14 +11,13 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import javax.swing.text.html.Option;
 import java.util.List;
 import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 @FieldDefaults(level = lombok.AccessLevel.PRIVATE, makeFinal = true)
-public class MauSacSerrvice implements IMauSacService {
+public class MauSacService implements IMauSacService {
     MauSacRepository mauSacRepository;
 
     @Override
@@ -27,8 +26,8 @@ public class MauSacSerrvice implements IMauSacService {
     }
 
     @Override
-    public Page<MauSac> getAllMauSac(Pageable pageable) {
-        return mauSacRepository.findAll(pageable);
+    public Page<MauSac> getAllMauSacPageable(String ten_mau, Pageable pageable) {
+        return mauSacRepository.findMauSacByTenMauLike("%" + ten_mau + "%", pageable);
     }
 
     @Override
@@ -51,7 +50,7 @@ public class MauSacSerrvice implements IMauSacService {
             MauSac mauSacUpdate = mauSacOptional.get();
             mauSacUpdate.setTenMau(mauSac.getTenMau());
             mauSacUpdate.setTrangThai(mauSac.getTrangThai());
-            mauSacUpdate.setUpdated_at(mauSac.getUpdated_at());
+            mauSacUpdate.setUpdatedAt(mauSac.getUpdatedAt());
             return mauSacRepository.save(mauSacUpdate);
         } else {
             throw new AppException(ErrorCode.MAUSAC_NOT_FOUND);

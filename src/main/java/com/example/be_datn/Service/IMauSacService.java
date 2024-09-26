@@ -8,7 +8,7 @@ import java.util.List;
 public interface IMauSacService {
     List<MauSac> getAllMauSac();
 
-    Page<MauSac> getAllMauSac(Pageable pageable);
+    Page<MauSac> getAllMauSacPageable(String ten_Mau,Pageable pageable);
 
     MauSac createMauSac(MauSac mauSac);
 
