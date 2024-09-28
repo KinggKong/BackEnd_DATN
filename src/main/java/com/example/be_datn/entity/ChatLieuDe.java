@@ -11,7 +11,7 @@ import lombok.experimental.FieldDefaults;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Entity
-@Table(name = "ChatLieuDe")
+@Table(name = "chat_lieu_de")
 public class ChatLieuDe extends BaseEntity{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -21,7 +21,7 @@ import lombok.experimental.FieldDefaults;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "thuongHieu")
+@Table(name = "thuong_hieu")
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class ThuongHieu extends BaseEntity {

@@ -1,4 +1,4 @@
-package com.example.be_datn.Entity;
+package com.example.be_datn.entity;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
@@ -10,7 +10,7 @@ import lombok.experimental.FieldDefaults;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "MauSac")
+@Table(name = "mau_sac")
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class MauSac extends BaseEntity{

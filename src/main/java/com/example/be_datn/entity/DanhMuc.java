@@ -19,7 +19,7 @@ import lombok.experimental.FieldDefaults;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "danhMuc")
+@Table(name = "danh_muc")
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class DanhMuc extends BaseEntity{

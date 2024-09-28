@@ -10,7 +10,7 @@ import lombok.experimental.FieldDefaults;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "KichThuoc")
+@Table(name = "kich_thuoc")
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 
