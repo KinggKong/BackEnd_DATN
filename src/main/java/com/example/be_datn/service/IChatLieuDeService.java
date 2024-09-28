@@ -1,7 +1,7 @@
-package com.example.be_datn.Service;
+package com.example.be_datn.service;
 
 
-import com.example.be_datn.Entity.ChatLieuDe;
+import com.example.be_datn.entity.ChatLieuDe;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 

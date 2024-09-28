@@ -1,4 +1,4 @@
-package com.example.be_datn.Entity;
+package com.example.be_datn.entity;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.Column;
