@@ -19,7 +19,7 @@ public class Size extends BaseEntity{
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
 
-    @jakarta.validation.constraints.Size(min = 2, message = "TEN_THUONGHIEU_INVALID")
+    @jakarta.validation.constraints.Size(min = 2, message = "TEN_SIZE_INVALID")
     @Column(name = "ten_size")
     private String tenSize;
 
