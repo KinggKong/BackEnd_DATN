@@ -9,19 +9,19 @@ import lombok.experimental.FieldDefaults;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "size")
+@Table(name = "KichThuoc")
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 
-public class Size extends BaseEntity{
+public class KichThuoc extends BaseEntity{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
 
-    @jakarta.validation.constraints.Size(min = 2, message = "TEN_SIZE_INVALID")
-    @Column(name = "ten_size")
-    private String tenSize;
+    @jakarta.validation.constraints.Size(min = 2, message = "TEN_KICHTHUOC_INVALID")
+    @Column(name = "ten_kich_thuoc")
+    private String tenKichThuoc;
 
     @Column(name = "trang_thai")
     Integer trangThai;

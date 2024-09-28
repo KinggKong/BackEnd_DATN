@@ -18,8 +18,8 @@ public enum ErrorCode {
     CHATLIEUDE_ALREADY_EXISTS(1006,"Chất liệu đế đã tồn tại !"),
     TEN_CHATLIEUDE_INVALID(1007,"Tên chất liệu đế cần nhiều hơn 3 ký tự !"),
 
-    SIZE_ALREADY_EXISTS(1010, "Size đã tồn tại!"),
-    SIZE_NOT_FOUND(1011, "Size không tồn tại!");
+    KICHTHUOC_ALREADY_EXISTS(1010, "Kich Thuoc đã tồn tại!"),
+    KICHTHUOC_NOT_FOUND(1011, "Kich Thuoc không tồn tại!");
 
     ;
     private int code;
