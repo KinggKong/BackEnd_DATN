@@ -1,8 +1,8 @@
-package com.example.be_datn.Controller;
+package com.example.be_datn.controller;
 
 import com.example.be_datn.DTO.Response.ApiResponse;
-import com.example.be_datn.Entity.ChatLieuDe;
-import com.example.be_datn.Service.IChatLieuDeService;
+import com.example.be_datn.entity.ChatLieuDe;
+import com.example.be_datn.service.IChatLieuDeService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
