@@ -1,4 +1,4 @@
-package com.example.be_datn.Exception;
+package com.example.be_datn.exception;
 
 import lombok.Getter;
 import lombok.Setter;

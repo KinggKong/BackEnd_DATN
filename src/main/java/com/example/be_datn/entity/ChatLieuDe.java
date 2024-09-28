@@ -1,4 +1,4 @@
-package com.example.be_datn.Entity;
+package com.example.be_datn.entity;
 
 import jakarta.persistence.*;
 import lombok.*;

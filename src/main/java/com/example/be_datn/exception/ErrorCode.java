@@ -1,9 +1,8 @@
-package com.example.be_datn.Exception;
+package com.example.be_datn.exception;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.springframework.http.HttpStatus;
 
 @Getter
 @AllArgsConstructor

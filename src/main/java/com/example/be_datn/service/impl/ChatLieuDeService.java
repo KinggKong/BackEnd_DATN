@@ -1,10 +1,10 @@
-package com.example.be_datn.Service.impl;
+package com.example.be_datn.service.impl;
 
-import com.example.be_datn.Entity.ChatLieuDe;
-import com.example.be_datn.Exception.AppException;
-import com.example.be_datn.Exception.ErrorCode;
-import com.example.be_datn.Repository.ChatLieuDeRepository;
-import com.example.be_datn.Service.IChatLieuDeService;
+import com.example.be_datn.entity.ChatLieuDe;
+import com.example.be_datn.exception.AppException;
+import com.example.be_datn.exception.ErrorCode;
+import com.example.be_datn.repository.ChatLieuDeRepository;
+import com.example.be_datn.service.IChatLieuDeService;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.data.domain.Page;

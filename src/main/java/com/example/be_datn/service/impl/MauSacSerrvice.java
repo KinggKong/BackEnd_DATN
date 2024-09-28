@@ -1,10 +1,10 @@
-package com.example.be_datn.Service.impl;
+package com.example.be_datn.service.impl;
 
-import com.example.be_datn.Entity.MauSac;
-import com.example.be_datn.Exception.AppException;
-import com.example.be_datn.Exception.ErrorCode;
-import com.example.be_datn.Repository.MauSacRepository;
-import com.example.be_datn.Service.IMauSacService;
+import com.example.be_datn.entity.MauSac;
+import com.example.be_datn.exception.AppException;
+import com.example.be_datn.exception.ErrorCode;
+import com.example.be_datn.repository.MauSacRepository;
+import com.example.be_datn.service.IMauSacService;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.data.domain.Page;
