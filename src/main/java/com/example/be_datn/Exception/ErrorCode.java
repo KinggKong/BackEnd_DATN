@@ -19,8 +19,10 @@ public enum ErrorCode {
     TEN_CHATLIEUDE_INVALID(1007,"Tên chất liệu đế cần nhiều hơn 3 ký tự !"),
 
     KICHTHUOC_ALREADY_EXISTS(1010, "Kich Thuoc đã tồn tại!"),
-    KICHTHUOC_NOT_FOUND(1011, "Kich Thuoc không tồn tại!");
+    KICHTHUOC_NOT_FOUND(1011, "Kich Thuoc không tồn tại!"),
 
+    CHAT_LIEU_VAI_ALREADY_EXISTS(1008,"Chất liệu vải đã tồn tại !"),
+    CHAT_LIEU_VAI_NOT_FOUND(1008,"Chất liệu vải không tồn tại !"),
     ;
     private int code;
     private String message;
