@@ -18,7 +18,6 @@ public class MauSac extends BaseEntity{
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
 
-    @Size(min=3, message = "TEN_MAUSAC_INVALID")
     @Column(name = "ten_mau")
     String tenMau;
 

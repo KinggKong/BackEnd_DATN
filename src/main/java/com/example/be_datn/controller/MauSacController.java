@@ -1,6 +1,8 @@
 package com.example.be_datn.controller;
 
+import com.example.be_datn.dto.Request.MauSacRequest;
 import com.example.be_datn.dto.Response.ApiResponse;
+import com.example.be_datn.dto.Response.MauSacResponse;
 import com.example.be_datn.entity.MauSac;
 import com.example.be_datn.service.IMauSacService;
 import jakarta.validation.Valid;
@@ -19,27 +21,27 @@ public class MauSacController {
     IMauSacService mauSacService;
 
     @GetMapping("")
-    ApiResponse<Page<MauSac>> getAllMauSacs(@RequestParam(name = "pageNumber", defaultValue = "0") int pageNumber,
+    ApiResponse<Page<MauSacResponse>> getAllMauSacs(@RequestParam(name = "pageNumber", defaultValue = "0") int pageNumber,
                                             @RequestParam(name = "pageSize", defaultValue = "10") int pageSize,
                                             @RequestParam(name = "tenMau",defaultValue = "") String ten_mau
     ) {
         Pageable pageable = PageRequest.of(Math.max(0, pageNumber), Math.max(1, pageSize));
-        ApiResponse<Page<MauSac>> apiResponse = new ApiResponse<>();
+        ApiResponse<Page<MauSacResponse>> apiResponse = new ApiResponse<>();
         apiResponse.setData(mauSacService.getAllMauSacPageable(ten_mau,pageable));
         return apiResponse;
     }
 
     @PostMapping("")
-    ApiResponse<MauSac> createMauSac(@RequestBody @Valid MauSac mauSac) {
-        ApiResponse<MauSac> apiResponse = new ApiResponse<>();
-        apiResponse.setMessage("Thêm mới thành công màu " + mauSac.getTenMau());
-        apiResponse.setData(mauSacService.createMauSac(mauSac));
+    ApiResponse<MauSacResponse> createMauSac(@RequestBody @Valid MauSacRequest mauSacRequest) {
+        ApiResponse<MauSacResponse> apiResponse = new ApiResponse<>();
+        apiResponse.setMessage("Thêm mới thành công màu " + mauSacRequest.getTenMau());
+        apiResponse.setData(mauSacService.createMauSac(mauSacRequest));
         return apiResponse;
     }
 
     @GetMapping("/{id}")
-    ApiResponse<MauSac> getMauSacById(@PathVariable Long id) {
-        ApiResponse<MauSac> apiResponse = new ApiResponse<>();
+    ApiResponse<MauSacResponse> getMauSacById(@PathVariable Long id) {
+        ApiResponse<MauSacResponse> apiResponse = new ApiResponse<>();
         apiResponse.setData(mauSacService.getMauSacById(id));
         return apiResponse;
     }
@@ -52,10 +54,10 @@ public class MauSacController {
     }
 
     @PutMapping("/{id}")
-    ApiResponse<MauSac> updateMauSac(@PathVariable Long id, @RequestBody @Valid MauSac mauSac) {
-        ApiResponse<MauSac> apiResponse = new ApiResponse<>();
+    ApiResponse<MauSacResponse> updateMauSac(@PathVariable Long id, @RequestBody @Valid MauSacRequest mauSacRequest) {
+        ApiResponse<MauSacResponse> apiResponse = new ApiResponse<>();
         apiResponse.setMessage("Cập nhật thành công màu sắc");
-        apiResponse.setData(mauSacService.updateMauSac(id, mauSac));
+        apiResponse.setData(mauSacService.updateMauSac(id, mauSacRequest));
         return apiResponse;
     }
 
