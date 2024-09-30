@@ -1,20 +1,21 @@
 package com.example.be_datn.service;
 
+import com.example.be_datn.dto.Request.MauSacRequest;
+import com.example.be_datn.dto.Response.MauSacResponse;
 import com.example.be_datn.entity.MauSac;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 public interface IMauSacService {
-    List<MauSac> getAllMauSac();
 
-    Page<MauSac> getAllMauSacPageable(String ten_Mau,Pageable pageable);
+    Page<MauSacResponse> getAllMauSacPageable(String ten_Mau, Pageable pageable);
 
-    MauSac createMauSac(MauSac mauSac);
+    MauSacResponse createMauSac(MauSacRequest mauSacRequest);
 
-    MauSac getMauSacById(Long id);
+    MauSacResponse getMauSacById(Long id);
 
-    MauSac updateMauSac(Long idMauSac, MauSac mauSac);
+    MauSacResponse updateMauSac(Long idMauSac, MauSacRequest mauSacRequest);
 
     String deleteMauSac(Long id);
 
