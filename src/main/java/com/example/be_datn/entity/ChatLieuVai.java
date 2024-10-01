@@ -9,17 +9,16 @@ import lombok.experimental.FieldDefaults;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "kich_thuoc")
+@Table(name = "chat_lieu_vai")
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class KichThuoc extends BaseEntity {
-
+public class ChatLieuVai extends BaseEntity{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
 
-    @Column(name = "ten_kich_thuoc")
-    String tenKichThuoc;
+    @Column(name = "ten_chat_lieu_vai")
+    String tenChatLieuVai;
 
     @Column(name = "trang_thai")
     int trangThai;

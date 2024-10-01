@@ -1,5 +1,8 @@
 package com.example.be_datn.service;
 
+import com.example.be_datn.dto.Request.DanhMucCreationRequest;
+import com.example.be_datn.dto.Request.DanhMucUpdateRequest;
+import com.example.be_datn.dto.Response.DanhMucResponse;
 import com.example.be_datn.entity.DanhMuc;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -7,15 +10,15 @@ import org.springframework.data.domain.Pageable;
 import java.util.List;
 
 public interface IDanhMucService {
-    List<DanhMuc> getAllDanhMuc();
+    List<DanhMucResponse> getAllDanhMuc();
 
     Page<DanhMuc> getAllDanhMucPageable(String tenDanhMuc, Pageable pageable);
 
-    DanhMuc createDanhMuc(DanhMuc DanhMuc);
+    DanhMucResponse createDanhMuc(DanhMucCreationRequest request);
 
-    DanhMuc getDanhMucById(Long id);
+    DanhMucResponse getDanhMucById(Long id);
 
-    DanhMuc updateDanhMuc(Long idDanhMuc, DanhMuc DanhMuc);
+    DanhMucResponse updateDanhMuc(Long idDanhMuc, DanhMucUpdateRequest request);
 
     String deleteDanhMuc(Long id);
 

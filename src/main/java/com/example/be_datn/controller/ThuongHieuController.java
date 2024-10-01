@@ -1,7 +1,11 @@
 package com.example.be_datn.controller;
 
 import com.example.be_datn.dto.Response.ApiResponse;
+import com.example.be_datn.dto.Request.ThuongHieuCreationRequest;
+import com.example.be_datn.dto.Request.ThuongHieuUpdateRequest;
+import com.example.be_datn.dto.Response.ThuongHieuResponse;
 import com.example.be_datn.entity.ThuongHieu;
+import com.example.be_datn.mapper.ThuongHieuMapper;
 import com.example.be_datn.service.IThuongHieuService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -26,6 +30,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class ThuongHieuController {
     IThuongHieuService thuongHieuService;
 
+    private final ThuongHieuMapper thuongHieuMapper;
     @GetMapping("")
     ApiResponse<Page<ThuongHieu>> getAllThuongHieu(@RequestParam(name = "pageNumber", defaultValue = "0") int pageNumber,
                                                    @RequestParam(name = "pageSize", defaultValue = "10") int pageSize,
@@ -38,16 +43,16 @@ public class ThuongHieuController {
     }
 
     @PostMapping("")
-    ApiResponse<ThuongHieu> createThuongHieu(@RequestBody @Valid ThuongHieu thuongHieu) {
-        ApiResponse<ThuongHieu> apiResponse = new ApiResponse<>();
-        apiResponse.setMessage("Thêm mới thành công màu " + thuongHieu.getTenThuongHieu());
-        apiResponse.setData(thuongHieuService.createThuongHieu(thuongHieu));
+    ApiResponse<?> createThuongHieu(@RequestBody @Valid ThuongHieuCreationRequest request) {
+        ApiResponse<ThuongHieuResponse> apiResponse = new ApiResponse<>();
+        apiResponse.setMessage("Thêm mới thành thương hiệu " + request.getTenThuongHieu());
+        apiResponse.setData(thuongHieuService.createThuongHieu(request));
         return apiResponse;
     }
 
     @GetMapping("/{id}")
-    ApiResponse<ThuongHieu> getThuongHieuById(@PathVariable Long id) {
-        ApiResponse<ThuongHieu> apiResponse = new ApiResponse<>();
+    ApiResponse<ThuongHieuResponse> getThuongHieuById(@PathVariable Long id) {
+        ApiResponse<ThuongHieuResponse> apiResponse = new ApiResponse<>();
         apiResponse.setData(thuongHieuService.getThuongHieuById(id));
         return apiResponse;
     }
@@ -60,10 +65,10 @@ public class ThuongHieuController {
     }
 
     @PutMapping("/{id}")
-    ApiResponse<ThuongHieu> updateThuongHieu(@PathVariable Long id, @RequestBody @Valid ThuongHieu thuongHieu) {
-        ApiResponse<ThuongHieu> apiResponse = new ApiResponse<>();
-        apiResponse.setMessage("Cập nhật thành công thuong hieu");
-        apiResponse.setData(thuongHieuService.updateThuongHieu(id, thuongHieu));
+    ApiResponse<ThuongHieuResponse> updateThuongHieu(@PathVariable Long id, @RequestBody @Valid ThuongHieuUpdateRequest request) {
+        ApiResponse<ThuongHieuResponse> apiResponse = new ApiResponse<>();
+        apiResponse.setMessage("Cập nhật thành công thương hiệu");
+        apiResponse.setData(thuongHieuService.updateThuongHieu(id, request));
         return apiResponse;
     }
 

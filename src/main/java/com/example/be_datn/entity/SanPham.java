@@ -1,5 +1,6 @@
 package com.example.be_datn.entity;
 
+
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -10,6 +11,7 @@ import lombok.experimental.FieldDefaults;
 @AllArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
+
 @Entity
 @Table(name = "san_pham")
 public class SanPham {
@@ -34,3 +36,4 @@ public class SanPham {
     @Column(name = "trang_thai")
     int trangThai;
 }
+

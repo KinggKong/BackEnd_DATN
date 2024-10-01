@@ -1,7 +1,6 @@
 package com.example.be_datn.dto.Response;
 
 import com.example.be_datn.entity.ChatLieuDe;
-import com.example.be_datn.entity.MauSac;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.*;
 
