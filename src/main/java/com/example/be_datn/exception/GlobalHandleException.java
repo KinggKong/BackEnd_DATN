@@ -1,6 +1,6 @@
 package com.example.be_datn.exception;
 
-import com.example.be_datn.dto.Response.ApiResponse;
+import com.example.be_datn.dto.ApiResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;

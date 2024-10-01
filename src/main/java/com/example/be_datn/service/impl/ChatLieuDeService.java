@@ -55,7 +55,7 @@ public class ChatLieuDeService implements IChatLieuDeService {
             ChatLieuDe chatLieuDeUpdate = chatLieuDeOptional.get();
             chatLieuDeUpdate.setTenChatLieu(chatLieuDe.getTenChatLieu());
             chatLieuDeUpdate.setTrangThai(chatLieuDe.getTrangThai());
-            chatLieuDeUpdate.setUpdated_at(chatLieuDe.getUpdated_at());
+            chatLieuDeUpdate.setUpdatedAt(chatLieuDe.getUpdatedAt());
             return chatLieuDeRepository.save(chatLieuDeUpdate);
         } else {
             throw new AppException(ErrorCode.CHATLIEUDE_NOT_FOUND);

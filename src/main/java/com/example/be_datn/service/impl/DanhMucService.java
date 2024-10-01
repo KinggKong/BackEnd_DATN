@@ -1,8 +1,12 @@
 package com.example.be_datn.service.impl;
 
+import com.example.be_datn.dto.request.DanhMucCreationRequest;
+import com.example.be_datn.dto.request.DanhMucUpdateRequest;
+import com.example.be_datn.dto.response.DanhMucResponse;
 import com.example.be_datn.entity.DanhMuc;
 import com.example.be_datn.exception.AppException;
 import com.example.be_datn.exception.ErrorCode;
+import com.example.be_datn.mapper.DanhMucMapper;
 import com.example.be_datn.repository.DanhMucRepository;
 import com.example.be_datn.service.IDanhMucService;
 import lombok.RequiredArgsConstructor;
@@ -19,10 +23,11 @@ import java.util.Optional;
 @FieldDefaults(level = lombok.AccessLevel.PRIVATE, makeFinal = true)
 public class DanhMucService implements IDanhMucService {
     DanhMucRepository danhMucRepository;
+    private final DanhMucMapper danhMucMapper;
 
     @Override
-    public List<DanhMuc> getAllDanhMuc() {
-        return danhMucRepository.findAll();
+    public List<DanhMucResponse> getAllDanhMuc() {
+        return danhMucMapper.toListThuongHieuResponse( danhMucRepository.findAll());
     }
 
     @Override
@@ -31,30 +36,24 @@ public class DanhMucService implements IDanhMucService {
     }
 
     @Override
-    public DanhMuc createDanhMuc(DanhMuc danhMuc) {
-        if (danhMucRepository.existsDanhMucByTenDanhMuc(danhMuc.getTenDanhMuc())) {
+    public DanhMucResponse createDanhMuc(DanhMucCreationRequest request) {
+        if (danhMucRepository.existsDanhMucByTenDanhMuc(request.getTenDanhMuc())) {
             throw new AppException(ErrorCode.HANG_ALREADY_EXISTS);
         }
-        return danhMucRepository.save(danhMuc);
+        DanhMuc dm= danhMucMapper.toDanhMuc(request);
+        return danhMucMapper.toDanhMucResponse(danhMucRepository.save(dm));
     }
 
     @Override
-    public DanhMuc getDanhMucById(Long id) {
-        return danhMucRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.HANG_NOT_FOUND));
+    public DanhMucResponse getDanhMucById(Long id) {
+        return danhMucMapper.toDanhMucResponse(danhMucRepository.findById(id).get());
     }
 
     @Override
-    public DanhMuc updateDanhMuc(Long idHang, DanhMuc danhMuc) {
-        Optional<DanhMuc> hangOptional = danhMucRepository.findById(idHang);
-        if (hangOptional.isPresent()) {
-            DanhMuc danhMucUpdate = hangOptional.get();
-            danhMucUpdate.setTenDanhMuc(danhMuc.getTenDanhMuc());
-            danhMucUpdate.setTrangThai(danhMuc.getTrangThai());
-            danhMucUpdate.setUpdated_at(danhMuc.getUpdated_at());
-            return danhMucRepository.save(danhMucUpdate);
-        } else {
-            throw new AppException(ErrorCode.HANG_NOT_FOUND);
-        }
+    public DanhMucResponse updateDanhMuc(Long idHang, DanhMucUpdateRequest request) {
+        DanhMuc dm = danhMucRepository.findById(idHang).orElseThrow(null);
+        danhMucMapper.updateDanhMuc(dm, request);
+        return danhMucMapper.toDanhMucResponse(danhMucRepository.save(dm));
     }
 
     @Override

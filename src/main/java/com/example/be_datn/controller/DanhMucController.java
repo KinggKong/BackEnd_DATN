@@ -1,6 +1,9 @@
 package com.example.be_datn.controller;
 
-import com.example.be_datn.dto.Response.ApiResponse;
+import com.example.be_datn.dto.ApiResponse;
+import com.example.be_datn.dto.request.DanhMucCreationRequest;
+import com.example.be_datn.dto.request.DanhMucUpdateRequest;
+import com.example.be_datn.dto.response.DanhMucResponse;
 import com.example.be_datn.entity.DanhMuc;
 import com.example.be_datn.service.IDanhMucService;
 import jakarta.validation.Valid;
@@ -38,16 +41,16 @@ public class DanhMucController {
     }
 
     @PostMapping("")
-    ApiResponse<DanhMuc> createDanhMuc(@RequestBody @Valid DanhMuc danhMuc) {
-        ApiResponse<DanhMuc> apiResponse = new ApiResponse<>();
-        apiResponse.setMessage("Thêm mới thành công màu " + danhMuc.getTenDanhMuc());
+    ApiResponse<DanhMucResponse> createDanhMuc(@RequestBody @Valid DanhMucCreationRequest danhMuc) {
+        ApiResponse<DanhMucResponse> apiResponse = new ApiResponse<>();
+        apiResponse.setMessage("Thêm mới thành công danh mục " + danhMuc.getTenDanhMuc());
         apiResponse.setData(danhMucService.createDanhMuc(danhMuc));
         return apiResponse;
     }
 
     @GetMapping("/{id}")
-    ApiResponse<DanhMuc> getDanhMucById(@PathVariable Long id) {
-        ApiResponse<DanhMuc> apiResponse = new ApiResponse<>();
+    ApiResponse<DanhMucResponse> getDanhMucById(@PathVariable Long id) {
+        ApiResponse<DanhMucResponse> apiResponse = new ApiResponse<>();
         apiResponse.setData(danhMucService.getDanhMucById(id));
         return apiResponse;
     }
@@ -60,9 +63,9 @@ public class DanhMucController {
     }
 
     @PutMapping("/{id}")
-    ApiResponse<DanhMuc> updateDanhMuc(@PathVariable Long id, @RequestBody @Valid DanhMuc danhMuc) {
-        ApiResponse<DanhMuc> apiResponse = new ApiResponse<>();
-        apiResponse.setMessage("Cập nhật thành công danhMuc");
+    ApiResponse<DanhMucResponse> updateDanhMuc(@PathVariable Long id, @RequestBody @Valid DanhMucUpdateRequest danhMuc) {
+        ApiResponse<DanhMucResponse> apiResponse = new ApiResponse<>();
+        apiResponse.setMessage("Cập nhật thành công danh mục");
         apiResponse.setData(danhMucService.updateDanhMuc(id, danhMuc));
         return apiResponse;
     }

@@ -1,8 +1,12 @@
 package com.example.be_datn.service.impl;
 
+import com.example.be_datn.dto.request.ThuongHieuCreationRequest;
+import com.example.be_datn.dto.request.ThuongHieuUpdateRequest;
+import com.example.be_datn.dto.response.ThuongHieuResponse;
 import com.example.be_datn.entity.ThuongHieu;
 import com.example.be_datn.exception.AppException;
 import com.example.be_datn.exception.ErrorCode;
+import com.example.be_datn.mapper.ThuongHieuMapper;
 import com.example.be_datn.repository.ThuongHieuRepository;
 import com.example.be_datn.service.IThuongHieuService;
 import lombok.RequiredArgsConstructor;
@@ -19,10 +23,11 @@ import java.util.Optional;
 @FieldDefaults(level = lombok.AccessLevel.PRIVATE, makeFinal = true)
 public class ThuongHieuService implements IThuongHieuService {
     ThuongHieuRepository thuongHieuRepository;
+    private ThuongHieuMapper thuongHieuMapper;
 
     @Override
-    public List<ThuongHieu> getAllThuongHieu() {
-        return thuongHieuRepository.findAll();
+    public List<ThuongHieuResponse> getAllThuongHieu() {
+        return thuongHieuMapper.toListThuongHieuResponse(thuongHieuRepository.findAll());
     }
 
     @Override
@@ -31,30 +36,24 @@ public class ThuongHieuService implements IThuongHieuService {
     }
 
     @Override
-    public ThuongHieu createThuongHieu(ThuongHieu thuongHieu) {
-        if (thuongHieuRepository.existsThuongHieuByTenThuongHieu(thuongHieu.getTenThuongHieu())) {
+    public ThuongHieuResponse createThuongHieu(ThuongHieuCreationRequest request) {
+        if (thuongHieuRepository.existsThuongHieuByTenThuongHieu(request.getTenThuongHieu())) {
             throw new AppException(ErrorCode.THUONGHIEU_ALREADY_EXISTS);
         }
-        return thuongHieuRepository.save(thuongHieu);
+        ThuongHieu th= thuongHieuMapper.toThuongHieu(request);
+        return thuongHieuMapper.toThuongHieuResponse(thuongHieuRepository.save(th));
     }
 
     @Override
-    public ThuongHieu getThuongHieuById(Long id) {
-        return thuongHieuRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.THUONGHIEU_NOT_FOUND));
+    public ThuongHieuResponse getThuongHieuById(Long id) {
+        return thuongHieuMapper.toThuongHieuResponse(thuongHieuRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.THUONGHIEU_NOT_FOUND)));
     }
 
     @Override
-    public ThuongHieu updateThuongHieu(Long idThuongHieu, ThuongHieu ThuongHieu) {
-        Optional<ThuongHieu> ThuongHieuOptional = thuongHieuRepository.findById(idThuongHieu);
-        if (ThuongHieuOptional.isPresent()) {
-            ThuongHieu ThuongHieuUpdate = ThuongHieuOptional.get();
-            ThuongHieuUpdate.setTenThuongHieu(ThuongHieu.getTenThuongHieu());
-            ThuongHieuUpdate.setTrangThai(ThuongHieu.getTrangThai());
-            ThuongHieuUpdate.setUpdated_at(ThuongHieu.getUpdated_at());
-            return thuongHieuRepository.save(ThuongHieuUpdate);
-        } else {
-            throw new AppException(ErrorCode.THUONGHIEU_NOT_FOUND);
-        }
+    public ThuongHieuResponse updateThuongHieu(Long idThuongHieu, ThuongHieuUpdateRequest request) {
+        ThuongHieu thuongHieu= thuongHieuRepository.findById(idThuongHieu).orElse(null);
+        thuongHieuMapper.updateThuongHieu(thuongHieu, request);
+        return thuongHieuMapper.toThuongHieuResponse(thuongHieuRepository.save(thuongHieu));
     }
 
     @Override

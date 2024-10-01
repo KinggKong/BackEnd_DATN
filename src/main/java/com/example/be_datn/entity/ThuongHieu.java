@@ -33,6 +33,6 @@ public class ThuongHieu extends BaseEntity {
     @Column(name = "ten_thuong_hieu")
     String tenThuongHieu;
     @Column(name = "trang_thai")
-    Integer trangThai;
+    int trangThai;
 
 }

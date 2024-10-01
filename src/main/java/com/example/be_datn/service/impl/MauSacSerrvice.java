@@ -51,7 +51,7 @@ public class MauSacSerrvice implements IMauSacService {
             MauSac mauSacUpdate = mauSacOptional.get();
             mauSacUpdate.setTenMau(mauSac.getTenMau());
             mauSacUpdate.setTrangThai(mauSac.getTrangThai());
-            mauSacUpdate.setUpdated_at(mauSac.getUpdated_at());
+            mauSacUpdate.setUpdatedAt(mauSac.getUpdatedAt());
             return mauSacRepository.save(mauSacUpdate);
         } else {
             throw new AppException(ErrorCode.MAUSAC_NOT_FOUND);

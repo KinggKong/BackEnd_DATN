@@ -51,7 +51,7 @@ public class KichThuocService implements IKichThuocService {
             KichThuoc kichThuocUpdate = kichThuocOptional.get();
             kichThuocUpdate.setTenKichThuoc(kichThuoc.getTenKichThuoc());
             kichThuocUpdate.setTrangThai(kichThuoc.getTrangThai());
-            kichThuocUpdate.setUpdated_at(kichThuoc.getUpdated_at()); // Đảm bảo rằng tên phương thức chính xác
+            kichThuocUpdate.setUpdatedAt(kichThuoc.getUpdatedAt()); // Đảm bảo rằng tên phương thức chính xác
             return kichThuocRepository.save(kichThuocUpdate);
         } else {
             throw new AppException(ErrorCode.KICHTHUOC_NOT_FOUND); // Thay đổi mã lỗi nếu cần

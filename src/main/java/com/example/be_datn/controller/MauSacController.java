@@ -1,6 +1,6 @@
 package com.example.be_datn.controller;
 
-import com.example.be_datn.dto.Response.ApiResponse;
+import com.example.be_datn.dto.ApiResponse;
 import com.example.be_datn.entity.MauSac;
 import com.example.be_datn.service.IMauSacService;
 import jakarta.validation.Valid;

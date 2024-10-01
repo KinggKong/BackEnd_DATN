@@ -1,6 +1,6 @@
 package com.example.be_datn.controller;
 
-import com.example.be_datn.dto.Response.ApiResponse;
+import com.example.be_datn.dto.ApiResponse;
 import com.example.be_datn.entity.ChatLieuDe;
 import com.example.be_datn.service.IChatLieuDeService;
 import jakarta.validation.Valid;
@@ -26,7 +26,7 @@ public class ChatLieuDeController {
     }
     @PostMapping("")
     ApiResponse<ChatLieuDe> createChatLieuDe(@RequestBody @Valid ChatLieuDe chatLieuDe) {
-        chatLieuDe.setCreated_at(LocalDateTime.now());
+        chatLieuDe.setCreatedAt(LocalDateTime.now());
         ApiResponse<ChatLieuDe> apiResponse = new ApiResponse<>();
         apiResponse.setData(chatLieuDeService.create(chatLieuDe));
         apiResponse.setMessage("Them thanh cong chat lieu de !");
