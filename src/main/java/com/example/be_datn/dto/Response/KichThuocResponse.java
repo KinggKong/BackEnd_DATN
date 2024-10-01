@@ -28,8 +28,8 @@ public class KichThuocResponse {
         return KichThuocResponse.builder()
                 .id(kichThuoc.getId())
                 .tenKichThuoc(kichThuoc.getTenKichThuoc())
-                .createdAt(kichThuoc.getCreated_at())
-                .updatedAt(kichThuoc.getUpdated_at())
+                .createdAt(kichThuoc.getCreatedAt())
+                .updatedAt(kichThuoc.getUpdatedAt())
                 .trangThai(kichThuoc.getTrangThai())
                 .build();
     }
