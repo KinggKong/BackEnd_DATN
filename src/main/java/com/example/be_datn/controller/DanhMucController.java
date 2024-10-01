@@ -1,8 +1,8 @@
 package com.example.be_datn.controller;
 
 import com.example.be_datn.dto.ApiResponse;
-import com.example.be_datn.dto.request.DanhMucCreationRequest;
-import com.example.be_datn.dto.request.DanhMucUpdateRequest;
+import com.example.be_datn.dto.Request.DanhMucCreationRequest;
+import com.example.be_datn.dto.Request.DanhMucUpdateRequest;
 import com.example.be_datn.dto.response.DanhMucResponse;
 import com.example.be_datn.entity.DanhMuc;
 import com.example.be_datn.service.IDanhMucService;

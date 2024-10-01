@@ -1,7 +1,7 @@
 package com.example.be_datn.service.impl;
 
-import com.example.be_datn.dto.request.DanhMucCreationRequest;
-import com.example.be_datn.dto.request.DanhMucUpdateRequest;
+import com.example.be_datn.dto.Request.DanhMucCreationRequest;
+import com.example.be_datn.dto.Request.DanhMucUpdateRequest;
 import com.example.be_datn.dto.response.DanhMucResponse;
 import com.example.be_datn.entity.DanhMuc;
 import com.example.be_datn.exception.AppException;
@@ -16,7 +16,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor

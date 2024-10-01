@@ -1,7 +1,7 @@
 package com.example.be_datn.service.impl;
 
-import com.example.be_datn.dto.request.ThuongHieuCreationRequest;
-import com.example.be_datn.dto.request.ThuongHieuUpdateRequest;
+import com.example.be_datn.dto.Request.ThuongHieuCreationRequest;
+import com.example.be_datn.dto.Request.ThuongHieuUpdateRequest;
 import com.example.be_datn.dto.response.ThuongHieuResponse;
 import com.example.be_datn.entity.ThuongHieu;
 import com.example.be_datn.exception.AppException;
@@ -16,7 +16,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
