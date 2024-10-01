@@ -1,11 +1,16 @@
 package com.example.be_datn.controller;
 
+import com.example.be_datn.dto.Request.ChatLieuDeRequest;
 import com.example.be_datn.dto.Response.ApiResponse;
+import com.example.be_datn.dto.Response.ChatLieuDeResponse;
 import com.example.be_datn.entity.ChatLieuDe;
 import com.example.be_datn.service.IChatLieuDeService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
@@ -19,22 +24,26 @@ public class ChatLieuDeController {
     IChatLieuDeService chatLieuDeService;
 
     @GetMapping("")
-    ApiResponse<List<ChatLieuDe>> getAllChatLieuDe(@RequestParam(defaultValue = "", name = "search") String name) {
-        ApiResponse<List<ChatLieuDe>> apiResponse = new ApiResponse<>();
-        apiResponse.setData(chatLieuDeService.getByName(name));
+    ApiResponse<Page<ChatLieuDeResponse>> getAllChatLieuDe(
+            @RequestParam(name = "pageNumber", defaultValue = "0") int pageNumber,
+            @RequestParam(name = "pageSize", defaultValue = "10") int pageSize,
+            @RequestParam(defaultValue = "", name = "tenChatLieuDe") String name) {
+        Pageable pageable = PageRequest.of(Math.max(0, pageNumber), Math.max(1, pageSize));
+        ApiResponse<Page<ChatLieuDeResponse>> apiResponse = new ApiResponse<>();
+        apiResponse.setData(chatLieuDeService.getByName(name,pageable));
         return apiResponse;
     }
     @PostMapping("")
-    ApiResponse<ChatLieuDe> createChatLieuDe(@RequestBody @Valid ChatLieuDe chatLieuDe) {
-        chatLieuDe.setCreated_at(LocalDateTime.now());
-        ApiResponse<ChatLieuDe> apiResponse = new ApiResponse<>();
+    ApiResponse<ChatLieuDeResponse> createChatLieuDe(@RequestBody @Valid ChatLieuDeRequest chatLieuDe) {
+
+        ApiResponse<ChatLieuDeResponse> apiResponse = new ApiResponse<>();
         apiResponse.setData(chatLieuDeService.create(chatLieuDe));
         apiResponse.setMessage("Them thanh cong chat lieu de !");
         return apiResponse;
     }
     @GetMapping("/{id}")
-    ApiResponse<ChatLieuDe> getChatLieuDeById(@PathVariable Long id) {
-        ApiResponse<ChatLieuDe> apiResponse = new ApiResponse<>();
+    ApiResponse<ChatLieuDeResponse> getChatLieuDeById(@PathVariable Long id) {
+        ApiResponse<ChatLieuDeResponse> apiResponse = new ApiResponse<>();
         apiResponse.setData(chatLieuDeService.getById(id));
 
         return apiResponse;
@@ -47,8 +56,8 @@ public class ChatLieuDeController {
         return apiResponse;
     }
     @PutMapping("/{id}")
-    ApiResponse<ChatLieuDe> updateChatLieuDe(@PathVariable Long id, @RequestBody @Valid ChatLieuDe chatLieuDe) {
-        ApiResponse<ChatLieuDe> apiResponse = new ApiResponse<>();
+    ApiResponse<ChatLieuDeResponse> updateChatLieuDe(@PathVariable Long id, @RequestBody @Valid ChatLieuDeRequest chatLieuDe) {
+        ApiResponse<ChatLieuDeResponse> apiResponse = new ApiResponse<>();
         apiResponse.setData(chatLieuDeService.update(id, chatLieuDe));
         apiResponse.setMessage("Cập nhật thành công chất liệu");
         return apiResponse;
