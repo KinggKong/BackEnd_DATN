@@ -1,20 +1,19 @@
 package com.example.be_datn.service;
 
-import com.example.be_datn.entity.KichThuoc;
+import com.example.be_datn.dto.Request.KichThuocRequest;
+import com.example.be_datn.dto.Response.KichThuocResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
-import java.util.List;
-
 public interface IKichThuocService {
-    List<KichThuoc> getAllKichThuoc();
 
-    Page<KichThuoc> getAllKichThuocPageable(String tenKichThuoc, Pageable pageable);
-    KichThuoc createKichThuoc(KichThuoc kichThuoc);
+    Page<KichThuocResponse> getAllKichThuocPageable(String tenKichThuoc, Pageable pageable);
 
-    KichThuoc getKichThuocById(Long id);
+    KichThuocResponse createKichThuoc(KichThuocRequest kichThuocRequest);
 
-    KichThuoc updateKichThuoc(Long idKichThuoc, KichThuoc kichThuoc);
+    KichThuocResponse getKichThuocById(Long id);
+
+    KichThuocResponse updateKichThuoc(Long idKichThuoc, KichThuocRequest kichThuocRequest);
 
     String deleteKichThuoc(Long id);
 }
