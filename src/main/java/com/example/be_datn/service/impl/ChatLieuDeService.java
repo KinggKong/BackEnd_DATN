@@ -1,5 +1,7 @@
 package com.example.be_datn.service.impl;
 
+import com.example.be_datn.dto.Request.ChatLieuDeRequest;
+import com.example.be_datn.dto.Response.ChatLieuDeResponse;
 import com.example.be_datn.entity.ChatLieuDe;
 import com.example.be_datn.exception.AppException;
 import com.example.be_datn.exception.ErrorCode;
@@ -12,7 +14,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -25,8 +26,8 @@ public class ChatLieuDeService implements IChatLieuDeService {
     }
 
     @Override
-    public List<ChatLieuDe> getByName(String name) {
-        return chatLieuDeRepository.findByTenChatLieuContaining(name);
+    public Page<ChatLieuDeResponse> getByName(String name, Pageable pageable) {
+        return chatLieuDeRepository.findChatLieuDeLikeName("%"+name+"%", pageable).map(ChatLieuDeResponse::fromChatLieuDe);
     }
 
     @Override
@@ -35,31 +36,30 @@ public class ChatLieuDeService implements IChatLieuDeService {
     }
 
     @Override
-    public ChatLieuDe create(ChatLieuDe chatLieuDe) {
+    public ChatLieuDeResponse create(ChatLieuDeRequest chatLieuDe) {
        if(chatLieuDeRepository.existsChatLieuDeByTenChatLieu(chatLieuDe.getTenChatLieu())){
           throw new AppException(ErrorCode.CHATLIEUDE_ALREADY_EXISTS);
-       }else {
-              return chatLieuDeRepository.save(chatLieuDe);
        }
+       ChatLieuDe chatLieuDe1 = ChatLieuDe.builder()
+               .tenChatLieu(chatLieuDe.getTenChatLieu())
+               .trangThai(chatLieuDe.getTrangThai())
+               .build();
+        ChatLieuDe savedChatLieuDe = chatLieuDeRepository.save(chatLieuDe1);
+        return ChatLieuDeResponse.fromChatLieuDe(savedChatLieuDe);
     }
 
     @Override
-    public ChatLieuDe getById(Long id) {
-        return chatLieuDeRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.CHATLIEUDE_NOT_FOUND));
+    public ChatLieuDeResponse getById(Long id) {
+        return chatLieuDeRepository.findById(id).map(ChatLieuDeResponse::fromChatLieuDe).orElseThrow(() -> new AppException(ErrorCode.CHATLIEUDE_NOT_FOUND));
     }
 
     @Override
-    public ChatLieuDe update(Long id, ChatLieuDe chatLieuDe) {
-        Optional<ChatLieuDe> chatLieuDeOptional = chatLieuDeRepository.findById(id);
-        if (chatLieuDeOptional.isPresent()) {
-            ChatLieuDe chatLieuDeUpdate = chatLieuDeOptional.get();
-            chatLieuDeUpdate.setTenChatLieu(chatLieuDe.getTenChatLieu());
-            chatLieuDeUpdate.setTrangThai(chatLieuDe.getTrangThai());
-            chatLieuDeUpdate.setUpdated_at(chatLieuDe.getUpdated_at());
-            return chatLieuDeRepository.save(chatLieuDeUpdate);
-        } else {
-            throw new AppException(ErrorCode.CHATLIEUDE_NOT_FOUND);
-        }
+    public ChatLieuDeResponse update(Long id, ChatLieuDeRequest chatLieuDe) {
+        var chatLieuDe1 = chatLieuDeRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.CHATLIEUDE_NOT_FOUND));
+        chatLieuDe1.setTenChatLieu(chatLieuDe.getTenChatLieu());
+        chatLieuDe1.setTrangThai(chatLieuDe.getTrangThai());
+        return ChatLieuDeResponse.fromChatLieuDe(chatLieuDeRepository.save(chatLieuDe1));
+
     }
 
     @Override
