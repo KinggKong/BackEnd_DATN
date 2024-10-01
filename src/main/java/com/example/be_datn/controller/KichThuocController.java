@@ -1,7 +1,8 @@
 package com.example.be_datn.controller;
 
 import com.example.be_datn.dto.ApiResponse;
-import com.example.be_datn.entity.KichThuoc;
+import com.example.be_datn.dto.Request.KichThuocRequest;
+import com.example.be_datn.dto.Response.KichThuocResponse;
 import com.example.be_datn.service.IKichThuocService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -19,27 +20,27 @@ public class KichThuocController {
     IKichThuocService kichThuocService;
 
     @GetMapping("")
-    ApiResponse<Page<KichThuoc>> getAllKichThuocs(@RequestParam(name = "pageNumber", defaultValue = "0") int pageNumber,
-                                                  @RequestParam(name = "pageSize", defaultValue = "10") int pageSize,
-                                                  @RequestParam(name = "tenKichThuoc", defaultValue = "") String tenKichThuoc // Thay đổi tên tham số
+    ApiResponse<Page<KichThuocResponse>> getAllKichThuocs(@RequestParam(name = "pageNumber", defaultValue = "0") int pageNumber,
+                                                          @RequestParam(name = "pageSize", defaultValue = "10") int pageSize,
+                                                          @RequestParam(name = "tenKichThuoc", defaultValue = "") String tenKichThuoc
     ) {
         Pageable pageable = PageRequest.of(Math.max(0, pageNumber), Math.max(1, pageSize));
-        ApiResponse<Page<KichThuoc>> apiResponse = new ApiResponse<>();
+        ApiResponse<Page<KichThuocResponse>> apiResponse = new ApiResponse<>();
         apiResponse.setData(kichThuocService.getAllKichThuocPageable(tenKichThuoc, pageable));
         return apiResponse;
     }
 
     @PostMapping("")
-    ApiResponse<KichThuoc> createKichThuoc(@RequestBody @Valid KichThuoc kichThuoc) {
-        ApiResponse<KichThuoc> apiResponse = new ApiResponse<>();
-        apiResponse.setMessage("Thêm mới thành công kích thước " + kichThuoc.getTenKichThuoc());
-        apiResponse.setData(kichThuocService.createKichThuoc(kichThuoc));
+    ApiResponse<KichThuocResponse> createKichThuoc(@RequestBody @Valid KichThuocRequest kichThuocRequest) {
+        ApiResponse<KichThuocResponse> apiResponse = new ApiResponse<>();
+        apiResponse.setMessage("Thêm mới thành công kích thước " + kichThuocRequest.getTenKichThuoc());
+        apiResponse.setData(kichThuocService.createKichThuoc(kichThuocRequest));
         return apiResponse;
     }
 
     @GetMapping("/{id}")
-    ApiResponse<KichThuoc> getKichThuocById(@PathVariable Long id) {
-        ApiResponse<KichThuoc> apiResponse = new ApiResponse<>();
+    ApiResponse<KichThuocResponse> getKichThuocById(@PathVariable Long id) {
+        ApiResponse<KichThuocResponse> apiResponse = new ApiResponse<>();
         apiResponse.setData(kichThuocService.getKichThuocById(id));
         return apiResponse;
     }
@@ -52,10 +53,10 @@ public class KichThuocController {
     }
 
     @PutMapping("/{id}")
-    ApiResponse<KichThuoc> updateKichThuoc(@PathVariable Long id, @RequestBody @Valid KichThuoc kichThuoc) {
-        ApiResponse<KichThuoc> apiResponse = new ApiResponse<>();
+    ApiResponse<KichThuocResponse> updateKichThuoc(@PathVariable Long id, @RequestBody @Valid KichThuocRequest kichThuocRequest) {
+        ApiResponse<KichThuocResponse> apiResponse = new ApiResponse<>();
         apiResponse.setMessage("Cập nhật thành công kích thước");
-        apiResponse.setData(kichThuocService.updateKichThuoc(id, kichThuoc));
+        apiResponse.setData(kichThuocService.updateKichThuoc(id, kichThuocRequest));
         return apiResponse;
     }
 }

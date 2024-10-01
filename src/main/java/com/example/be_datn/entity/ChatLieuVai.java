@@ -1,7 +1,6 @@
 package com.example.be_datn.entity;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Size;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -10,16 +9,16 @@ import lombok.experimental.FieldDefaults;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "mau_sac")
+@Table(name = "chat_lieu_vai")
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class MauSac extends BaseEntity{
+public class ChatLieuVai extends BaseEntity{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
 
-    @Column(name = "ten_mau")
-    String tenMau;
+    @Column(name = "ten_chat_lieu_vai")
+    String tenChatLieuVai;
 
     @Column(name = "trang_thai")
     int trangThai;
