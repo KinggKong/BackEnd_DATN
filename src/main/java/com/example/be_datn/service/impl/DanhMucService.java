@@ -2,7 +2,7 @@ package com.example.be_datn.service.impl;
 
 import com.example.be_datn.dto.Request.DanhMucCreationRequest;
 import com.example.be_datn.dto.Request.DanhMucUpdateRequest;
-import com.example.be_datn.dto.response.DanhMucResponse;
+import com.example.be_datn.dto.Response.DanhMucResponse;
 import com.example.be_datn.entity.DanhMuc;
 import com.example.be_datn.exception.AppException;
 import com.example.be_datn.exception.ErrorCode;

@@ -2,7 +2,7 @@ package com.example.be_datn.service.impl;
 
 import com.example.be_datn.dto.Request.ThuongHieuCreationRequest;
 import com.example.be_datn.dto.Request.ThuongHieuUpdateRequest;
-import com.example.be_datn.dto.response.ThuongHieuResponse;
+import com.example.be_datn.dto.Response.ThuongHieuResponse;
 import com.example.be_datn.entity.ThuongHieu;
 import com.example.be_datn.exception.AppException;
 import com.example.be_datn.exception.ErrorCode;

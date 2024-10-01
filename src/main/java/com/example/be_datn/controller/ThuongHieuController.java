@@ -3,7 +3,7 @@ package com.example.be_datn.controller;
 import com.example.be_datn.dto.ApiResponse;
 import com.example.be_datn.dto.Request.ThuongHieuCreationRequest;
 import com.example.be_datn.dto.Request.ThuongHieuUpdateRequest;
-import com.example.be_datn.dto.response.ThuongHieuResponse;
+import com.example.be_datn.dto.Response.ThuongHieuResponse;
 import com.example.be_datn.entity.ThuongHieu;
 import com.example.be_datn.mapper.ThuongHieuMapper;
 import com.example.be_datn.service.IThuongHieuService;

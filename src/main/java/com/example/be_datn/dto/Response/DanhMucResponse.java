@@ -1,4 +1,4 @@
-package com.example.be_datn.dto.response;
+package com.example.be_datn.dto.Response;
 
 import lombok.Getter;
 import lombok.Setter;
