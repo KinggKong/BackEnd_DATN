@@ -1,6 +1,6 @@
 package com.example.be_datn.controller;
 
-import com.example.be_datn.dto.ApiResponse;
+import com.example.be_datn.dto.Response.ApiResponse;
 import com.example.be_datn.dto.Request.ChatLieuVaiRequest;
 import com.example.be_datn.dto.Response.ChatLieuVaiResponse;
 import com.example.be_datn.service.IChatLieuVaiService;
