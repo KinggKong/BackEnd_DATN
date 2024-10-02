@@ -1,4 +1,3 @@
-
 package com.example.be_datn.entity;
 
 import jakarta.persistence.*;
@@ -13,19 +12,16 @@ import lombok.experimental.FieldDefaults;
 @Table(name = "kich_thuoc")
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-
-public class KichThuoc extends BaseEntity{
+public class KichThuoc extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
 
-    @jakarta.validation.constraints.Size(min = 2, message = "TEN_KICHTHUOC_INVALID")
     @Column(name = "ten_kich_thuoc")
-    private String tenKichThuoc;
+    String tenKichThuoc;
 
     @Column(name = "trang_thai")
-    Integer trangThai;
-
+    int trangThai;
 
 }

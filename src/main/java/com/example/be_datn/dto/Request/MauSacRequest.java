@@ -1,6 +1,5 @@
 package com.example.be_datn.dto.Request;
 
-import com.example.be_datn.entity.MauSac;
 import jakarta.validation.constraints.*;
 import lombok.*;
 

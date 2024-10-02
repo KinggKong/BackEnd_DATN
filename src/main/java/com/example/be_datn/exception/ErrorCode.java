@@ -19,6 +19,11 @@ public enum ErrorCode {
     TEN_CHATLIEUDE_INVALID(1007,"Tên chất liệu đế cần nhiều hơn 3 ký tự !"),
     KICHTHUOC_ALREADY_EXISTS(1008, "KichThuoc đã tồn tại!"),
     KICHTHUOC_NOT_FOUND(1009, "KichThuoc không tồn tại!"),
+    TRANGTHAI_KICHTHUOC_INVALID(1009,"Trạng thái không hợp lệ !"),
+    CHATLIEUVAI_NOT_FOUND(1002,"chất liệu đế Not Found"),
+    CHATLIEUVAI_ALREADY_EXISTS(1003,"chất liệu đế đã tồn tại !"),
+    TEN_CHATLIEUVAI_INVALID(1004,"Tên chất liệu đế cần nhiều hơn 2 ký tự !"),
+    TRANGTHAI_CHATLIEUVAI_INVALID(1004,"Trạng thái không hợp lệ !"),
     HANG_ALREADY_EXISTS(1010,"DanhMuc da ton tai!"),
     HANG_NOT_FOUND(1011,"DanhMuc khong ton tai"),
     THUONGHIEU_ALREADY_EXISTS(1012,"Thuong hieu da ton tai !"),
@@ -31,8 +36,8 @@ public enum ErrorCode {
     THUONGHIEU_SANPHAM_INVALID(1014,"Thương hiệu không được để trống"),
     DEGIAY_SANPHAM_INVALID(1014,"Đế giày không được để trống"),
     TRANGTHAI_SANPHAM_INVALID(1014,"Trạng thái không hợp lệ !"),
-    LOAIVAI_SANPHAM_INVALID(1014,"Loại vải không được để trống"),
-    CHATLIEUVAI_NOT_FOUND(1014,"Chất liệu vải không tồn tại !");
+    LOAIVAI_SANPHAM_INVALID(1014,"Loại vải không được để trống");
+
 
     private int code;
     private String message;
