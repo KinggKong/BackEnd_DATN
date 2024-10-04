@@ -26,8 +26,14 @@ public enum ErrorCode {
     TRANGTHAI_CHATLIEUVAI_INVALID(1004,"Trạng thái không hợp lệ !"),
     HANG_ALREADY_EXISTS(1010,"DanhMuc da ton tai!"),
     HANG_NOT_FOUND(1011,"DanhMuc khong ton tai"),
+    // Bổ sung các mã lỗi cho voucher
+    VOUCHER_ALREADY_EXISTS(1020, "Voucher đã tồn tại!"),
+    VOUCHER_NOT_FOUND(1021, "Voucher không tồn tại!"),
+
     THUONGHIEU_ALREADY_EXISTS(1012,"Thuong hieu da ton tai !"),
     THUONGHIEU_NOT_FOUND(1013,"Thuong hieu khong ton tai !");
+
+
 
     private int code;
     private String message;

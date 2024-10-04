@@ -1,67 +1,53 @@
 package com.example.be_datn.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
-import jakarta.validation.constraints.Size;
-import lombok.Getter;
-import lombok.Setter;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import jakarta.persistence.*;
+import lombok.*;
 
-import java.time.Instant;
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 @Entity
 @Table(name = "voucher")
-public class Voucher {
+public class Voucher extends BaseEntity {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id", nullable = false)
     private Long id;
 
-    @Size(max = 255)
-    @Column(name = "ten_chien_dich")
-    private String tenChienDich;
+    @Column(name = "ten_voucher", nullable = false)
+    private String tenVoucher;
 
-    @Size(max = 255)
-    @Column(name = "hinh_thuc_gian")
-    private String hinhThucGian;
+    @Column(name = "hinh_thuc_giam")
+    private String hinhThucGiam;
 
     @Column(name = "gia_tri_giam")
     private Float giaTriGiam;
 
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
     @Column(name = "ngay_bat_dau")
-    private Instant ngayBatDau;
+    private LocalDateTime ngayBatDau;
 
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
     @Column(name = "ngay_ket_thuc")
-    private Instant ngayKetThuc;
+    private LocalDateTime ngayKetThuc;
 
     @Column(name = "trang_thai")
     private Integer trangThai;
 
-    @Size(max = 255)
     @Column(name = "ma_voucher")
     private String maVoucher;
 
     @Column(name = "gia_tri_don_hang_toi_thieu")
     private Float giaTriDonHangToiThieu;
 
-    @Column(name = "gia_tri_don_hang_toi_da")
-    private Float giaTriDonHangToiDa;
-
     @Column(name = "gia_tri_giam_toi_da")
     private Float giaTriGiamToiDa;
 
     @Column(name = "so_luong")
     private Integer soLuong;
-
-    @Column(name = "created_at")
-    private Instant createdAt;
-
-    @Column(name = "updated_at")
-    private Instant updatedAt;
-
 }
