@@ -10,6 +10,9 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import lombok.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
 
 @Getter
 @Setter
@@ -34,4 +37,5 @@ public class SanPhamChiTietRequest {
     Double giaBan;
     @NotNull(message = "TRANG_THAI_INVALID")
     int trangThai;
+    List<String> hinhanh;
 }

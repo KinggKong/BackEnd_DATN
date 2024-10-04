@@ -5,6 +5,8 @@ import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
+import java.util.List;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -34,5 +36,7 @@ public class SanPhamChiTiet extends BaseEntity {
     Double giaBan;
     @Column(name = "trang_thai")
     int trangThai;
+    @OneToMany(mappedBy = "sanPhamChiTiet", fetch = FetchType.LAZY)
+    List<HinhAnh> hinhAnhList;
 }
 
