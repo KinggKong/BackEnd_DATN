@@ -27,7 +27,8 @@ public enum ErrorCode {
     HANG_ALREADY_EXISTS(1010,"DanhMuc da ton tai!"),
     HANG_NOT_FOUND(1011,"DanhMuc khong ton tai"),
     THUONGHIEU_ALREADY_EXISTS(1012,"Thuong hieu da ton tai !"),
-    THUONGHIEU_NOT_FOUND(1013,"Thuong hieu khong ton tai !");
+    THUONGHIEU_NOT_FOUND(1013,"Thương hiệu không tồn taị !"),
+    DIA_CHI_NOT_FOUND(2002,"Địa chỉ không tồn tại !");
 
     private int code;
     private String message;
