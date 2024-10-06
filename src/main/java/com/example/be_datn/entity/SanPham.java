@@ -1,46 +1,56 @@
 package com.example.be_datn.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
-import jakarta.validation.constraints.Size;
-import lombok.Getter;
-import lombok.Setter;
+import jakarta.persistence.*;
+import lombok.*;
+import lombok.experimental.Accessors;
+import lombok.experimental.FieldDefaults;
+import org.hibernate.annotations.ColumnDefault;
 
 @Getter
 @Setter
 @Entity
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE)
+@Accessors(chain = true)
 @Table(name = "san_pham")
-public class SanPham {
+public class SanPham extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
-    private Long id;
+    Long id;
 
-    @Size(max = 255)
-    @Column(name = "ten_san_pham")
-    private String tenSanPham;
 
-    @Size(max = 255)
+    @Column(name = "ten_san_pham", nullable = false)
+    String tenSanPham;
+
+    @Lob
     @Column(name = "mo_ta")
-    private String moTa;
+    String moTa;
 
-    @Column(name = "trang_thai")
-    private Integer trangThai;
 
-    @Column(name = "id_danh_muc")
-    private Long idDanhMuc;
+    @ColumnDefault("1")
+    @Column(name = "trang_thai", nullable = false)
+    int trangThai;
 
-    @Column(name = "id_thuong_hieu")
-    private Long idThuongHieu;
 
-    @Column(name = "id_chat_lieu_vai")
-    private Long idChatLieuVai;
+    @ManyToOne
+    @JoinColumn(name = "id_danh_muc")
+    DanhMuc danhMuc;
 
-    @Column(name = "id_chat_lieu")
-    private Long idChatLieu;
 
+    @ManyToOne
+    @JoinColumn(name = "id_thuong_hieu")
+    ThuongHieu thuongHieu;
+
+
+    @ManyToOne
+    @JoinColumn(name = "id_chat_lieu_vai")
+    ChatLieuVai chatLieuVai;
+
+
+    @ManyToOne
+    @JoinColumn(name = "id_chat_lieu_de")
+    ChatLieuDe chatLieuDe;
 }
