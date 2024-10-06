@@ -11,36 +11,23 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.Instant;
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
 @Entity
 @Table(name = "dia_chi")
-public class DiaChi {
+public class DiaChi extends BaseEntity{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
     private Long id;
-
-    @Size(max = 255)
-    @Column(name = "ten_dia_chi")
-    private String tenDiaChi;
-
-    @Size(max = 11)
-    @Column(name = "sdt", length = 11)
+    private Long id_khach_hang;
+    private String dia_chi_cu_the;
     private String sdt;
-
-    @Size(max = 255)
-    @Column(name = "loai_dia_chi")
-    private String loaiDiaChi;
-
-    @Column(name = "created_at")
-    private Instant createdAt;
-
-    @Column(name = "updated_at")
-    private Instant updatedAt;
-
-    @Column(name = "trang_thai")
-    private Integer trangThai;
+    private String tinh;
+    private String quan;
+    private String huyen;
+    private String loai_dia_chi;
 
 }
