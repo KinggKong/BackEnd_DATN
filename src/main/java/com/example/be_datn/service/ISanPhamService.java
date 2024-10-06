@@ -8,6 +8,10 @@ import org.springframework.data.domain.Pageable;
 public interface ISanPhamService {
     Page<SanPhamResponse> getAllPageable(Pageable pageable);
 
+    SanPhamResponse updateStatus(Long idSanPham ,int status);
+
+    Page<SanPhamResponse> getAllWithFilter(Long idDanhMuc, Long idThuongHieu, Long idChatLieuVai, Long idChatLieuDe, String tenSanPham, Pageable pageable);
+
     SanPhamResponse getById(Long id);
 
     SanPhamResponse create(SanPhamRequest sanPhamRequest);

@@ -17,12 +17,12 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 @FieldDefaults(level = lombok.AccessLevel.PRIVATE, makeFinal = true)
-public class MauSacSerrvice implements IMauSacService {
+public class MauSacService implements IMauSacService {
     MauSacRepository mauSacRepository;
 
     @Override
-    public Page<MauSacResponse> getAllMauSacPageable(String ten_mau, Pageable pageable) {
-        return mauSacRepository.findMauSacByTenMauLike("%" + ten_mau + "%", pageable).map(MauSacResponse::fromMauSac);
+    public Page<MauSacResponse> getAllMauSacPageable(String tenMau, Pageable pageable) {
+        return mauSacRepository.findMauSacByTenMauLike("%" + tenMau + "%", pageable).map(MauSacResponse::fromMauSac);
     }
 
     @Override
@@ -45,10 +45,10 @@ public class MauSacSerrvice implements IMauSacService {
 
     @Override
     public MauSacResponse updateMauSac(Long idMauSac, MauSacRequest mauSacRequest) {
-        var MauSac = mauSacRepository.findById(idMauSac).orElseThrow(() -> new AppException(ErrorCode.MAUSAC_NOT_FOUND));
-        MauSac.setTenMau(mauSacRequest.getTenMau());
-        MauSac.setTrangThai(mauSacRequest.getTrangThai());
-        return MauSacResponse.fromMauSac(mauSacRepository.save(MauSac));
+        var mauSac = mauSacRepository.findById(idMauSac).orElseThrow(() -> new AppException(ErrorCode.MAUSAC_NOT_FOUND));
+        mauSac.setTenMau(mauSacRequest.getTenMau());
+        mauSac.setTrangThai(mauSacRequest.getTrangThai());
+        return MauSacResponse.fromMauSac(mauSacRepository.save(mauSac));
     }
 
     @Override

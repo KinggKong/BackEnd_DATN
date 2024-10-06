@@ -15,7 +15,7 @@ import org.hibernate.annotations.ColumnDefault;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Accessors(chain = true)
 @Table(name = "san_pham")
-public class SanPham extends BaseEntity{
+public class SanPham extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
@@ -37,20 +37,20 @@ public class SanPham extends BaseEntity{
 
     @ManyToOne
     @JoinColumn(name = "id_danh_muc")
-    DanhMuc DanhMuc;
+    DanhMuc danhMuc;
 
 
     @ManyToOne
     @JoinColumn(name = "id_thuong_hieu")
-    ThuongHieu ThuongHieu;
+    ThuongHieu thuongHieu;
 
 
     @ManyToOne
     @JoinColumn(name = "id_chat_lieu_vai")
-    ChatLieuVai ChatLieuVai;
+    ChatLieuVai chatLieuVai;
 
 
     @ManyToOne
     @JoinColumn(name = "id_chat_lieu_de")
-    ChatLieuDe ChatLieuDe;
+    ChatLieuDe chatLieuDe;
 }
