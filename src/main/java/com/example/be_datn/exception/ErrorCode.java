@@ -36,8 +36,8 @@ public enum ErrorCode {
     THUONGHIEU_SANPHAM_INVALID(1014,"Thương hiệu không được để trống"),
     DEGIAY_SANPHAM_INVALID(1014,"Đế giày không được để trống"),
     TRANGTHAI_SANPHAM_INVALID(1014,"Trạng thái không hợp lệ !"),
-    LOAIVAI_SANPHAM_INVALID(1014,"Loại vải không được để trống");
-
+    LOAIVAI_SANPHAM_INVALID(1014,"Loại vải không được để trống"),
+    DIA_CHI_NOT_FOUND(2002,"Địa chỉ không tồn tại !");
 
     private int code;
     private String message;
