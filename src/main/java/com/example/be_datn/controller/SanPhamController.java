@@ -41,7 +41,7 @@ public class SanPhamController {
     ) {
         Pageable pageable = PageRequest.of(Math.max(0, pageNumber), Math.max(1, pageSize));
         ApiResponse<Page<SanPhamResponse>> apiResponse = new ApiResponse<>();
-        apiResponse.setData(sanPhamService.getAllWithFilter(idDahMuc, idThuongHieu, idChatLieuDe, idChatLieuVai, tenSanPham, pageable));
+        apiResponse.setData(sanPhamService.getAllWithFilter(idDahMuc, idThuongHieu,idChatLieuVai, idChatLieuDe, tenSanPham, pageable));
         return apiResponse;
     }
 
