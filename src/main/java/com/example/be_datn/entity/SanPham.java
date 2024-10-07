@@ -1,13 +1,21 @@
 package com.example.be_datn.entity;
 
+
+
 import jakarta.persistence.*;
 import lombok.*;
+import lombok.experimental.FieldDefaults;
+
+
 import lombok.experimental.Accessors;
 import lombok.experimental.FieldDefaults;
 import org.hibernate.annotations.ColumnDefault;
 
+
 @Getter
 @Setter
+
+
 @Entity
 @Builder
 @NoArgsConstructor
@@ -54,3 +62,4 @@ public class SanPham extends BaseEntity {
     @JoinColumn(name = "id_chat_lieu_de")
     ChatLieuDe chatLieuDe;
 }
+
