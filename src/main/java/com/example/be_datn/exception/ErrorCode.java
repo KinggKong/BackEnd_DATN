@@ -26,8 +26,24 @@ public enum ErrorCode {
     TRANGTHAI_CHATLIEUVAI_INVALID(1004,"Trạng thái không hợp lệ !"),
     HANG_ALREADY_EXISTS(1010,"DanhMuc da ton tai!"),
     HANG_NOT_FOUND(1011,"DanhMuc khong ton tai"),
+    // Bổ sung các mã lỗi cho voucher
+    VOUCHER_ALREADY_EXISTS(1020, "Voucher đã tồn tại!"),
+    VOUCHER_NOT_FOUND(1021, "Voucher không tồn tại!"),
+
     THUONGHIEU_ALREADY_EXISTS(1012,"Thuong hieu da ton tai !"),
-    THUONGHIEU_NOT_FOUND(1013,"Thuong hieu khong ton tai !");
+    THUONGHIEU_NOT_FOUND(1013,"Thuong hieu khong ton tai !"),
+    SANPHAM_NOT_FOUND(1014,"Sản phẩm không tồn tại !"),
+    TEN_SANPHAM_INVALID(1014,"Tên sản phẩm không hợp lệ phải nhiều hơn 8 kí tự !"),
+    TEN_SANPHAM_EXIST(1014,"Tên sản phẩm không được trùng !"),
+    DANHMUC_SANPHAM_INVALID(1014,"Danh mục không được để trống"),
+    DANHMUC_NOT_FOUND(1014,"Danh mục không tồn tại !"),
+    THUONGHIEU_SANPHAM_INVALID(1014,"Thương hiệu không được để trống"),
+    DEGIAY_SANPHAM_INVALID(1014,"Đế giày không được để trống"),
+    TRANGTHAI_SANPHAM_INVALID(1014,"Trạng thái không hợp lệ !"),
+    LOAIVAI_SANPHAM_INVALID(1014,"Loại vải không được để trống"),
+    DIA_CHI_NOT_FOUND(2002,"Địa chỉ không tồn tại !");
+
+
 
     private int code;
     private String message;

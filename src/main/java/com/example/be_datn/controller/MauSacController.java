@@ -30,11 +30,11 @@ public class MauSacController {
     @GetMapping("")
     ApiResponse<Page<MauSacResponse>> getAllMauSacs(@RequestParam(name = "pageNumber", defaultValue = "0") int pageNumber,
                                                     @RequestParam(name = "pageSize", defaultValue = "10") int pageSize,
-                                                    @RequestParam(name = "tenMau",defaultValue = "") String ten_mau
+                                                    @RequestParam(name = "tenMau",defaultValue = "") String tenMau
     ) {
         Pageable pageable = PageRequest.of(Math.max(0, pageNumber), Math.max(1, pageSize));
         ApiResponse<Page<MauSacResponse>> apiResponse = new ApiResponse<>();
-        apiResponse.setData(mauSacService.getAllMauSacPageable(ten_mau,pageable));
+        apiResponse.setData(mauSacService.getAllMauSacPageable(tenMau,pageable));
         return apiResponse;
     }
 
