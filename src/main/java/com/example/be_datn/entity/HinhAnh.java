@@ -17,8 +17,8 @@ public class HinhAnh {
     private Long id;
 
     @Size(max = 255)
-    @Column(name = "src")
-    private String src;
+    @Column(name = "url")
+    private String url;
 
     @Column(name = "trang_thai")
     private Integer trangThai;

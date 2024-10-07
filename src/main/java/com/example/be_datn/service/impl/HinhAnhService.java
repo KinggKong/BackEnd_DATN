@@ -16,7 +16,7 @@ public class HinhAnhService implements IHinhAnhService {
     @Override
     public void addHinhAnh(String url, Long idSanPhamCt, SanPhamChiTiet sanPhamChiTiet) {
         HinhAnh hinhAnh = new HinhAnh();
-        hinhAnh.setSrc(url);
+        hinhAnh.setUrl(url);
         hinhAnh.setTrangThai(1);
         hinhAnh.setIdSanPhamCt(idSanPhamCt);
         hinhAnh.setSanPhamChiTiet(sanPhamChiTiet);
