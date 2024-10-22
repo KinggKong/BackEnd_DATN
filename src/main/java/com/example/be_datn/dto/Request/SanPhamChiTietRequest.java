@@ -37,5 +37,5 @@ public class SanPhamChiTietRequest {
     Double giaBan;
     @NotNull(message = "TRANG_THAI_INVALID")
     int trangThai;
-    List<String> hinhanh;
+    List<String> hinhAnh;
 }

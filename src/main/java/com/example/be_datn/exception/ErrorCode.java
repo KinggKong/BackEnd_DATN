@@ -41,8 +41,11 @@ public enum ErrorCode {
     DEGIAY_SANPHAM_INVALID(1014,"Đế giày không được để trống"),
     TRANGTHAI_SANPHAM_INVALID(1014,"Trạng thái không hợp lệ !"),
     LOAIVAI_SANPHAM_INVALID(1014,"Loại vải không được để trống"),
-    DIA_CHI_NOT_FOUND(2002,"Địa chỉ không tồn tại !");
-
+    DIA_CHI_NOT_FOUND(2002,"Địa chỉ không tồn tại !"),
+    SANPHAMCHITIET_NOT_FOUND(1015,"Sản phẩm chi tiết không tồn tại !"),
+    SANPHAMCHITIET_EXIST(1016,"Sản phẩm chi tiết đã tồn tại !"),
+    GIA_BAN_INVALID(1017,"Giá bán không hợp lệ !"),
+    SO_LUONG_INVALID(1018,"Số lượng không hợp lệ !");
 
 
     private int code;
