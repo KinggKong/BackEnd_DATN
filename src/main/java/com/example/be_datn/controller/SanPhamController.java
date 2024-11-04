@@ -13,6 +13,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
@@ -44,6 +46,14 @@ public class SanPhamController {
         apiResponse.setData(sanPhamService.getAllWithFilter(idDahMuc, idThuongHieu,idChatLieuVai, idChatLieuDe, tenSanPham, pageable));
         return apiResponse;
     }
+    @GetMapping("/get-all")
+    public ApiResponse<List<SanPhamResponse>> getSanPhams(@RequestParam(value = "tenSanPham", defaultValue = "") String tenSanPham){
+        ApiResponse<List<SanPhamResponse>> apiResponse = new ApiResponse<>();
+        apiResponse.setData(sanPhamService.getAllByTenSanPhamContaning(tenSanPham));
+        return apiResponse;
+    }
+
+
 
     @GetMapping("/{id}")
     public ApiResponse<SanPhamResponse> getSanPhamById(@PathVariable("id") Long id) {

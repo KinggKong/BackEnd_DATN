@@ -35,6 +35,12 @@ public class SanPhamChiTietController {
         apiResponse.setData(sanPhamChiTietService.getAllByFilter(idDahMuc, idThuongHieu,idChatLieuVai, idChatLieuDe, idSanPham, pageable));
         return apiResponse;
     }
+    @GetMapping("/get-all-by-sanpham/{id}")
+    public ApiResponse<List<SanPhamChiTietResponse>> getSanPhamChiTietBySanPhamId(@PathVariable("id") Long id) {
+        ApiResponse<List<SanPhamChiTietResponse>> apiResponse = new ApiResponse<>();
+        apiResponse.setData(sanPhamChiTietService.getAllBySanPhamId(id));
+        return apiResponse;
+    }
     @GetMapping("/exits")
     public ApiResponse<SanPhamChiTietResponse> getSPCTByMauSacAndKichThuoc(@RequestParam("idSp") Long idSp,
                                                                            @RequestParam("idMauSac") Long idMauSac,
@@ -91,6 +97,12 @@ public class SanPhamChiTietController {
     public ApiResponse<SanPhamChiTietResponse> updateSanPhamChiTiet(@PathVariable("id") Long id, @RequestBody SanPhamChiTietRequest sanPhamChiTietRequest) {
         ApiResponse<SanPhamChiTietResponse> apiResponse = new ApiResponse<>();
         apiResponse.setData(sanPhamChiTietService.update(id, sanPhamChiTietRequest));
+        return apiResponse;
+    }
+    @GetMapping("/{id}")
+    public ApiResponse<SanPhamChiTietResponse> getSanPhamChiTietById(@PathVariable("id") Long id) {
+        ApiResponse<SanPhamChiTietResponse> apiResponse = new ApiResponse<>();
+        apiResponse.setData(sanPhamChiTietService.getById(id));
         return apiResponse;
     }
 }

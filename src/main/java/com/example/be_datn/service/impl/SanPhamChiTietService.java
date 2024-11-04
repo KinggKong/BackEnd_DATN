@@ -33,6 +33,12 @@ public class SanPhamChiTietService implements ISanPhamChiTietService {
     KichThuocRepository kichThuocRepository;
     HinhAnhService hinhAnhService;
     SanPhamRepository sanPhamRepository;
+
+    @Override
+    public List<SanPhamChiTietResponse> getAllBySanPhamId(Long id) {
+        return sanPhamChiTietRepository.getAllSPCTBySanPhamId(id).stream().map(SanPhamChiTietResponse::fromSanPhamChiTiet).toList();
+    }
+
     @Override
     public Page<SanPhamChiTietResponse> getAllPage(Pageable pageable) {
         return sanPhamChiTietRepository.findAll(pageable).map(SanPhamChiTietResponse::fromSanPhamChiTiet);
