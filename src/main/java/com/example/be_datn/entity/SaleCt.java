@@ -1,11 +1,7 @@
 package com.example.be_datn.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
@@ -27,9 +23,13 @@ public class SaleCt {
     @Column(name = "gia_tri_giam")
     private Float giaTriGiam;
 
-    @Column(name = "id_sale")
-    private Long idSale;
+    @ManyToOne
+    @JoinColumn(name = "id_sale")
+    @JsonIgnore
+    private Sale sale;
 
+    @Column(name="tien_giam")
+    private Float tienGiam;
     @Column(name = "id_san_pham_ct")
     private Long idSanPhamCt;
 

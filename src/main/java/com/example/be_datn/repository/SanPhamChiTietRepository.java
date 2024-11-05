@@ -8,6 +8,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.List;
+
 public interface SanPhamChiTietRepository extends JpaRepository<SanPhamChiTiet,Long> {
     @Query(value = "select * from san_pham_chi_tiet where id_san_pham = ?1 and id_mau_sac = ?2 and id_kich_thuoc = ?3", nativeQuery = true)
     SanPhamChiTiet findBySanPhamIdAndMauSacIdAndKichThuocId(Long idSanPham, Long idMauSac, Long idKichThuoc);
@@ -15,8 +17,10 @@ public interface SanPhamChiTietRepository extends JpaRepository<SanPhamChiTiet,L
     Page<SanPhamChiTiet> findBySanPhamId(Long id, Pageable pageable);
     @Query("select spct from SanPhamChiTiet spct where spct.sanPham.id = ?1")
     Page<SanPhamChiTiet> findSPCTBySanPhamId(Long id, Pageable pageable);
+    @Query("select spct from SanPhamChiTiet spct where spct.sanPham.id = ?1")
+    List<SanPhamChiTiet> getAllSPCTBySanPhamId(Long id);
 
-    @Query(value = "SELECT spct.* FROM san_pham_chi_tiet spct join san_pham sp " +
+    @Query(value = "SELECT spct.id, spct.id_mau_sac, spct.id_kich_thuoc, spct.id_san_pham,spct.so_luong,spct.gia_tien,spct.trang_thai,spct.created_at,spct.updated_at,spct.ma_san_pham FROM san_pham_chi_tiet spct join san_pham sp " +
             "on spct.id_san_pham = sp.id " +
             "where (sp.id_danh_muc = '' or sp.id_danh_muc = :idDanhMuc or :idDanhMuc is null) " +
             "and (sp.id_thuong_hieu = '' or sp.id_thuong_hieu = :idThuongHieu or :idThuongHieu is null) " +

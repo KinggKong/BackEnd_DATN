@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.util.List;
 
 public interface ISanPhamChiTietService {
+    List<SanPhamChiTietResponse> getAllBySanPhamId(Long id);
     Page<SanPhamChiTietResponse> getAllPage(Pageable pageable);
     Page<SanPhamChiTietResponse> getAllPageBySanPhamId(Long id, Pageable pageable);
     Page<SanPhamChiTietResponse> getAllByFilter(Long idDanhMuc, Long idThuongHieu, Long idChatLieuVai, Long idChatLieuDe, Long idSanPham, Pageable pageable);
