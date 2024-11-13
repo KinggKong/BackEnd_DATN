@@ -23,16 +23,8 @@ public class VaiTro {
     private Long id;
 
     @Size(max = 255)
-    @Column(name = "ten_dia_chi")
-    private String tenDiaChi;
-
-    @Size(max = 11)
-    @Column(name = "sdt", length = 11)
-    private String sdt;
-
-    @Size(max = 255)
-    @Column(name = "loai_dia_chi")
-    private String loaiDiaChi;
+    @Column(name = "ten_vai_tro")
+    private String tenVaiTro;
 
     @Column(name = "created_at")
     private Instant createdAt;
