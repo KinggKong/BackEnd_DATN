@@ -52,7 +52,13 @@ public enum ErrorCode {
     UNAUTHENTICATED(3006,"Unauthenticated"),
     TEN_TAIkHOAN_EXISTED(3007, "Tên tài khoản đã tồn tại !"),
 
-    ;
+    SANPHAMCHITIET_NOT_FOUND(1015,"Sản phẩm chi tiết không tồn tại !"),
+    SANPHAMCHITIET_EXIST(1016,"Sản phẩm chi tiết đã tồn tại !"),
+    GIA_BAN_INVALID(1017,"Giá bán không hợp lệ !"),
+    SO_LUONG_INVALID(1018,"Số lượng không hợp lệ !"),
+    Sale_NOT_FOUND(1019,"Sale không tồn tại !"),
+    TEN_SALE_INVALID(1019,"Tên sale không đã tồn tại !"),
+    THOI_GIAN_INVALID(1019,"Thời gian không hợp lệ !");
 
 
     private int code;

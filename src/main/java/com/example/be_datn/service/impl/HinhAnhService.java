@@ -8,6 +8,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 @FieldDefaults(level = lombok.AccessLevel.PRIVATE, makeFinal = true)
@@ -21,5 +23,25 @@ public class HinhAnhService implements IHinhAnhService {
         hinhAnh.setIdSanPhamCt(idSanPhamCt);
         hinhAnh.setSanPhamChiTiet(sanPhamChiTiet);
         hinhAnhRepository.save(hinhAnh);
+    }
+
+    @Override
+    public List<HinhAnh> getAll() {
+        return hinhAnhRepository.findAll();
+    }
+
+    @Override
+    public List<HinhAnh> getAllByIdSanPhamCt(Long idSanPhamCt) {
+        return hinhAnhRepository.findByIdSanPhamCt(idSanPhamCt);
+    }
+
+    @Override
+    public void deleteHinhAnhByUrl(String url) {
+        HinhAnh hinhAnh = hinhAnhRepository.findByUrl(url);
+        hinhAnhRepository.delete(hinhAnh);
+    }
+
+    public HinhAnh findBySanPhamChiTietId(String src) {
+        return hinhAnhRepository.findBySanPhamChiTietId(src);
     }
 }

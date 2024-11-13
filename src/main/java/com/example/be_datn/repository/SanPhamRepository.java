@@ -7,9 +7,11 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.List;
+
 public interface SanPhamRepository extends JpaRepository<SanPham, Long> {
     boolean existsByTenSanPham(String tenSanPham);
-
+    List<SanPham> getAllByTenSanPhamContainingIgnoreCase(String tenSanPham);
     @Query(value = "SELECT sp.* FROM san_pham sp \n" +
             "where (sp.id_danh_muc = '' or sp.id_danh_muc = :idDanhMuc or :idDanhMuc is null) \n" +
             "and (sp.id_thuong_hieu = '' or sp.id_thuong_hieu = :idThuongHieu or :idThuongHieu is null)\n" +

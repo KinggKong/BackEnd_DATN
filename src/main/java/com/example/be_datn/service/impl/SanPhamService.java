@@ -14,6 +14,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
@@ -27,6 +29,11 @@ public class SanPhamService implements ISanPhamService {
     @Override
     public Page<SanPhamResponse> getAllPageable(Pageable pageable) {
         return sanPhamRepository.findAll(pageable).map(SanPhamResponse::fromSanPham);
+    }
+
+    @Override
+    public List<SanPhamResponse> getAllByTenSanPhamContaning(String tenSanPham) {
+        return sanPhamRepository.getAllByTenSanPhamContainingIgnoreCase(tenSanPham).stream().map(SanPhamResponse::fromSanPham).toList();
     }
 
     @Override
