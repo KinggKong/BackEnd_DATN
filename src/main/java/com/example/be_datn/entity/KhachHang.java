@@ -7,8 +7,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.Size;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.Instant;
 
@@ -16,6 +15,9 @@ import java.time.Instant;
 @Setter
 @Entity
 @Table(name = "khach_hang")
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class KhachHang {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -33,6 +35,8 @@ public class KhachHang {
     @Size(max = 255)
     @Column(name = "mat_khau")
     private String matKhau;
+
+    private String email;
 
     @Size(max = 11)
     @Column(name = "sdt", length = 11)
