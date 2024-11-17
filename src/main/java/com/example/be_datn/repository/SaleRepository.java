@@ -15,7 +15,7 @@ public interface SaleRepository extends JpaRepository<Sale,Long> {
     @Query("select s.tenChienDich from Sale s")
     List<String> getALLTenChienDich();
     @Query(value = "SELECT * \n" +
-            "FROM Sale s\n" +
+            "FROM sale s\n" +
             "WHERE (:tenChienDich IS NULL OR :tenChienDich = '' OR s.ten_Chien_Dich LIKE CONCAT('%', :tenChienDich, '%'))\n" +
             "  AND (:ngayBatDau IS NULL OR s.thoi_Gian_Bat_Dau >= :ngayBatDau)\n" +
             "  AND (:ngayKetThuc IS NULL OR s.thoi_Gian_Ket_Thuc <= :ngayKetThuc)\n" +
