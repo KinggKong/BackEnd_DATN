@@ -1,14 +1,8 @@
 package com.example.be_datn.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -17,6 +11,9 @@ import java.time.LocalDateTime;
 @Setter
 @Entity
 @Table(name = "nhan_vien")
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class NhanVien {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -27,13 +24,9 @@ public class NhanVien {
     @Column(name = "ten")
     private String ten;
 
-    @Size(max = 255)
-    @Column(name = "ten_dang_nhap")
-    private String tenDangNhap;
-
-    @Size(max = 255)
-    @Column(name = "mat_khau")
-    private String matKhau;
+    @OneToOne
+    @JoinColumn(name = "id_tai_khoan")
+    TaiKhoan taiKhoan;
 
     @Size(max = 255)
     @Column(name = "email")
@@ -53,9 +46,6 @@ public class NhanVien {
     @Size(max = 255)
     @Column(name = "dia_chi")
     private String diaChi;
-
-    @Column(name = "vai_tro")
-    private Integer vaiTro;
 
     @Column(name = "gioi_tinh")
     private Boolean gioiTinh;
