@@ -1,6 +1,7 @@
 package com.example.be_datn.service.impl;
 
 import com.example.be_datn.dto.Request.SanPhamRequest;
+import com.example.be_datn.dto.Response.SanPhamCustumerResponse;
 import com.example.be_datn.dto.Response.SanPhamResponse;
 import com.example.be_datn.entity.SanPham;
 import com.example.be_datn.exception.AppException;
@@ -32,8 +33,18 @@ public class SanPhamService implements ISanPhamService {
     }
 
     @Override
+    public Page<SanPham> getAllPageableCustumer(Pageable pageable) {
+        return sanPhamRepository.getAllByFilterCustumer(pageable);
+    }
+
+    @Override
     public List<SanPhamResponse> getAllByTenSanPhamContaning(String tenSanPham) {
         return sanPhamRepository.getAllByTenSanPhamContainingIgnoreCase(tenSanPham).stream().map(SanPhamResponse::fromSanPham).toList();
+    }
+
+    @Override
+    public List<SanPham> getSanPhamByDanhMucID(Integer id) {
+        return sanPhamRepository.getSanPhamByDanhMucID(id);
     }
 
     @Override

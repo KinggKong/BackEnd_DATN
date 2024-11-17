@@ -24,4 +24,27 @@ public interface SanPhamRepository extends JpaRepository<SanPham, Long> {
                                  @Param("idChatLieuDe") Long idChatLieuDe,
                                  @Param(("tenSanPham")) String tenSanPham,
                                  Pageable pageable);
+    @Query(value = "SELECT sp.* FROM san_pham sp \n" +
+            "where sp.trang_thai = 1" , nativeQuery = true)
+    Page<SanPham> getAllByFilterCustumer(
+                                 Pageable pageable);
+    @Query(value = "SELECT sp.* FROM san_pham sp \n" +
+            "where sp.id_danh_muc = :idDanhMuc", nativeQuery = true)
+    List<SanPham> getSanPhamByDanhMucID(@Param("idDanhMuc") Integer id);
+
+
+    //Loc ben khach hang
+    @Query(value = "SELECT sp.* FROM san_pham sp " +
+            "WHERE (:idDanhMuc IS NULL OR sp.id_danh_muc IN :idDanhMuc) " +
+            "AND (sp.id_thuong_hieu = '' OR sp.id_thuong_hieu = :idThuongHieu OR :idThuongHieu IS NULL) " +
+            "AND (:idChatLieuVai IS NULL or sp.id_chat_lieu_vai IN :idChatLieuVai) " +
+            "AND (:idChatLieuDe IS NULL or sp.id_chat_lieu_de IN :idChatLieuDe) " +
+            "AND (sp.ten_san_pham LIKE :tenSanPham)", nativeQuery = true)
+    Page<SanPham> getAllByFilterCustumer(@Param("idDanhMuc") List<Long> idDanhMuc,
+                                 @Param("idThuongHieu") Long idThuongHieu,
+                                 @Param("idChatLieuVai") List<Long> idChatLieuVai,
+                                 @Param("idChatLieuDe") List<Long> idChatLieuDe,
+                                 @Param("tenSanPham") String tenSanPham,
+                                 Pageable pageable);
+
 }

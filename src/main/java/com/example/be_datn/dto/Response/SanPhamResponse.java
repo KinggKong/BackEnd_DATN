@@ -5,6 +5,8 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
+import java.util.List;
 
 @Getter
 @Setter
@@ -31,6 +33,7 @@ public class SanPhamResponse {
     LocalDateTime createdAt;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     LocalDateTime updatedAt;
+    List<SanPhamChiTietResponse> sanPhamChiTietList;
 
     public static SanPhamResponse fromSanPham(SanPham sanPham) {
         return SanPhamResponse.builder()
@@ -44,6 +47,8 @@ public class SanPhamResponse {
                 .chatLieuDe(sanPham.getChatLieuDe())
                 .createdAt(sanPham.getCreated_at())
                 .updatedAt(sanPham.getUpdated_at())
+                .sanPhamChiTietList(sanPham.getSanPhamChiTietList() != null ?
+                        sanPham.getSanPhamChiTietList().stream().map(SanPhamChiTietResponse::fromSanPhamChiTiet).toList() : Collections.emptyList())
                 .build();
     }
 }
