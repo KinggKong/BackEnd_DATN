@@ -29,6 +29,9 @@ public enum ErrorCode {
     // Bổ sung các mã lỗi cho voucher
     VOUCHER_ALREADY_EXISTS(1020, "Voucher đã tồn tại!"),
     VOUCHER_NOT_FOUND(1021, "Voucher không tồn tại!"),
+    EMAIL_ALREADY_EXISTS(1020, "Email đã tồn tại!"),
+    PHONE_ALREADY_EXISTS(1020, "SDT đã tồn tại!"),
+    KHACH_HANG_NOT_FOUND(1021, "Khách hàng không tồn tại!"),
 
     THUONGHIEU_ALREADY_EXISTS(1012, "Thuong hieu da ton tai !"),
     THUONGHIEU_NOT_FOUND(1013, "Thuong hieu khong ton tai !"),
