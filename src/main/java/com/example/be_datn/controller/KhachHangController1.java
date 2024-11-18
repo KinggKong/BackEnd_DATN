@@ -63,4 +63,5 @@ public class KhachHangController1 {
         apiResponse.setData(khachHangService.updateKhachHang(id, khachHangRequest));
         return apiResponse;
     }
+
 }
