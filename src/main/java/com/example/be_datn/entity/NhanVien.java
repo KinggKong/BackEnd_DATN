@@ -58,5 +58,4 @@ public class NhanVien {
 
     @Column(name = "trang_thai")
     private int trangThai;
-
 }

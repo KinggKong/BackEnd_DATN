@@ -61,12 +61,14 @@ public enum ErrorCode {
     THOI_GIAN_INVALID(1019, "Thời gian không hợp lệ !"),
 
 
+    //NhanVien service
+    NHAN_VIEN_EXIST(3000, "Nhan viên đã tồn tại !"),
     GIO_HANG_NOT_FOUND(2000, "Giỏ hàng không tồn tại !"),
     GIO_HANG_CHI_TIET_NOT_FOUND(2000,"Giỏ hàng chi tiết không tồn tại !"),
     HOA_DON_INVALID(2000, "Không thể tạo hóa đơn"),
     HOA_DON_NOT_FOUND(2000,"Hóa đơn không tồn tại !"),
     HOA_DON_CHI_TIET_NOT_FOUND_LIST(2000,"Danh sách hóa đơn chi tiết by id hóa đơn không tồn tại"),
-    NHANVIEN_NOT_FOUND(2000,"Nhân viên không tồn tại !")
+    NHANVIEN_NOT_FOUND(2000,"Nhân viên không tồn tại !");
 
 
     ;
