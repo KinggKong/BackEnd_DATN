@@ -31,7 +31,6 @@ public class SanPhamChiTietController {
     @PostMapping("")
     public ApiResponse<List<SanPhamChiTietResponse>> createSanPhamChiTiet(@RequestBody List<SanPhamChiTietRequest> sanPhamChiTietRequests) throws IOException {
         ApiResponse<List<SanPhamChiTietResponse>> apiResponse = new ApiResponse<>();
-
         apiResponse.setData(sanPhamChiTietService.create(sanPhamChiTietRequests));
         return apiResponse;
     }

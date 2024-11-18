@@ -1,6 +1,8 @@
 package com.example.be_datn.entity;
 
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -37,6 +39,7 @@ public class SanPhamChiTiet extends BaseEntity {
     @Column(name = "trang_thai")
     int trangThai;
     @OneToMany(mappedBy = "sanPhamChiTiet", fetch = FetchType.LAZY)
+    @JsonBackReference
     List<HinhAnh> hinhAnhList;
 }
 

@@ -41,7 +41,13 @@ public enum ErrorCode {
     DEGIAY_SANPHAM_INVALID(1014,"Đế giày không được để trống"),
     TRANGTHAI_SANPHAM_INVALID(1014,"Trạng thái không hợp lệ !"),
     LOAIVAI_SANPHAM_INVALID(1014,"Loại vải không được để trống"),
-    DIA_CHI_NOT_FOUND(2002,"Địa chỉ không tồn tại !");
+    DIA_CHI_NOT_FOUND(2002,"Địa chỉ không tồn tại !"),
+    HOA_DON_NOT_FOUND(3004, "Hóa đơn không tồn tại !"),
+    KHACH_HANG_NOT_FOUND(5004, "Khách hàng không tồn tại !"),
+    LOAI_HOA_DON_INVALID(6004, "Error type order"),
+    LICH_SU_THANH_TOAN_NOT_FOUND(7004, "LICH_SU_THANH_TOAN_NOT_FOUND")
+    ;
+
 
 
 

@@ -122,4 +122,15 @@ public class SanPhamChiTietService implements ISanPhamChiTietService {
         sanPhamChiTietRepository.deleteById(id);
         return "deleted successfully";
     }
+
+    @Override
+    public void updateSoLuongSanPhamChiTiet(Long id, Integer soLuong, String method) {
+        SanPhamChiTiet sanPhamChiTiet = sanPhamChiTietRepository.findById(id).orElseThrow();
+        if(method.equalsIgnoreCase("minus")){
+            sanPhamChiTiet.setSoLuong(sanPhamChiTiet.getSoLuong() - soLuong);
+        }else {
+            sanPhamChiTiet.setSoLuong(sanPhamChiTiet.getSoLuong() + soLuong);
+        }
+        sanPhamChiTietRepository.save(sanPhamChiTiet);
+    }
 }

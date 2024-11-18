@@ -15,5 +15,6 @@ public interface ISanPhamChiTietService {
     SanPhamChiTietResponse update(Long id, SanPhamChiTietRequest sanPhamChiTietRequest);
     SanPhamChiTietResponse getById(Long id);
     String delete(Long id);
+    void updateSoLuongSanPhamChiTiet(Long id, Integer soLuong, String method);
 
 }
