@@ -20,6 +20,7 @@ public class GioHangChiTietMapper {
                 .trangThai(gioHangChiTiet.getTrangThai())
                 .updatedAt(gioHangChiTiet.getUpdated_at())
                 .createdAt(gioHangChiTiet.getCreated_at())
+                .giaTien(gioHangChiTiet.getGiaTien())
                 .build();
     }
 

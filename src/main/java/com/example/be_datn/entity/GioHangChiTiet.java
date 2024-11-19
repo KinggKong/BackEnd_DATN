@@ -27,7 +27,8 @@ public class GioHangChiTiet extends BaseEntity {
 
     @Column(name = "so_luong")
     int soLuong;
-
+    @Column(name = "gia_tien")
+    Double giaTien;
 
     @Column(name = "trang_thai")
     private Integer trangThai;

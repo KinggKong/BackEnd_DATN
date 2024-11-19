@@ -19,5 +19,6 @@ public class GioHangChiTietResponse {
     int soLuong;
     LocalDateTime createdAt;
     LocalDateTime updatedAt;
+    Double giaTien;
     Integer trangThai;
 }

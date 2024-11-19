@@ -11,4 +11,6 @@ public class GioHangChiTietRequest {
     Long idGioHang;
     Long idSanPhamChiTiet;
     int soLuong;
+    Double giaTien;
+    int id_khachHang;
 }
