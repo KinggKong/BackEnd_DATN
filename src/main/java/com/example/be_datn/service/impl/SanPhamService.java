@@ -3,7 +3,10 @@ package com.example.be_datn.service.impl;
 import com.example.be_datn.dto.Request.SanPhamRequest;
 import com.example.be_datn.dto.Response.SanPhamCustumerResponse;
 import com.example.be_datn.dto.Response.SanPhamResponse;
+import com.example.be_datn.entity.HinhAnh;
+import com.example.be_datn.entity.SaleCt;
 import com.example.be_datn.entity.SanPham;
+import com.example.be_datn.entity.SanPhamChiTiet;
 import com.example.be_datn.exception.AppException;
 import com.example.be_datn.exception.ErrorCode;
 import com.example.be_datn.repository.*;
@@ -26,6 +29,7 @@ public class SanPhamService implements ISanPhamService {
     ThuongHieuRepository thuongHieuRepository;
     ChatLieuDeRepository chatLieuDeRepository;
     ChatLieuVaiRepository chatLieuVaiRepository;
+    Sale_CTService sale_ctService;
 
     @Override
     public Page<SanPhamResponse> getAllPageable(Pageable pageable) {
@@ -35,6 +39,52 @@ public class SanPhamService implements ISanPhamService {
     @Override
     public Page<SanPham> getAllPageableCustumer(Pageable pageable) {
         return sanPhamRepository.getAllByFilterCustumer(pageable);
+    }
+
+    @Override
+    public Page<SanPhamCustumerResponse> getAllPageableCustumerFilter(List<Long> idDanhMuc,
+                                                                      Long idThuongHieu,List<Long> idChatLieuVai,
+                                                                      List<Long>idChatLieuDe,String tenSanPham,Pageable pageable) {
+        Page<SanPham> sanPhams = sanPhamRepository.getAllByFilterCustumers(idDanhMuc, idThuongHieu,idChatLieuVai,idChatLieuDe,tenSanPham,pageable);
+        Page<SanPhamCustumerResponse> sanPhamCustumerResponses = sanPhams.map(sanPham -> {
+            List<Double> giaBan = sanPham.getSanPhamChiTietList().stream().map(SanPhamChiTiet::getGiaBan).toList();
+            Double giaBanThapNhat = giaBan.stream().min(Double::compareTo).orElse(0.0);
+            Double giaBanCaoNhat = giaBan.stream().max(Double::compareTo).orElse(0.0);
+            String giaHienThi = giaBanThapNhat.equals(giaBanCaoNhat)
+                    ? String.format("%,.0f VND", giaBanThapNhat)
+                    : String.format("%,.0f - %,.0f VND", giaBanThapNhat, giaBanCaoNhat);
+
+            String hinhAnh = sanPham.getSanPhamChiTietList()
+                    .stream()
+                    .flatMap(chiTiet -> chiTiet.getHinhAnhList().stream())
+                    .map(HinhAnh::getUrl)
+                    .findFirst()
+                    .orElse(null);
+
+            String phanTramGiamGia = "";
+            for (SanPhamChiTiet sanPhamChiTiet : sanPham.getSanPhamChiTietList()) {
+                SaleCt saleCts = sale_ctService.getSaleCtById(sanPhamChiTiet.getId());
+                if(saleCts != null){
+                    Double giaBanMoi = sanPhamChiTiet.getGiaBan() - saleCts.getTienGiam();
+                    giaBanThapNhat = giaBanMoi;
+                    phanTramGiamGia =saleCts.getGiaTriGiam().toString();
+                    giaHienThi = String.format("%,.0f VND", giaBanMoi);
+                    break;
+                }
+            }
+
+
+            return new SanPhamCustumerResponse(
+                    sanPham.getId(),
+                    sanPham.getTenSanPham(),
+                    giaBanThapNhat,
+                    giaBanCaoNhat,
+                    giaHienThi,
+                    hinhAnh,
+                    phanTramGiamGia
+            );
+        });
+        return sanPhamCustumerResponses;
     }
 
     @Override

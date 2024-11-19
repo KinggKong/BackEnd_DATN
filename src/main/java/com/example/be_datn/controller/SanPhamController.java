@@ -200,5 +200,18 @@ public class SanPhamController {
 
         return apiResponse;
     }
-
+    @GetMapping("/get-all-customer-filter")
+    public ApiResponse<Page<SanPhamCustumerResponse>> getSanPhamsCustumerFilter(@RequestParam(value = "pageNumber", defaultValue = "0") int pageNumber,
+                                                                               @RequestParam(value = "pageSize", defaultValue = "10") int pageSize,
+                                                                                @RequestParam(value = "danhMuc", defaultValue = "") List<Long> idDanhMuc,
+                                                                                @RequestParam(value = "thuongHieu", defaultValue = "") Long idThuongHieu,
+                                                                                @RequestParam(value = "chatLieuVai", defaultValue = "") List<Long> idChatLieuVai,
+                                                                                @RequestParam(value = "chatLieuDe", defaultValue = "") List<Long> idChatLieuDe,
+                                                                                @RequestParam(value = "tenSanPham", defaultValue = "") String tenSanPham
+    ) {
+        Pageable pageable = PageRequest.of(Math.max(0, pageNumber), Math.max(1, pageSize));
+        ApiResponse<Page<SanPhamCustumerResponse>> apiResponse = new ApiResponse<>();
+        apiResponse.setData(sanPhamService.getAllPageableCustumerFilter(idDanhMuc,idThuongHieu,idChatLieuVai,idChatLieuDe,tenSanPham,pageable));
+        return apiResponse;
+    }
 }
