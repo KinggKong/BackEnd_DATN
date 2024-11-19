@@ -4,18 +4,17 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 
-import java.time.Instant;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 @Getter
 @Setter
 @Entity
-@Table(name = "nhan_vien")
+@Table(name = "khach_hang")
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class NhanVien extends BaseEntity {
+public class KhachHang1 extends BaseEntity {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
@@ -25,11 +24,10 @@ public class NhanVien extends BaseEntity {
     @Column(name = "ten")
     private String ten;
 
-    @Column(name = "id_tai_khoan")
-    private Long idTaiKhoan;
-
     @Size(max = 255)
-    @Column(name = "email")
+    @Column(name = "ma")
+    private String ma;
+
     private String email;
 
     @Size(max = 11)
@@ -43,15 +41,16 @@ public class NhanVien extends BaseEntity {
     @Column(name = "ngay_sinh")
     private LocalDate ngaySinh;
 
-    @Size(max = 255)
-    @Column(name = "dia_chi")
-    private String diaChi;
+    @Column(name = "id_dia_chi")
+    private Long idDiaChi;
+
+    @Column(name = "id_tai_khoan")
+    private Long idTaiKhoan;
 
     @Column(name = "gioi_tinh")
     private Boolean gioiTinh;
 
 
     @Column(name = "trang_thai")
-    private int trangThai;
-
+    private Integer trangThai;
 }
