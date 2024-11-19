@@ -11,6 +11,8 @@ import lombok.experimental.Accessors;
 import lombok.experimental.FieldDefaults;
 import org.hibernate.annotations.ColumnDefault;
 
+import java.util.List;
+
 
 @Getter
 @Setter
@@ -61,5 +63,7 @@ public class SanPham extends BaseEntity {
     @ManyToOne
     @JoinColumn(name = "id_chat_lieu_de")
     ChatLieuDe chatLieuDe;
+    @OneToMany(mappedBy = "sanPham", fetch = FetchType.LAZY)
+    List<SanPhamChiTiet> sanPhamChiTietList;
 }
 
