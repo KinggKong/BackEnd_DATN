@@ -3,10 +3,11 @@ package com.example.be_datn.controller;
 import com.example.be_datn.service.impl.PaymentService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.HashMap;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/payment")
@@ -23,21 +24,22 @@ public class PaymentController {
         return "redirect:" + vnpayUrl;
     }
 
-    // Sau khi hoàn tất thanh toán, VNPAY sẽ chuyển hướng trình duyệt về URL này
-//    @GetMapping("/vnpay-payment-return")
-//    public String paymentCompleted(HttpServletRequest request, Model model) {
-//        int paymentStatus = paymentService.orderReturn(request);
-//
-//        String orderInfo = request.getParameter("vnp_OrderInfo");
-//        String paymentTime = request.getParameter("vnp_PayDate");
-//        String transactionId = request.getParameter("vnp_TransactionNo");
-//        String totalPrice = request.getParameter("vnp_Amount");
-//
-//        model.addAttribute("orderId", orderInfo);
-//        model.addAttribute("totalPrice", totalPrice);
-//        model.addAttribute("paymentTime", paymentTime);
-//        model.addAttribute("transactionId", transactionId);
-//
-//        return paymentStatus == 1 ? "ordersuccess" : "orderfail";
-//    }
+    @GetMapping("/vnpay-payment-return")
+    public ResponseEntity<Map<String, Object>> paymentCompleted(HttpServletRequest request) {
+        int paymentStatus = paymentService.orderReturn(request);
+
+        String orderInfo = request.getParameter("vnp_OrderInfo");
+        String paymentTime = request.getParameter("vnp_PayDate");
+        String transactionId = request.getParameter("vnp_TransactionNo");
+        String totalPrice = request.getParameter("vnp_Amount");
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("orderId", orderInfo);
+        response.put("totalPrice", totalPrice);
+        response.put("paymentTime", paymentTime);
+        response.put("transactionId", transactionId);
+        response.put("paymentStatus", paymentStatus);
+
+        return ResponseEntity.ok(response);
+    }
 }
