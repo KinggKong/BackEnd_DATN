@@ -4,12 +4,13 @@ import com.example.be_datn.entity.SanPham;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 
-public interface SanPhamRepository extends JpaRepository<SanPham, Long> {
+public interface SanPhamRepository extends JpaRepository<SanPham, Long>, JpaSpecificationExecutor<SanPham> {
     boolean existsByTenSanPham(String tenSanPham);
     List<SanPham> getAllByTenSanPhamContainingIgnoreCase(String tenSanPham);
     @Query(value = "SELECT sp.* FROM san_pham sp \n" +
@@ -35,16 +36,16 @@ public interface SanPhamRepository extends JpaRepository<SanPham, Long> {
 
     //Loc ben khach hang
     @Query(value = "SELECT sp.* FROM san_pham sp " +
-            "WHERE (:idDanhMuc IS NULL OR sp.id_danh_muc IN :idDanhMuc) " +
+            "WHERE (   :idDanhMuc IS NULL OR sp.id_danh_muc IN :idDanhMuc ) " +
             "AND (sp.id_thuong_hieu = '' OR sp.id_thuong_hieu = :idThuongHieu OR :idThuongHieu IS NULL) " +
-            "AND (:idChatLieuVai IS NULL or sp.id_chat_lieu_vai IN :idChatLieuVai) " +
-            "AND (:idChatLieuDe IS NULL or sp.id_chat_lieu_de IN :idChatLieuDe) " +
-            "AND (sp.ten_san_pham LIKE :tenSanPham)", nativeQuery = true)
+            "AND ( :idChatLieuVai IS NULL or sp.id_chat_lieu_vai IN :idChatLieuVai ) " +
+            "AND (:idChatLieuDe IS NULL  or sp.id_chat_lieu_de IN :idChatLieuDe ) " +
+            "AND (sp.ten_san_pham LIKE CONCAT('%', :tenSanPham, '%'))", nativeQuery = true)
     Page<SanPham> getAllByFilterCustumers(@Param("idDanhMuc") List<Long> idDanhMuc,
-                                 @Param("idThuongHieu") Long idThuongHieu,
-                                 @Param("idChatLieuVai") List<Long> idChatLieuVai,
-                                 @Param("idChatLieuDe") List<Long> idChatLieuDe,
-                                 @Param("tenSanPham") String tenSanPham,
-                                 Pageable pageable);
+                                          @Param("idThuongHieu") Long idThuongHieu,
+                                          @Param("idChatLieuVai") List<Long> idChatLieuVai,
+                                          @Param("idChatLieuDe") List<Long> idChatLieuDe,
+                                          @Param("tenSanPham") String tenSanPham,
+                                          Pageable pageable);
 
 }

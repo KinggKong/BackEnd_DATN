@@ -21,7 +21,9 @@ public interface SaleRepository extends JpaRepository<Sale,Long> {
             "  AND (:ngayBatDau IS NULL OR s.thoi_Gian_Bat_Dau >= :ngayBatDau)\n" +
             "  AND (:ngayKetThuc IS NULL OR s.thoi_Gian_Ket_Thuc <= :ngayKetThuc)\n" +
             "  AND (:trangThai IS NULL OR :trangThai = '' OR s.trang_Thai = :trangThai)" +
-            "ORDER BY s.created_at DESC",
+            "ORDER BY s.updated_at DESC",
             nativeQuery = true)
     Page<Sale> findAllByFilter(String tenChienDich, LocalDateTime ngayBatDau, LocalDateTime ngayKetThuc,  Integer trangThai, Pageable pageable);
+
+    List<Sale> findByThoiGianKetThucBefore(LocalDateTime localDateTime);
 }

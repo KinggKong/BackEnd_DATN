@@ -1,5 +1,6 @@
 package com.example.be_datn.service.impl;
 
+import com.example.be_datn.dto.Request.SanPhamFilterRequest;
 import com.example.be_datn.dto.Request.SanPhamRequest;
 import com.example.be_datn.dto.Response.SanPhamCustumerResponse;
 import com.example.be_datn.dto.Response.SanPhamResponse;
@@ -16,6 +17,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.JpaSort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -145,6 +148,18 @@ public class SanPhamService implements ISanPhamService {
             throw new AppException(ErrorCode.SANPHAM_NOT_FOUND);
         }
 
+    }
+
+    @Override
+    public List<SanPham> filterProducts(SanPhamFilterRequest filterRequest) {
+        return List.of();
+    }
+    public List<SanPhamResponse> testSpecification(List<Long> idDanhMucs) {
+        Specification<SanPham> spec = Specification.where(SanPhamSpecification.activeUsers())
+                .and(SanPhamSpecification.byDanhMuc(idDanhMucs));
+
+        List<SanPham> sanPhams = sanPhamRepository.findAll(spec, JpaSort.unsorted());
+        return sanPhams.stream().map(SanPhamResponse::fromSanPham).toList();
     }
 
 

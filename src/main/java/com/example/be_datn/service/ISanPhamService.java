@@ -1,5 +1,6 @@
 package com.example.be_datn.service;
 
+import com.example.be_datn.dto.Request.SanPhamFilterRequest;
 import com.example.be_datn.dto.Request.SanPhamRequest;
 import com.example.be_datn.dto.Response.SanPhamCustumerResponse;
 import com.example.be_datn.dto.Response.SanPhamResponse;
@@ -28,4 +29,6 @@ public interface ISanPhamService {
     SanPhamResponse update(SanPhamRequest sanPhamRequest, Long id);
 
     String delete(Long id);
+
+    List<SanPham> filterProducts(SanPhamFilterRequest filterRequest);
 }
