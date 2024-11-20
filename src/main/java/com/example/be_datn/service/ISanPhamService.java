@@ -12,9 +12,6 @@ import java.util.List;
 public interface ISanPhamService {
     Page<SanPhamResponse> getAllPageable(Pageable pageable);
     Page<SanPham> getAllPageableCustumer(Pageable pageable);
-    Page<SanPhamCustumerResponse> getAllPageableCustumerFilter(List<Long> idDanhMuc,
-                                                               Long idThuongHieu,List<Long> idChatLieuVai,
-                                                               List<Long>idChatLieuDe,String tenSanPham,Pageable pageable);
     List<SanPhamResponse> getAllByTenSanPhamContaning(String tenSanPham);
     List<SanPham> getSanPhamByDanhMucID(Integer id);
     SanPhamResponse updateStatus(Long idSanPham ,int status);

@@ -51,16 +51,16 @@ public class SanPhamController {
     ) {
         Pageable pageable = PageRequest.of(Math.max(0, pageNumber), Math.max(1, pageSize));
         ApiResponse<Page<SanPhamResponse>> apiResponse = new ApiResponse<>();
-        apiResponse.setData(sanPhamService.getAllWithFilter(idDahMuc, idThuongHieu,idChatLieuVai, idChatLieuDe, tenSanPham, pageable));
+        apiResponse.setData(sanPhamService.getAllWithFilter(idDahMuc, idThuongHieu, idChatLieuVai, idChatLieuDe, tenSanPham, pageable));
         return apiResponse;
     }
+
     @GetMapping("/get-all")
-    public ApiResponse<List<SanPhamResponse>> getSanPhams(@RequestParam(value = "tenSanPham", defaultValue = "") String tenSanPham){
+    public ApiResponse<List<SanPhamResponse>> getSanPhams(@RequestParam(value = "tenSanPham", defaultValue = "") String tenSanPham) {
         ApiResponse<List<SanPhamResponse>> apiResponse = new ApiResponse<>();
         apiResponse.setData(sanPhamService.getAllByTenSanPhamContaning(tenSanPham));
         return apiResponse;
     }
-
 
 
     @GetMapping("/{id}")
@@ -87,10 +87,10 @@ public class SanPhamController {
     }
 
     @PutMapping("/status/{id}")
-    public ApiResponse<SanPhamResponse> updateSanPhamStatus(@PathVariable("id") Long id,@RequestBody int trangThai) {
+    public ApiResponse<SanPhamResponse> updateSanPhamStatus(@PathVariable("id") Long id, @RequestBody int trangThai) {
         ApiResponse<SanPhamResponse> apiResponse = new ApiResponse<>();
         apiResponse.setMessage("Sửa sản phẩm thành công");
-        apiResponse.setData(sanPhamService.updateStatus(id,trangThai));
+        apiResponse.setData(sanPhamService.updateStatus(id, trangThai));
         return apiResponse;
     }
 
@@ -126,10 +126,10 @@ public class SanPhamController {
             String phanTramGiamGia = "";
             for (SanPhamChiTiet sanPhamChiTiet : sanPham.getSanPhamChiTietList()) {
                 SaleCt saleCts = sale_ctService.getSaleCtById(sanPhamChiTiet.getId());
-                if(saleCts != null){
+                if (saleCts != null) {
                     Double giaBanMoi = sanPhamChiTiet.getGiaBan() - saleCts.getTienGiam();
                     giaBanThapNhat = giaBanMoi;
-                    phanTramGiamGia =saleCts.getGiaTriGiam().toString();
+                    phanTramGiamGia = saleCts.getGiaTriGiam().toString();
                     giaHienThi = String.format("%,.0f VND", giaBanMoi);
                     break;
                 }
@@ -151,6 +151,7 @@ public class SanPhamController {
 
         return apiResponse;
     }
+
     @GetMapping("/get-by-category/{id}")
     public ApiResponse<List<SanPhamCustumerResponse>> getSanPhamsCustumerByDanhMuc(@PathVariable("id") Integer id) {
         ApiResponse<List<SanPhamCustumerResponse>> apiResponse = new ApiResponse<>();
@@ -200,18 +201,30 @@ public class SanPhamController {
 
         return apiResponse;
     }
-    @GetMapping("/get-all-customer-filter")
-    public ApiResponse<Page<SanPhamCustumerResponse>> getSanPhamsCustumerFilter(@RequestParam(value = "pageNumber", defaultValue = "0") int pageNumber,
-                                                                               @RequestParam(value = "pageSize", defaultValue = "10") int pageSize,
-                                                                                @RequestParam(value = "danhMuc", defaultValue = "") List<Long> idDanhMuc,
-                                                                                @RequestParam(value = "thuongHieu", defaultValue = "") Long idThuongHieu,
-                                                                                @RequestParam(value = "chatLieuVai", defaultValue = "") List<Long> idChatLieuVai,
-                                                                                @RequestParam(value = "chatLieuDe", defaultValue = "") List<Long> idChatLieuDe,
-                                                                                @RequestParam(value = "tenSanPham", defaultValue = "") String tenSanPham
-    ) {
-        Pageable pageable = PageRequest.of(Math.max(0, pageNumber), Math.max(1, pageSize));
-        ApiResponse<Page<SanPhamCustumerResponse>> apiResponse = new ApiResponse<>();
-        apiResponse.setData(sanPhamService.getAllPageableCustumerFilter(idDanhMuc,idThuongHieu,idChatLieuVai,idChatLieuDe,tenSanPham,pageable));
-        return apiResponse;
+//    @GetMapping("/get-all-customer-filter")
+//    public ApiResponse<Page<SanPhamCustumerResponse>> getSanPhamsCustumerFilter(@RequestParam(value = "pageNumber", defaultValue = "0") int pageNumber,
+//                                                                               @RequestParam(value = "pageSize", defaultValue = "10") int pageSize,
+//                                                                                @RequestParam(value = "danhMuc", defaultValue = "") Long idDanhMuc,
+//                                                                                @RequestParam(value = "thuongHieu", defaultValue = "") Long idThuongHieu,
+//                                                                                @RequestParam(value = "chatLieuVai", defaultValue = "") Long idChatLieuVai,
+//                                                                                @RequestParam(value = "chatLieuDe", defaultValue = "") Long idChatLieuDe,
+//                                                                                @RequestParam(value = "tenSanPham", defaultValue = "") String tenSanPham
+//    ) {
+//        Pageable pageable = PageRequest.of(Math.max(0, pageNumber), Math.max(1, pageSize));
+//        ApiResponse<Page<SanPhamCustumerResponse>> apiResponse = new ApiResponse<>();
+//        apiResponse.setData(sanPhamService.getAllPageableCustumerFilter(idDanhMuc,idThuongHieu,idChatLieuVai,idChatLieuDe,tenSanPham,pageable));
+//        return apiResponse;
+//    }
+
+    @GetMapping("/test-specification")
+    public ApiResponse<?> getAllSpecification(@RequestParam(required = false) List<Long> idDanhMucs,
+                                              @RequestParam(required = false) Long idThuongHieus,
+                                              @RequestParam(required = false) List<Long> idChatLieuVais,
+                                              @RequestParam(required = false) List<Long> idChatLieuDes,
+                                              @RequestParam(required = false) String name) {
+        return ApiResponse.builder()
+                .data(sanPhamService.testSpecification(idDanhMucs, idThuongHieus, idChatLieuVais, idChatLieuDes, name))
+                .message("get data successfull")
+                .build();
     }
 }

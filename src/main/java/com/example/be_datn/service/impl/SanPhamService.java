@@ -1,14 +1,11 @@
 package com.example.be_datn.service.impl;
 
 import com.example.be_datn.dto.Request.SanPhamRequest;
-import com.example.be_datn.dto.Response.SanPhamCustumerResponse;
 import com.example.be_datn.dto.Response.SanPhamResponse;
-import com.example.be_datn.entity.HinhAnh;
-import com.example.be_datn.entity.SaleCt;
 import com.example.be_datn.entity.SanPham;
-import com.example.be_datn.entity.SanPhamChiTiet;
 import com.example.be_datn.exception.AppException;
 import com.example.be_datn.exception.ErrorCode;
+import com.example.be_datn.mapper.SanPhamMapper;
 import com.example.be_datn.repository.*;
 import com.example.be_datn.service.ISanPhamService;
 import lombok.AccessLevel;
@@ -16,6 +13,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.JpaSort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -41,51 +40,52 @@ public class SanPhamService implements ISanPhamService {
         return sanPhamRepository.getAllByFilterCustumer(pageable);
     }
 
-    @Override
-    public Page<SanPhamCustumerResponse> getAllPageableCustumerFilter(List<Long> idDanhMuc,
-                                                                      Long idThuongHieu,List<Long> idChatLieuVai,
-                                                                      List<Long>idChatLieuDe,String tenSanPham,Pageable pageable) {
-        Page<SanPham> sanPhams = sanPhamRepository.getAllByFilterCustumers(idDanhMuc, idThuongHieu,idChatLieuVai,idChatLieuDe,tenSanPham,pageable);
-        Page<SanPhamCustumerResponse> sanPhamCustumerResponses = sanPhams.map(sanPham -> {
-            List<Double> giaBan = sanPham.getSanPhamChiTietList().stream().map(SanPhamChiTiet::getGiaBan).toList();
-            Double giaBanThapNhat = giaBan.stream().min(Double::compareTo).orElse(0.0);
-            Double giaBanCaoNhat = giaBan.stream().max(Double::compareTo).orElse(0.0);
-            String giaHienThi = giaBanThapNhat.equals(giaBanCaoNhat)
-                    ? String.format("%,.0f VND", giaBanThapNhat)
-                    : String.format("%,.0f - %,.0f VND", giaBanThapNhat, giaBanCaoNhat);
-
-            String hinhAnh = sanPham.getSanPhamChiTietList()
-                    .stream()
-                    .flatMap(chiTiet -> chiTiet.getHinhAnhList().stream())
-                    .map(HinhAnh::getUrl)
-                    .findFirst()
-                    .orElse(null);
-
-            String phanTramGiamGia = "";
-            for (SanPhamChiTiet sanPhamChiTiet : sanPham.getSanPhamChiTietList()) {
-                SaleCt saleCts = sale_ctService.getSaleCtById(sanPhamChiTiet.getId());
-                if(saleCts != null){
-                    Double giaBanMoi = sanPhamChiTiet.getGiaBan() - saleCts.getTienGiam();
-                    giaBanThapNhat = giaBanMoi;
-                    phanTramGiamGia =saleCts.getGiaTriGiam().toString();
-                    giaHienThi = String.format("%,.0f VND", giaBanMoi);
-                    break;
-                }
-            }
-
-
-            return new SanPhamCustumerResponse(
-                    sanPham.getId(),
-                    sanPham.getTenSanPham(),
-                    giaBanThapNhat,
-                    giaBanCaoNhat,
-                    giaHienThi,
-                    hinhAnh,
-                    phanTramGiamGia
-            );
-        });
-        return sanPhamCustumerResponses;
-    }
+//    @Override
+//    public Page<SanPhamCustumerResponse> getAllPageableCustumerFilter(Long idDanhMuc,
+//                                                                      Long idThuongHieu,
+//                                                                      Long idChatLieuVai,
+//                                                                      Long idChatLieuDe, String tenSanPham, Pageable pageable) {
+////        Page<SanPham> sanPhams = sanPhamRepository.getAllByFilterCustumers(idDanhMuc, idThuongHieu, idChatLieuVai, idChatLieuDe, tenSanPham, pageable);
+//        Page<SanPhamCustumerResponse> sanPhamCustumerResponses = sanPhams.map(sanPham -> {
+//            List<Double> giaBan = sanPham.getSanPhamChiTietList().stream().map(SanPhamChiTiet::getGiaBan).toList();
+//            Double giaBanThapNhat = giaBan.stream().min(Double::compareTo).orElse(0.0);
+//            Double giaBanCaoNhat = giaBan.stream().max(Double::compareTo).orElse(0.0);
+//            String giaHienThi = giaBanThapNhat.equals(giaBanCaoNhat)
+//                    ? String.format("%,.0f VND", giaBanThapNhat)
+//                    : String.format("%,.0f - %,.0f VND", giaBanThapNhat, giaBanCaoNhat);
+//
+//            String hinhAnh = sanPham.getSanPhamChiTietList()
+//                    .stream()
+//                    .flatMap(chiTiet -> chiTiet.getHinhAnhList().stream())
+//                    .map(HinhAnh::getUrl)
+//                    .findFirst()
+//                    .orElse(null);
+//
+//            String phanTramGiamGia = "";
+//            for (SanPhamChiTiet sanPhamChiTiet : sanPham.getSanPhamChiTietList()) {
+//                SaleCt saleCts = sale_ctService.getSaleCtById(sanPhamChiTiet.getId());
+//                if (saleCts != null) {
+//                    Double giaBanMoi = sanPhamChiTiet.getGiaBan() - saleCts.getTienGiam();
+//                    giaBanThapNhat = giaBanMoi;
+//                    phanTramGiamGia = saleCts.getGiaTriGiam().toString();
+//                    giaHienThi = String.format("%,.0f VND", giaBanMoi);
+//                    break;
+//                }
+//            }
+//
+//
+//            return new SanPhamCustumerResponse(
+//                    sanPham.getId(),
+//                    sanPham.getTenSanPham(),
+//                    giaBanThapNhat,
+//                    giaBanCaoNhat,
+//                    giaHienThi,
+//                    hinhAnh,
+//                    phanTramGiamGia
+//            );
+//        });
+//        return sanPhamCustumerResponses;
+//    }
 
     @Override
     public List<SanPhamResponse> getAllByTenSanPhamContaning(String tenSanPham) {
@@ -187,5 +187,21 @@ public class SanPhamService implements ISanPhamService {
                 .danhMuc(danhMucRepository.findById(request.getIdDanhMuc()).orElseThrow(() -> new AppException(ErrorCode.DANHMUC_NOT_FOUND)))
                 .trangThai(request.getTrangThai())
                 .build();
+    }
+
+
+
+
+    public List<SanPhamResponse> testSpecification(List<Long> idDanhMucs, Long idThuongHieus, List<Long> idChatLieuVais, List<Long> idChatLieuDes,String name) {
+        Specification<SanPham> spec = Specification.where(SanPhamSpecification.activeUsers())
+                .and(SanPhamSpecification.byDanhMuc(idDanhMucs))
+                .and(SanPhamSpecification.byChatLieuDe(idChatLieuDes))
+                .and(SanPhamSpecification.byChatLieuVai(idChatLieuVais))
+                .and(SanPhamSpecification.byThuongHieu(idThuongHieus))
+                .and(SanPhamSpecification.byNameSanPham(name));
+
+
+        List<SanPham> sanPhams = sanPhamRepository.findAll(spec, JpaSort.unsorted());
+        return SanPhamMapper.toSanPhamResponses(sanPhams);
     }
 }
