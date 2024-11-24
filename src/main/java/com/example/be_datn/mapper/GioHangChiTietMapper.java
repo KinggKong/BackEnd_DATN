@@ -21,6 +21,7 @@ public class GioHangChiTietMapper {
                 .updatedAt(gioHangChiTiet.getUpdated_at())
                 .createdAt(gioHangChiTiet.getCreated_at())
                 .giaTien(gioHangChiTiet.getGiaTien())
+                .thoiGianGiamGia(gioHangChiTiet.getThoiGianGiamGia())
                 .build();
     }
 

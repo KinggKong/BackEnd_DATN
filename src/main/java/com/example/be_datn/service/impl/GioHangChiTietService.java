@@ -47,6 +47,7 @@ public class GioHangChiTietService implements IGioHangChiTietService {
         if (existGioHangChiTiet != null) {
             existGioHangChiTiet.setSoLuong(existGioHangChiTiet.getSoLuong() + gioHangChiTietRequest.getSoLuong());
             existGioHangChiTiet.setGiaTien(gioHangChiTietRequest.getGiaTien());
+            existGioHangChiTiet.setThoiGianGiamGia(gioHangChiTietRequest.getThoiGianGiamGia());
             return gioHangChiTietMapper.toGioHangChiTietResponse(gioHangChiTietRepository.save(existGioHangChiTiet));
         }
         GioHangChiTiet gioHangChiTiet = GioHangChiTiet.builder()
@@ -55,6 +56,7 @@ public class GioHangChiTietService implements IGioHangChiTietService {
                 .trangThai(1)
                 .sanPhamChiTiet(sanPhamChiTiet)
                 .giaTien(gioHangChiTietRequest.getGiaTien())
+                .thoiGianGiamGia(gioHangChiTietRequest.getThoiGianGiamGia())
                 .build();
         return gioHangChiTietMapper.toGioHangChiTietResponse(gioHangChiTietRepository.save(gioHangChiTiet));
 
