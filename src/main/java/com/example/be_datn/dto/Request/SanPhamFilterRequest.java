@@ -12,10 +12,13 @@ import java.util.List;
 @AllArgsConstructor
 public class SanPhamFilterRequest {
 
-    private List<Long> danhMuc; // Ví dụ: ["Giày nam", "Giày xấu v~"]
-    private List<Long> chatLieuDe; // Ví dụ: ["vàng", "cao su"]
-    private List<Long> chatLieuVai; // Ví dụ: ["Da cá sấu", "Da hổ"]
+    private List<Long> danhMucs; // Ví dụ: ["Giày nam", "Giày xấu v~"]
+    private List<Long> chatLieuDes; // Ví dụ: ["vàng", "cao su"]
+    private List<Long> chatLieuVais; // Ví dụ: ["Da cá sấu", "Da hổ"]
     private Long thuongHieu; // Ví dụ: 1
-    private BigDecimal minPrice; // Giá tối thiểu
-    private BigDecimal maxPrice; // Giá tối đa
+    private Double minPrice; // Giá tối thiểu
+    private Double maxPrice; // Giá tối đa
+    private String tenSanPham; // Tên sản phẩm
+    private Integer page; // Trang hiện tại
+    private Integer size; // Số lượng sản phẩm trên mỗi trang
 }

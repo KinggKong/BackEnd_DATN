@@ -30,7 +30,8 @@ public interface SanPhamRepository extends JpaRepository<SanPham, Long>, JpaSpec
     Page<SanPham> getAllByFilterCustumer(
                                  Pageable pageable);
     @Query(value = "SELECT sp.* FROM san_pham sp \n" +
-            "where sp.id_danh_muc = :idDanhMuc", nativeQuery = true)
+            "where sp.id_danh_muc = :idDanhMuc " +
+            "and sp.trang_thai = 1", nativeQuery = true)
     List<SanPham> getSanPhamByDanhMucID(@Param("idDanhMuc") Integer id);
 
 
@@ -47,5 +48,18 @@ public interface SanPhamRepository extends JpaRepository<SanPham, Long>, JpaSpec
                                           @Param("idChatLieuDe") List<Long> idChatLieuDe,
                                           @Param("tenSanPham") String tenSanPham,
                                           Pageable pageable);
+
+    //Lấy ra danh sách sản phẩm bán chạy
+    @Query(value = "SELECT sp.id, sp.ten_san_pham, MIN(spct.gia_tien), MAX(spct.gia_tien), SUM(hdct.so_luong) AS totalQuantity " +
+            "FROM hoa_don_ct hdct " +
+            "JOIN san_pham_chi_tiet spct ON hdct.id_san_pham_ct = spct.id " +
+            "JOIN san_pham sp ON spct.id_san_pham = sp.id " +
+            "JOIN hoa_don hd ON hdct.id_hoa_don = hd.id " +
+            "WHERE hdct.trang_thai = 1 " +
+            "AND hd.trang_thai = 'DONE' " +
+            "GROUP BY sp.id, sp.ten_san_pham " +
+            "ORDER BY totalQuantity DESC", nativeQuery = true)
+    List<Object[]> findBestSellingProductsNative();
+
 
 }

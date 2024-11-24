@@ -195,4 +195,9 @@ public class SanPhamChiTietService implements ISanPhamChiTietService {
         }
         return SanPhamChiTietResponse.fromSanPhamChiTiet(sanPhamChiTiet);
     }
+
+    @Override
+    public Double getSanPhamChiTietByGiaTienMax() {
+        return sanPhamChiTietRepository.getSanPhamChiTietByGiaTienMax();
+    }
 }

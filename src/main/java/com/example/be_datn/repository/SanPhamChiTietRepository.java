@@ -34,4 +34,8 @@ public interface SanPhamChiTietRepository extends JpaRepository<SanPhamChiTiet,L
                                  @Param(("idSanPham")) Long idSanPham,
                                  Pageable pageable);
 //    Page<SanPhamChiTiet> getAll(Pageable pageable);
+
+    //lấy ra sản phẩm chi tiết có giá cao nhất
+    @Query(value = "SELECT spct.gia_tien FROM san_pham_chi_tiet spct WHERE gia_tien = (SELECT MAX(gia_tien) FROM san_pham_chi_tiet) limit 1", nativeQuery = true)
+    Double getSanPhamChiTietByGiaTienMax();
 }

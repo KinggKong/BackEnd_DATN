@@ -19,5 +19,6 @@ public interface ISanPhamChiTietService {
     String delete(Long id);
     SanPhamChiTietResponse updateStatus(Long idSanPhamChiTiet, int status);
     SanPhamChiTietResponse getSPCTByMauSacAndKichThuoc(Long idSp,Long idMauSac, Long idKichThuoc);
+    Double getSanPhamChiTietByGiaTienMax();
 
 }
