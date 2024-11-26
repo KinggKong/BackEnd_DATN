@@ -1,5 +1,6 @@
 package com.example.be_datn.controller;
 
+import com.example.be_datn.dto.Request.SanPhamFilterRequest;
 import com.example.be_datn.dto.Request.SanPhamRequest;
 import com.example.be_datn.dto.Response.ApiResponse;
 import com.example.be_datn.dto.Response.SanPhamCustumerResponse;
@@ -101,117 +102,46 @@ public class SanPhamController {
         return apiResponse;
     }
 
-    @GetMapping("/get-all-customer")
-    public ApiResponse<Page<SanPhamCustumerResponse>> getSanPhamsCustumer(@RequestParam(value = "pageNumber", defaultValue = "0") int pageNumber,
-                                                                          @RequestParam(value = "pageSize", defaultValue = "10") int pageSize
-    ) {
-        Pageable pageable = PageRequest.of(Math.max(0, pageNumber), Math.max(1, pageSize));
-        ApiResponse<Page<SanPhamCustumerResponse>> apiResponse = new ApiResponse<>();
-        Page<SanPham> sanPhams = sanPhamService.getAllPageableCustumer(pageable);
-        Page<SanPhamCustumerResponse> sanPhamCustumerResponses = sanPhams.map(sanPham -> {
-            List<Double> giaBan = sanPham.getSanPhamChiTietList().stream().map(SanPhamChiTiet::getGiaBan).toList();
-            Double giaBanThapNhat = giaBan.stream().min(Double::compareTo).orElse(0.0);
-            Double giaBanCaoNhat = giaBan.stream().max(Double::compareTo).orElse(0.0);
-            String giaHienThi = giaBanThapNhat.equals(giaBanCaoNhat)
-                    ? String.format("%,.0f VND", giaBanThapNhat)
-                    : String.format("%,.0f - %,.0f VND", giaBanThapNhat, giaBanCaoNhat);
 
-            String hinhAnh = sanPham.getSanPhamChiTietList()
-                    .stream()
-                    .flatMap(chiTiet -> chiTiet.getHinhAnhList().stream())
-                    .map(HinhAnh::getUrl)
-                    .findFirst()
-                    .orElse(null);
-
-            String phanTramGiamGia = "";
-            for (SanPhamChiTiet sanPhamChiTiet : sanPham.getSanPhamChiTietList()) {
-                SaleCt saleCts = sale_ctService.getSaleCtById(sanPhamChiTiet.getId());
-                if(saleCts != null){
-                    Double giaBanMoi = sanPhamChiTiet.getGiaBan() - saleCts.getTienGiam();
-                    giaBanThapNhat = giaBanMoi;
-                    phanTramGiamGia =saleCts.getGiaTriGiam().toString();
-                    giaHienThi = String.format("%,.0f VND", giaBanMoi);
-                    break;
-                }
-            }
-
-
-            return new SanPhamCustumerResponse(
-                    sanPham.getId(),
-                    sanPham.getTenSanPham(),
-                    giaBanThapNhat,
-                    giaBanCaoNhat,
-                    giaHienThi,
-                    hinhAnh,
-                    phanTramGiamGia
-            );
-        });
-        apiResponse.setData(sanPhamCustumerResponses);
-        apiResponse.setMessage("Lấy danh sách sản phẩm thành công");
-
-        return apiResponse;
-    }
     @GetMapping("/get-by-category/{id}")
     public ApiResponse<List<SanPhamCustumerResponse>> getSanPhamsCustumerByDanhMuc(@PathVariable("id") Integer id) {
         ApiResponse<List<SanPhamCustumerResponse>> apiResponse = new ApiResponse<>();
-
-        // Lấy danh sách sản phẩm từ dịch vụ
-        List<SanPham> sanPhams = sanPhamService.getSanPhamByDanhMucID(id);
-
-        // Chuyển đổi danh sách sản phẩm thành danh sách phản hồi
-        List<SanPhamCustumerResponse> sanPhamCustumerResponses = sanPhams.stream().map(sanPham -> {
-            // Lấy danh sách giá bán của tất cả chi tiết sản phẩm
-            List<Double> giaBan = sanPham.getSanPhamChiTietList().stream()
-                    .map(SanPhamChiTiet::getGiaBan)
-                    .collect(Collectors.toList());
-
-            // Tìm giá thấp nhất và cao nhất
-            Double giaBanThapNhat = giaBan.stream().min(Double::compareTo).orElse(0.0);
-            Double giaBanCaoNhat = giaBan.stream().max(Double::compareTo).orElse(0.0);
-
-            // Tạo chuỗi hiển thị giá
-            String giaHienThi = giaBanThapNhat.equals(giaBanCaoNhat)
-                    ? String.format("%,.0f VND", giaBanThapNhat)
-                    : String.format("%,.0f - %,.0f VND", giaBanThapNhat, giaBanCaoNhat);
-
-            // Lấy ảnh đầu tiên của sản phẩm
-            String hinhAnh = sanPham.getSanPhamChiTietList().stream()
-                    .flatMap(chiTiet -> chiTiet.getHinhAnhList().stream())
-                    .map(HinhAnh::getUrl)
-                    .findFirst()
-                    .orElse(null);
-
-
-            // Trả về đối tượng phản hồi
-            return new SanPhamCustumerResponse(
-                    sanPham.getId(),
-                    sanPham.getTenSanPham(),
-                    giaBanThapNhat,
-                    giaBanCaoNhat,
-                    giaHienThi,
-                    hinhAnh,
-                    ""
-            );
-        }).collect(Collectors.toList());  // Chuyển đổi Stream thành List
-
-        // Đặt dữ liệu vào phản hồi
-        apiResponse.setData(sanPhamCustumerResponses);
+        apiResponse.setData(sanPhamService.getSanPhamByDanhMucID(id));
         apiResponse.setMessage("Lấy danh sách sản phẩm thành công");
-
         return apiResponse;
     }
     @GetMapping("/get-all-customer-filter")
     public ApiResponse<Page<SanPhamCustumerResponse>> getSanPhamsCustumerFilter(@RequestParam(value = "pageNumber", defaultValue = "0") int pageNumber,
-                                                                               @RequestParam(value = "pageSize", defaultValue = "10") int pageSize,
-                                                                                @RequestParam(value = "danhMuc", defaultValue = "") List<Long> idDanhMuc,
-                                                                                @RequestParam(value = "thuongHieu", defaultValue = "") Long idThuongHieu,
-                                                                                @RequestParam(value = "chatLieuVai", defaultValue = "") List<Long> idChatLieuVai,
-                                                                                @RequestParam(value = "chatLieuDe", defaultValue = "") List<Long> idChatLieuDe,
-                                                                                @RequestParam(value = "tenSanPham", defaultValue = "") String tenSanPham
-    ) {
+                                                                                @RequestParam(value = "pageSize", defaultValue = "10") int pageSize,
+                                                                                @RequestParam(value = "danhMucs", required = false) List<Long> danhMucs,
+                                                                                @RequestParam(value = "thuongHieu", required = false) List<Long> thuongHieus,
+                                                                                @RequestParam(value = "chatLieuVais", required = false) List<Long> chatLieuVais,
+                                                                                @RequestParam(value = "chatLieuDes", required = false) List<Long> chatLieuDes,
+                                                                                @RequestParam(value = "tenSanPham", defaultValue = "") String tenSanPham,
+                                                                                @RequestParam(value = "minPrice", defaultValue = "0") Double minPrice,
+                                                                                @RequestParam(value = "maxPrice", defaultValue = "0") Double maxPrice,
+                                                                                @RequestParam(value = "sortBy", defaultValue = "moiNhat") String sortBy){
+
         Pageable pageable = PageRequest.of(Math.max(0, pageNumber), Math.max(1, pageSize));
+        // Xử lý tham số đầu vào
+
+
         ApiResponse<Page<SanPhamCustumerResponse>> apiResponse = new ApiResponse<>();
-        apiResponse.setData(sanPhamService.getAllPageableCustumerFilter(idDanhMuc,idThuongHieu,idChatLieuVai,idChatLieuDe,tenSanPham,pageable));
+        apiResponse.setData(sanPhamService.getAllPageableCustumerFilter(danhMucs,thuongHieus,chatLieuDes,chatLieuVais,tenSanPham,minPrice,maxPrice ,sortBy,pageable));
+        return apiResponse;
+    }
+    @GetMapping("/get-all-customer-sale")
+    public ApiResponse<List<SanPhamCustumerResponse>> getSanPhamsCustumerSale() {
+        ApiResponse<List<SanPhamCustumerResponse>> apiResponse = new ApiResponse<>();
+        apiResponse.setData(sanPhamService.listSanPhamGiamGia());
+        apiResponse.setMessage("Lấy danh sách sản phẩm thành công");
+        return apiResponse;
+    }
+    @GetMapping("/get-all-customer-best-sell")
+    public ApiResponse<List<SanPhamCustumerResponse>> getSanPhamsCustumerBestSell() {
+        ApiResponse<List<SanPhamCustumerResponse>> apiResponse = new ApiResponse<>();
+        apiResponse.setData(sanPhamService.listSanPhamBanChay());
+        apiResponse.setMessage("Lấy danh sách sản phẩm thành công");
         return apiResponse;
     }
 }

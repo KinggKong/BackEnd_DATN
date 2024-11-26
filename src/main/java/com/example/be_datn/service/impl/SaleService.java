@@ -104,7 +104,10 @@ public class SaleService implements ISaleService {
         List<SaleCt> saleCts = sale.getSaleCts();
         List<Long> idSanPhamChiTietNew = saleRequest.getIdSanPhamChiTiet();
         List<Long> idSanPhamChiTietOld = saleCts!=null ? saleCts.stream().map(SaleCt::getIdSanPhamCt).toList():new ArrayList<>();
-
+        for (SaleCt saleCt : saleCts) {
+            saleCt.setGiaTriGiam(saleRequest.getGiaTriGiam());
+            sale_ChiTietRepository.save(saleCt);
+        }
         for (Long idSanPhamChiTiet : idSanPhamChiTietOld) {
             if(!idSanPhamChiTietNew.contains(idSanPhamChiTiet)){
                 SaleCt saleCt = sale_ChiTietRepository.findByIdSanPhamCtAndIdSale(idSanPhamChiTiet, id);

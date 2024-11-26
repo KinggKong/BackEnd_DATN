@@ -1,5 +1,6 @@
 package com.example.be_datn.service.impl;
 
+import com.example.be_datn.dto.Request.SanPhamFilterRequest;
 import com.example.be_datn.dto.Request.SanPhamRequest;
 import com.example.be_datn.dto.Response.SanPhamCustumerResponse;
 import com.example.be_datn.dto.Response.SanPhamResponse;
@@ -15,9 +16,14 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.JpaSort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -42,10 +48,25 @@ public class SanPhamService implements ISanPhamService {
     }
 
     @Override
-    public Page<SanPhamCustumerResponse> getAllPageableCustumerFilter(List<Long> idDanhMuc,
-                                                                      Long idThuongHieu,List<Long> idChatLieuVai,
-                                                                      List<Long>idChatLieuDe,String tenSanPham,Pageable pageable) {
-        Page<SanPham> sanPhams = sanPhamRepository.getAllByFilterCustumers(idDanhMuc, idThuongHieu,idChatLieuVai,idChatLieuDe,tenSanPham,pageable);
+    public Page<SanPhamCustumerResponse> getAllPageableCustumerFilter(List<Long> danhMucs,List<Long> thuongHieus,List<Long> chatLieuDes,List<Long> chatLieuVai,String ten,Double min, Double max ,String sortBy, Pageable pageable) {
+        Specification<SanPham> spec = Specification.where(SanPhamSpecification.activeUsers())
+                .and(SanPhamSpecification.byDanhMuc(danhMucs))
+                .and(SanPhamSpecification.byChatLieuDe(chatLieuDes))
+                .and(SanPhamSpecification.byChatLieuVai(chatLieuVai))
+                .and(SanPhamSpecification.byThuongHieu(thuongHieus))
+                .and(SanPhamSpecification.byNameSanPham(ten))
+                .and(SanPhamSpecification.byMinPrice(min))
+                .and(SanPhamSpecification.byMaxPrice(max));
+        // Thêm sắp xếp
+        if ("tuCaoDenThap".equals(sortBy)) {
+            spec = spec.and(SanPhamSpecification.sortByPriceDesc());
+        } else if ("tuThapDenCao".equals(sortBy)) {
+            spec = spec.and(SanPhamSpecification.sortByPriceAsc());
+        } else if ("moiNhat".equals(sortBy)) {
+            spec = spec.and(SanPhamSpecification.sortByNewest());
+        }
+
+        Page<SanPham> sanPhams = sanPhamRepository.findAll(spec, pageable);
         Page<SanPhamCustumerResponse> sanPhamCustumerResponses = sanPhams.map(sanPham -> {
             List<Double> giaBan = sanPham.getSanPhamChiTietList().stream().map(SanPhamChiTiet::getGiaBan).toList();
             Double giaBanThapNhat = giaBan.stream().min(Double::compareTo).orElse(0.0);
@@ -64,10 +85,10 @@ public class SanPhamService implements ISanPhamService {
             String phanTramGiamGia = "";
             for (SanPhamChiTiet sanPhamChiTiet : sanPham.getSanPhamChiTietList()) {
                 SaleCt saleCts = sale_ctService.getSaleCtById(sanPhamChiTiet.getId());
-                if(saleCts != null){
+                if (saleCts != null) {
                     Double giaBanMoi = sanPhamChiTiet.getGiaBan() - saleCts.getTienGiam();
                     giaBanThapNhat = giaBanMoi;
-                    phanTramGiamGia =saleCts.getGiaTriGiam().toString();
+                    phanTramGiamGia = saleCts.getGiaTriGiam().toString();
                     giaHienThi = String.format("%,.0f VND", giaBanMoi);
                     break;
                 }
@@ -81,7 +102,8 @@ public class SanPhamService implements ISanPhamService {
                     giaBanCaoNhat,
                     giaHienThi,
                     hinhAnh,
-                    phanTramGiamGia
+                    phanTramGiamGia,
+                    0l
             );
         });
         return sanPhamCustumerResponses;
@@ -93,9 +115,63 @@ public class SanPhamService implements ISanPhamService {
     }
 
     @Override
-    public List<SanPham> getSanPhamByDanhMucID(Integer id) {
-        return sanPhamRepository.getSanPhamByDanhMucID(id);
+    public List<SanPhamCustumerResponse> getSanPhamByDanhMucID(Integer id) {
+
+        // Lấy danh sách sản phẩm theo danh mục
+        List<SanPham> sanPhams = sanPhamRepository.getSanPhamByDanhMucID(id);
+
+        // Chuyển đổi sang danh sách SanPhamCustumerResponse
+        List<SanPhamCustumerResponse> sanPhamCustumerResponses = sanPhams.stream().map(sanPham -> {
+            // Lấy danh sách giá bán
+            List<Double> giaBan = sanPham.getSanPhamChiTietList().stream()
+                    .map(SanPhamChiTiet::getGiaBan)
+                    .toList();
+
+            // Tìm giá thấp nhất và cao nhất
+            Double giaBanThapNhat = giaBan.stream().min(Double::compareTo).orElse(0.0);
+            Double giaBanCaoNhat = giaBan.stream().max(Double::compareTo).orElse(0.0);
+
+            // Hiển thị giá
+            String giaHienThi = giaBanThapNhat.equals(giaBanCaoNhat)
+                    ? String.format("%,.0f VND", giaBanThapNhat)
+                    : String.format("%,.0f - %,.0f VND", giaBanThapNhat, giaBanCaoNhat);
+
+            // Lấy hình ảnh đầu tiên
+            String hinhAnh = sanPham.getSanPhamChiTietList().stream()
+                    .flatMap(chiTiet -> chiTiet.getHinhAnhList().stream())
+                    .map(HinhAnh::getUrl)
+                    .findFirst()
+                    .orElse(null);
+
+            // Tìm giảm giá nếu có
+            String phanTramGiamGia = "";
+            for (SanPhamChiTiet sanPhamChiTiet : sanPham.getSanPhamChiTietList()) {
+                SaleCt saleCts = sale_ctService.getSaleCtById(sanPhamChiTiet.getId());
+                if (saleCts != null) {
+                    Double giaBanMoi = sanPhamChiTiet.getGiaBan() - saleCts.getTienGiam();
+                    giaBanThapNhat = Math.min(giaBanThapNhat, giaBanMoi);
+                    phanTramGiamGia = saleCts.getGiaTriGiam().toString();
+                    giaHienThi = String.format("%,.0f VND", giaBanMoi);
+                    break;
+                }
+            }
+
+            // Tạo đối tượng SanPhamCustumerResponse
+            return new SanPhamCustumerResponse(
+                    sanPham.getId(),
+                    sanPham.getTenSanPham(),
+                    giaBanThapNhat,
+                    giaBanCaoNhat,
+                    giaHienThi,
+                    hinhAnh,
+                    phanTramGiamGia,
+                    0l
+            );
+        }).toList();
+
+        return sanPhamCustumerResponses;
     }
+
 
     @Override
     public SanPhamResponse updateStatus(Long idSanPham, int status) {
@@ -146,6 +222,136 @@ public class SanPhamService implements ISanPhamService {
         }
 
     }
+
+    @Override
+    public List<SanPham> filterProducts(SanPhamFilterRequest filterRequest) {
+        return List.of();
+    }
+
+    @Override
+    public List<SanPhamCustumerResponse> listSanPhamGiamGia() {
+        List<SanPham> sanPhams = sanPhamRepository.findAll();
+        List<SanPham> sanPhamGiamGias = new ArrayList<>();
+        for (SanPham sanPham : sanPhams) {
+            for (SanPhamChiTiet sanPhamChiTiet : sanPham.getSanPhamChiTietList()) {
+                SaleCt saleCts = sale_ctService.getSaleCtById(sanPhamChiTiet.getId());
+                if (saleCts != null) {
+                    sanPhamGiamGias.add(sanPham);
+                    break;
+                }
+            }
+        }
+        List<SanPhamCustumerResponse> sanPhamCustumerResponses = sanPhamGiamGias.stream().map(sanPham -> {
+            // Lấy danh sách giá bán
+            List<Double> giaBan = sanPham.getSanPhamChiTietList().stream()
+                    .map(SanPhamChiTiet::getGiaBan)
+                    .toList();
+
+            // Tìm giá thấp nhất và cao nhất
+            Double giaBanThapNhat = giaBan.stream().min(Double::compareTo).orElse(0.0);
+            Double giaBanCaoNhat = giaBan.stream().max(Double::compareTo).orElse(0.0);
+
+            // Hiển thị giá
+            String giaHienThi = giaBanThapNhat.equals(giaBanCaoNhat)
+                    ? String.format("%,.0f VND", giaBanThapNhat)
+                    : String.format("%,.0f - %,.0f VND", giaBanThapNhat, giaBanCaoNhat);
+
+            // Lấy hình ảnh đầu tiên
+            String hinhAnh = sanPham.getSanPhamChiTietList().stream()
+                    .flatMap(chiTiet -> chiTiet.getHinhAnhList().stream())
+                    .map(HinhAnh::getUrl)
+                    .findFirst()
+                    .orElse(null);
+
+            // Tìm giảm giá nếu có
+            String phanTramGiamGia = "";
+            for (SanPhamChiTiet sanPhamChiTiet : sanPham.getSanPhamChiTietList()) {
+                SaleCt saleCts = sale_ctService.getSaleCtById(sanPhamChiTiet.getId());
+                if (saleCts != null) {
+                    Double giaBanMoi = sanPhamChiTiet.getGiaBan() - saleCts.getTienGiam();
+                    giaBanThapNhat = Math.min(giaBanThapNhat, giaBanMoi);
+                    phanTramGiamGia = saleCts.getGiaTriGiam().toString();
+                    giaHienThi = String.format("%,.0f VND", giaBanMoi);
+                    break;
+                }
+            }
+
+            // Tạo đối tượng SanPhamCustumerResponse
+            return new SanPhamCustumerResponse(
+                    sanPham.getId(),
+                    sanPham.getTenSanPham(),
+                    giaBanThapNhat,
+                    giaBanCaoNhat,
+                    giaHienThi,
+                    hinhAnh,
+                    phanTramGiamGia,
+                    0l
+            );
+        }).toList();
+        return sanPhamCustumerResponses;
+    }
+
+    @Override
+    public List<SanPhamCustumerResponse> listSanPhamBanChay() {
+        // Lấy danh sách sản phẩm và tổng số lượng bán từ query
+        List<Object[]> sanPhamData = sanPhamRepository.findBestSellingProductsNative();
+
+
+        List<SanPhamCustumerResponse> sanPhamCustumerResponses = sanPhamData.stream().map(data -> {
+            // Dữ liệu từ query
+            SanPham sanPham = sanPhamRepository.findById((Long) data[0]).orElseThrow(() -> new AppException(ErrorCode.SANPHAM_NOT_FOUND));
+            Long totalQuantity =  ((BigDecimal) data[4]).longValue();; // Số lượng bán (totalQuantity)
+
+            // Lấy danh sách giá bán
+            List<Double> giaBan = sanPham.getSanPhamChiTietList().stream()
+                    .map(SanPhamChiTiet::getGiaBan)
+                    .toList();
+
+            // Tìm giá thấp nhất và cao nhất
+            Double giaBanThapNhat = giaBan.stream().min(Double::compareTo).orElse(0.0);
+            Double giaBanCaoNhat = giaBan.stream().max(Double::compareTo).orElse(0.0);
+
+            // Hiển thị giá
+            String giaHienThi = giaBanThapNhat.equals(giaBanCaoNhat)
+                    ? String.format("%,.0f VND", giaBanThapNhat)
+                    : String.format("%,.0f - %,.0f VND", giaBanThapNhat, giaBanCaoNhat);
+
+            // Lấy hình ảnh đầu tiên
+            String hinhAnh = sanPham.getSanPhamChiTietList().stream()
+                    .flatMap(chiTiet -> chiTiet.getHinhAnhList().stream())
+                    .map(HinhAnh::getUrl)
+                    .findFirst()
+                    .orElse(null);
+
+            // Tìm giảm giá nếu có
+            String phanTramGiamGia = "";
+            for (SanPhamChiTiet sanPhamChiTiet : sanPham.getSanPhamChiTietList()) {
+                SaleCt saleCts = sale_ctService.getSaleCtById(sanPhamChiTiet.getId());
+                if (saleCts != null) {
+                    Double giaBanMoi = sanPhamChiTiet.getGiaBan() - saleCts.getTienGiam();
+                    giaBanThapNhat = Math.min(giaBanThapNhat, giaBanMoi);
+                    phanTramGiamGia = saleCts.getGiaTriGiam().toString();
+                    giaHienThi = String.format("%,.0f VND", giaBanMoi);
+                    break;
+                }
+            }
+
+            // Tạo đối tượng SanPhamCustumerResponse
+            return new SanPhamCustumerResponse(
+                    sanPham.getId(),
+                    sanPham.getTenSanPham(),
+                    giaBanThapNhat,
+                    giaBanCaoNhat,
+                    giaHienThi,
+                    hinhAnh,
+                    phanTramGiamGia,
+                    totalQuantity
+            );
+        }).toList();
+
+        return sanPhamCustumerResponses;
+    }
+
 
 
     private void validateForeignKeys(SanPhamRequest request) {

@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 public interface GioHangChiTietRepository extends JpaRepository<GioHangChiTiet, Long> {
@@ -31,4 +32,8 @@ public interface GioHangChiTietRepository extends JpaRepository<GioHangChiTiet, 
                               @Param("idGioHang") Long idGioHang,
                               @Param("soLuong") int soLuong);
 
+
+    //Lấy ra tất cả giỏ hàng chi tiết theo thoi giam giam gia het han
+//    @Query(value = "select ghct from GioHangChiTiet ghct where ghct.thoiGianGiamGia < current_timestamp and ghct.trangThai = 1")
+    List<GioHangChiTiet> findByThoiGianGiamGiaBefore(LocalDateTime localDateTime);
 }

@@ -16,6 +16,7 @@ public class SanPhamCustumerResponse {
     private String giaHienThi; // Giá hiển thị (dạng chuỗi)
     private String hinhAnh;
     private String phanTramGiamGia;
+    private Long soLuongBan;
 
 
 }

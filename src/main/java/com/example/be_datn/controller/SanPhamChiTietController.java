@@ -105,4 +105,10 @@ public class SanPhamChiTietController {
         apiResponse.setData(sanPhamChiTietService.getById(id));
         return apiResponse;
     }
+    @GetMapping("/max-price")
+    public ApiResponse<Double> getSanPhamChiTietByGiaTienMax() {
+        ApiResponse<Double> apiResponse = new ApiResponse<>();
+        apiResponse.setData(sanPhamChiTietService.getSanPhamChiTietByGiaTienMax());
+        return apiResponse;
+    }
 }
