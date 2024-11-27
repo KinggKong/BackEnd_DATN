@@ -28,7 +28,6 @@ public class HoaDonRequest {
 
     Long idKhachHang;
 
-
     Long idVoucher;
 
     String hinhThucThanhToan;

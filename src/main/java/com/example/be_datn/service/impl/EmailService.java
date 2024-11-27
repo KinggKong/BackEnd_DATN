@@ -192,7 +192,7 @@ public class EmailService implements IEmailService {
         StringBuilder html = new StringBuilder();
         for (HoaDonChiTietResponse item : items) {
             SanPhamChiTietResponse sp = item.getSanPhamChiTietResponse();
-            String imageUrl = sp.getHinhAnhList().get(0).getUrl(); // Lấy ảnh đầu tiên
+            String imageUrl = sp.getHinhAnhList().get(0).getUrl();
 
             html.append(String.format("""
                             <tr>
