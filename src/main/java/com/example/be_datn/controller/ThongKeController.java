@@ -17,6 +17,8 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
@@ -26,7 +28,8 @@ public class ThongKeController {
     ThongKeService thongKeSerVice;
     @GetMapping("")
     public ApiResponse<ThongKeResponse> getThongKe(@RequestParam(value = "ngayBatDau", defaultValue = "") String ngayBatDau,
-                                                   @RequestParam(value = "ngayKetThuc", defaultValue = "") String ngayKetThuc) {
+                                                   @RequestParam(value = "ngayKetThuc", defaultValue = "") String ngayKetThuc,
+                                                   @RequestParam(value = "typeSale", defaultValue = "") String typeSale) {
         ApiResponse<ThongKeResponse> apiResponse = new ApiResponse<>();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy").withZone(ZoneId.systemDefault());
         LocalDateTime date1 = LocalDate.parse(ngayBatDau, formatter).atStartOfDay();
@@ -34,7 +37,45 @@ public class ThongKeController {
 //        Instant date1 = LocalDate.parse(ngayBatDau, formatter).atStartOfDay(ZoneId.systemDefault()).toInstant();
 //        Instant date2 = LocalDate.parse(ngayKetThuc,formatter).atTime(23, 59, 59).atZone(ZoneId.systemDefault()).toInstant();
         //Instant date2 = LocalDate.parse(ngayKetThuc, formatter).atStartOfDay(ZoneId.systemDefault()).toInstant();
-        apiResponse.setData(thongKeSerVice.getAll(date1,date2));
+        apiResponse.setData(thongKeSerVice.getAll(date1,date2,typeSale));
+        return apiResponse;
+    }
+
+    @GetMapping("doanh-thu")
+    public ApiResponse<List<Map<String,Object>>> getThongKeDoanhThu(@RequestParam(value = "ngayBatDau", defaultValue = "") String ngayBatDau,
+                                                     @RequestParam(value = "ngayKetThuc", defaultValue = "") String ngayKetThuc) {
+        ApiResponse<List<Map<String,Object>>> apiResponse = new ApiResponse<>();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy").withZone(ZoneId.systemDefault());
+        LocalDateTime date1 = LocalDate.parse(ngayBatDau, formatter).atStartOfDay();
+        LocalDateTime date2 = LocalDate.parse(ngayKetThuc, formatter).atTime(23, 59, 59);
+//        Instant date1 = LocalDate.parse(ngayBatDau, formatter).atStartOfDay(ZoneId.systemDefault()).toInstant();
+//        Instant date2 = LocalDate.parse(ngayKetThuc,formatter).atTime(23, 59, 59).atZone(ZoneId.systemDefault()).toInstant();
+        //Instant date2 = LocalDate.parse(ngayKetThuc, formatter).atStartOfDay(ZoneId.systemDefault()).toInstant();
+        apiResponse.setData(thongKeSerVice.layDoanhThuTheoThoiGian(date1,date2));
+        return apiResponse;
+    }
+    @GetMapping("doanh-thu-ngay")
+    public ApiResponse<List<Map<String,Object>>> getThongKeDoanhThuNgay(@RequestParam(value = "ngayBatDau", defaultValue = "") String ngayBatDau,
+                                                                        @RequestParam(value = "ngayKetThuc", defaultValue = "") String ngayKetThuc,
+                                                                        @RequestParam(value = "filter", defaultValue = "") String filter,
+                                                                        @RequestParam(value = "typeSale", defaultValue = "") String typeSale) {
+        ApiResponse<List<Map<String,Object>>> apiResponse = new ApiResponse<>();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy").withZone(ZoneId.systemDefault());
+        LocalDateTime date1 = LocalDate.parse(ngayBatDau, formatter).atStartOfDay();
+        LocalDateTime date2 = LocalDate.parse(ngayKetThuc, formatter).atTime(23, 59, 59);
+        apiResponse.setData(thongKeSerVice.layDoanhThuTheoThoiGianNgay(filter,date1,date2,typeSale));
+        return apiResponse;
+    }
+    @GetMapping("doanh-thu-san-pham")
+    public ApiResponse<List<Map<String,Object>>> getThongKeDoanhThuSanPham(@RequestParam(value = "ngayBatDau", defaultValue = "") String ngayBatDau,
+                                                                        @RequestParam(value = "ngayKetThuc", defaultValue = "") String ngayKetThuc,
+                                                                           @RequestParam(value = "filter", defaultValue = "") String filter,
+                                                                           @RequestParam(value = "typeSale", defaultValue = "") String typeSale) {
+        ApiResponse<List<Map<String,Object>>> apiResponse = new ApiResponse<>();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy").withZone(ZoneId.systemDefault());
+        LocalDateTime date1 = LocalDate.parse(ngayBatDau, formatter).atStartOfDay();
+        LocalDateTime date2 = LocalDate.parse(ngayKetThuc, formatter).atTime(23, 59, 59);
+        apiResponse.setData(thongKeSerVice.getDoanhThuTheoSanPham(filter,date1,date2,typeSale));
         return apiResponse;
     }
 
