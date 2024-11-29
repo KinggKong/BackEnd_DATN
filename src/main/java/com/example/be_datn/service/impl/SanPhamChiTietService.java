@@ -77,6 +77,7 @@ public class SanPhamChiTietService implements ISanPhamChiTietService {
             if (sanPhamChiTietCheck != null) {
                 sanPhamChiTietCheck.setSoLuong(sanPhamChiTietCheck.getSoLuong() + sanPhamChiTietRequest1.getSoLuong());
                 sanPhamChiTietCheck.setGiaBan(sanPhamChiTietRequest1.getGiaBan());
+                sanPhamChiTietCheck.setGiaBanSauKhiGiam(sanPhamChiTietRequest1.getGiaBan());
                 sanPhamChiTietCheck.setTrangThai(sanPhamChiTietRequest1.getTrangThai());
                 sanPhamChiTietCheck = sanPhamChiTietRepository.save(sanPhamChiTietCheck);
                 List<String> existingImages = hinhAnhService.getAllByIdSanPhamCt(sanPhamChiTietCheck.getId())
@@ -106,6 +107,7 @@ public class SanPhamChiTietService implements ISanPhamChiTietService {
             SanPhamChiTiet sanPhamChiTiet = SanPhamChiTiet.builder()
                     .soLuong(sanPhamChiTietRequest1.getSoLuong())
                     .giaBan(sanPhamChiTietRequest1.getGiaBan())
+                    .giaBanSauKhiGiam(sanPhamChiTietRequest1.getGiaBan())
                     .sanPham(sanPham)
                     .kichThuoc(kichThuoc)
                     .mauSac(mauSac)
@@ -137,6 +139,7 @@ public class SanPhamChiTietService implements ISanPhamChiTietService {
         SanPham sanPham = sanPhamRepository.findById(sanPhamChiTietRequest.getId_sanPham()).orElseThrow(()-> new AppException(ErrorCode.SANPHAM_NOT_FOUND));
         sanPhamChiTiet.setSoLuong(sanPhamChiTietRequest.getSoLuong());
         sanPhamChiTiet.setGiaBan(sanPhamChiTietRequest.getGiaBan());
+        sanPhamChiTiet.setGiaBanSauKhiGiam(sanPhamChiTietRequest.getGiaBan());
         sanPhamChiTiet.setSanPham(sanPham);
         sanPhamChiTiet.setKichThuoc(kichThuoc);
         sanPhamChiTiet.setMauSac(mauSac);
@@ -199,5 +202,10 @@ public class SanPhamChiTietService implements ISanPhamChiTietService {
     @Override
     public Double getSanPhamChiTietByGiaTienMax() {
         return sanPhamChiTietRepository.getSanPhamChiTietByGiaTienMax();
+    }
+
+    @Override
+    public Page<SanPhamChiTietResponse> getSanPhamChiTietBySoLuong(int soLuong, Pageable pageable) {
+        return sanPhamChiTietRepository.getSanPhamChiTietBySoLuong(soLuong,pageable).map(SanPhamChiTietResponse::fromSanPhamChiTiet);
     }
 }

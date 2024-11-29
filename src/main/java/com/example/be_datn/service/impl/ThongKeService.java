@@ -2,6 +2,7 @@ package com.example.be_datn.service.impl;
 
 import com.example.be_datn.dto.Response.ThongKeResponse;
 
+import com.example.be_datn.dto.Response.ThongKeSanPhamBanChayResponse;
 import com.example.be_datn.repository.HoaDonRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -9,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -94,6 +96,21 @@ public class ThongKeService {
                 return hoaDonRepository.getDoanhThuTheoSanPham(startDate, endDate,typeSale);
         }
 
+
+
+    }
+    public List<ThongKeSanPhamBanChayResponse> getSanPhambanChayDoanhThu(LocalDateTime startDate, LocalDateTime endDate,String typeSale) {
+
+        List<Object[]> list = hoaDonRepository.findBestSellingProductsNative(startDate, endDate,typeSale);
+        List<ThongKeSanPhamBanChayResponse> thongKeSanPhamBanChayResponses = new ArrayList<>();
+        for (Object[] objects : list) {
+            ThongKeSanPhamBanChayResponse thongKeSanPhamBanChayResponse = new ThongKeSanPhamBanChayResponse();
+            thongKeSanPhamBanChayResponse.setTenSanPham(objects[0].toString());
+            thongKeSanPhamBanChayResponse.setTongSoLuongBan(Integer.parseInt(objects[1].toString()));
+            thongKeSanPhamBanChayResponse.setTongDoanhThu(Double.parseDouble(objects[2].toString()));
+            thongKeSanPhamBanChayResponses.add(thongKeSanPhamBanChayResponse);
+        }
+        return thongKeSanPhamBanChayResponses;
     }
 }
 

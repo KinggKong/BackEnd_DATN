@@ -68,6 +68,8 @@ public class SaleService implements ISaleService {
             if(sanPhamChiTiet == null){
                 throw new AppException(ErrorCode.SANPHAMCHITIET_NOT_FOUND);
             }
+            sanPhamChiTiet.setGiaBanSauKhiGiam((Double) (sanPhamChiTiet.getGiaBan()*(100-saleRequest.getGiaTriGiam())/100));
+            sanPhamChiTietRepository.save(sanPhamChiTiet);
             SaleCt saleCt = new SaleCt();
             saleCt.setIdSanPhamCt(saleRequest.getIdSanPhamChiTiet().get(i));
             saleCt.setSale(saleSave);
@@ -106,6 +108,21 @@ public class SaleService implements ISaleService {
         List<Long> idSanPhamChiTietOld = saleCts!=null ? saleCts.stream().map(SaleCt::getIdSanPhamCt).toList():new ArrayList<>();
         for (SaleCt saleCt : saleCts) {
             saleCt.setGiaTriGiam(saleRequest.getGiaTriGiam());
+            if(sale.getTrangThai()==1){
+                SanPhamChiTiet sanPhamChiTiet = sanPhamChiTietRepository.findById(saleCt.getIdSanPhamCt()).orElse(null);
+                if(sanPhamChiTiet == null){
+                    throw new AppException(ErrorCode.SANPHAMCHITIET_NOT_FOUND);
+                }
+                sanPhamChiTiet.setGiaBanSauKhiGiam((Double) (sanPhamChiTiet.getGiaBan()*(100-saleRequest.getGiaTriGiam())/100));
+                sanPhamChiTietRepository.save(sanPhamChiTiet);
+            }else {
+                SanPhamChiTiet sanPhamChiTiet = sanPhamChiTietRepository.findById(saleCt.getIdSanPhamCt()).orElse(null);
+                if(sanPhamChiTiet == null){
+                    throw new AppException(ErrorCode.SANPHAMCHITIET_NOT_FOUND);
+                }
+                sanPhamChiTiet.setGiaBanSauKhiGiam(sanPhamChiTiet.getGiaBan());
+                sanPhamChiTietRepository.save(sanPhamChiTiet);
+            }
             sale_ChiTietRepository.save(saleCt);
         }
         for (Long idSanPhamChiTiet : idSanPhamChiTietOld) {
@@ -124,6 +141,14 @@ public class SaleService implements ISaleService {
                     throw new AppException(ErrorCode.SANPHAMCHITIET_NOT_FOUND);
                 }
                 SaleCt saleCt = sale_ChiTietRepository.findByIdSanPhamCtAndIdSale(idSanPhamChiTiet, id);
+                if(sale.getTrangThai() == 1){
+                    sanPhamChiTiet.setGiaBanSauKhiGiam((Double) (sanPhamChiTiet.getGiaBan()*(100-saleRequest.getGiaTriGiam())/100));
+                    sanPhamChiTietRepository.save(sanPhamChiTiet);
+                }else {
+                    sanPhamChiTiet.setGiaBanSauKhiGiam(sanPhamChiTiet.getGiaBan());
+                    sanPhamChiTietRepository.save(sanPhamChiTiet);
+                }
+
                 if(saleCt == null){
                     saleCt = new SaleCt();
                     saleCt.setIdSanPhamCt(idSanPhamChiTiet);

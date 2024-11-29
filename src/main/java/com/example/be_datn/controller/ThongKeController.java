@@ -3,6 +3,7 @@ package com.example.be_datn.controller;
 import com.example.be_datn.dto.Response.ApiResponse;
 import com.example.be_datn.dto.Response.ThongKeResponse;
 
+import com.example.be_datn.dto.Response.ThongKeSanPhamBanChayResponse;
 import com.example.be_datn.service.impl.ThongKeService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -76,6 +77,17 @@ public class ThongKeController {
         LocalDateTime date1 = LocalDate.parse(ngayBatDau, formatter).atStartOfDay();
         LocalDateTime date2 = LocalDate.parse(ngayKetThuc, formatter).atTime(23, 59, 59);
         apiResponse.setData(thongKeSerVice.getDoanhThuTheoSanPham(filter,date1,date2,typeSale));
+        return apiResponse;
+    }
+    @GetMapping("san-pham-ban-chay")
+    public ApiResponse<List<ThongKeSanPhamBanChayResponse>> getThongKeSanPhamBanChay(@RequestParam(value = "ngayBatDau", defaultValue = "") String ngayBatDau,
+                                                                                     @RequestParam(value = "ngayKetThuc", defaultValue = "") String ngayKetThuc,
+                                                                                     @RequestParam(value = "typeSale", defaultValue = "") String typeSale) {
+        ApiResponse<List<ThongKeSanPhamBanChayResponse>> apiResponse = new ApiResponse<>();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy").withZone(ZoneId.systemDefault());
+        LocalDateTime date1 = LocalDate.parse(ngayBatDau, formatter).atStartOfDay();
+        LocalDateTime date2 = LocalDate.parse(ngayKetThuc, formatter).atTime(23, 59, 59);
+        apiResponse.setData(thongKeSerVice.getSanPhambanChayDoanhThu(date1,date2,typeSale));
         return apiResponse;
     }
 

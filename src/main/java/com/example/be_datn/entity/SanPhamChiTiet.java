@@ -36,6 +36,8 @@ public class SanPhamChiTiet extends BaseEntity {
     int soLuong;
     @Column(name = "gia_tien")
     Double giaBan;
+    @Column(name = "gia_ban_sau_khi_giam")
+    Double giaBanSauKhiGiam;
     @Column(name = "trang_thai")
     int trangThai;
     @OneToMany(mappedBy = "sanPhamChiTiet", fetch = FetchType.LAZY)

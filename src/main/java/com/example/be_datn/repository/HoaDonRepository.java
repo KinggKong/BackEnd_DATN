@@ -1,5 +1,6 @@
 package com.example.be_datn.repository;
 
+import com.example.be_datn.dto.Response.ThongKeSanPhamBanChayResponse;
 import com.example.be_datn.entity.HoaDon;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -32,7 +33,7 @@ public interface HoaDonRepository extends JpaRepository<HoaDon, Long> {
     @Query("select sum(hdb.tongTien) from HoaDon hdb where hdb.trangThai='DONE' and hdb.created_at >= ?1 and hdb.created_at <= ?2")
     Float tongDoanhThu(LocalDateTime ngayBatDau, LocalDateTime ngayKetThuc);
     @Query(value = """
-    SELECT SUM(hdb.tong_tien) 
+    SELECT SUM(hdb.tien_sau_giam - hdb.tien_ship) 
     FROM hoa_don hdb 
     WHERE hdb.trang_thai = 'DONE' 
       AND hdb.created_at >= :ngayBatDau 
@@ -71,7 +72,7 @@ public interface HoaDonRepository extends JpaRepository<HoaDon, Long> {
     //Query theo ngày trong thang
     @Query(value = "SELECT " +
             "  all_dates.ngay, " +
-            "  COALESCE(SUM(hd.tong_tien), 0) AS doanhThu " +
+            "  COALESCE(SUM(hd.tien_sau_giam - hd.tien_ship), 0) AS doanhThu " +
             "FROM (SELECT DATE(:monthDate) + INTERVAL a DAY AS ngay " +
             "      FROM (SELECT 0 AS a UNION ALL SELECT 1 UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL " +
             "            SELECT 4 UNION ALL SELECT 5 UNION ALL SELECT 6 UNION ALL SELECT 7 UNION ALL " +
@@ -88,7 +89,7 @@ public interface HoaDonRepository extends JpaRepository<HoaDon, Long> {
 
     @Query(value = "SELECT " +
             "  all_dates.ngay, " +
-            "  COALESCE(SUM(hd.tong_tien), 0) AS doanhThu " +
+            "  COALESCE(SUM(hd.tien_sau_giam - hd.tien_ship), 0) AS doanhThu " +
             "FROM (SELECT DATE(:startDate) + INTERVAL a DAY AS ngay " +
             "      FROM (SELECT 0 AS a UNION ALL SELECT 1 UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL " +
             "            SELECT 4 UNION ALL SELECT 5 UNION ALL SELECT 6 UNION ALL SELECT 7 UNION ALL " +
@@ -198,7 +199,34 @@ public interface HoaDonRepository extends JpaRepository<HoaDon, Long> {
             """, nativeQuery = true)
     List<Map<String, Object>> getDoanhThuTheoSanPhamVaThang(@Param("startDate") LocalDateTime startDate, @Param("typeSale") String typeSale);
 
-    
+    //Lấy ra danh sách sản phẩm bán chạy theo doanh thu
+    @Query(value = """
+            SELECT
+                sp.ten_san_pham AS tenSanPham,
+                COALESCE(SUM(hdct.so_luong), 0) AS tongSoLuongBan,
+                COALESCE(SUM(hdct.so_luong * hdct.gia_tien), 0) AS tongDoanhThu
+            FROM
+                hoa_don hd
+            JOIN
+                hoa_don_ct hdct ON hd.id = hdct.id_hoa_don
+            JOIN
+                san_pham_chi_tiet spct ON hdct.id_san_pham_ct = spct.id
+            JOIN
+                san_pham sp ON spct.id_san_pham = sp.id
+            WHERE
+                hd.trang_thai = 'DONE' -- Chỉ lấy hóa đơn đã hoàn thành
+                AND hd.created_at >= :ngayBatDau -- Lọc theo ngày bắt đầu
+                AND hd.created_at <= :ngayKetThuc -- Lọc theo ngày kết thúc
+                AND (:loaiHoaDon ='' OR hd.loai_hoa_don = :loaiHoaDon or :loaiHoaDon IS NULL) -- Lọc theo loại hóa đơn nếu có
+            GROUP BY
+                sp.ten_san_pham
+            ORDER BY
+                tongDoanhThu DESC;
+            """, nativeQuery = true)
+    List<Object[]> findBestSellingProductsNative(@Param("ngayBatDau") LocalDateTime ngayBatDau,
+                                                 @Param("ngayKetThuc") LocalDateTime ngayKetThuc,
+                                                 @Param("loaiHoaDon") String loaiHoaDon);
+
 
 
 }

@@ -25,6 +25,7 @@ public class SanPhamChiTietResponse {
     String tenKichThuoc;
     int soLuong;
     Double giaBan;
+    Double giaBanSauKhiGiam;
     int trangThai;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     LocalDateTime createdAt;
@@ -45,6 +46,7 @@ public class SanPhamChiTietResponse {
                 .tenKichThuoc(sanPhamChiTiet.getKichThuoc().getTenKichThuoc())
                 .soLuong(sanPhamChiTiet.getSoLuong())
                 .giaBan(sanPhamChiTiet.getGiaBan())
+                .giaBanSauKhiGiam(sanPhamChiTiet.getGiaBanSauKhiGiam())
                 .trangThai(sanPhamChiTiet.getTrangThai())
                 .createdAt(sanPhamChiTiet.getCreated_at())
                 .updatedAt(sanPhamChiTiet.getUpdated_at())
