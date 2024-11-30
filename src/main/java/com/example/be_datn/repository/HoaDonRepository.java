@@ -10,6 +10,7 @@ import java.util.List;
 public interface HoaDonRepository extends JpaRepository<HoaDon, Long> {
     HoaDon findByMaHoaDon(String maHoaDon);
 
-    @Query("SELECT hd FROM HoaDon hd WHERE hd.trangThai LIKE CONCAT('%', :trangThai, '%') order by hd.created_at desc")
+    @Query("SELECT hd FROM HoaDon hd WHERE hd.trangThai LIKE CONCAT('%', :trangThai, '%')  AND hd.trangThai <> 'PENDING' order by hd.created_at desc")
     List<HoaDon> findByTrangThai(@Param("trangThai") String trangThai);
+
 }

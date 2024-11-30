@@ -16,4 +16,14 @@ public class Sale_CTService implements ISale_CTService {
     public SaleCt createSaleCt(SaleCt saleCt) {
         return sale_ChiTietRepository.save(saleCt);
     }
+
+    @Override
+    public SaleCt getSaleCtById(Long id) {
+        return sale_ChiTietRepository.findMostRecentByIdSanPhamCtAndIdSale(id);
+    }
+
+    @Override
+    public SaleCt getSaleCtByIdSanPhamCt(Long idSanPhamChiTiet) {
+        return sale_ChiTietRepository.findMostRecentByIdSanPhamCtAndIdSale(idSanPhamChiTiet);
+    }
 }

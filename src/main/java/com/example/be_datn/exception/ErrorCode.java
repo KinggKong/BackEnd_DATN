@@ -29,6 +29,9 @@ public enum ErrorCode {
     // Bổ sung các mã lỗi cho voucher
     VOUCHER_ALREADY_EXISTS(1020, "Voucher đã tồn tại!"),
     VOUCHER_NOT_FOUND(1021, "Voucher không tồn tại!"),
+    EMAIL_ALREADY_EXISTS(1020, "Email đã tồn tại!"),
+    PHONE_ALREADY_EXISTS(1020, "SDT đã tồn tại!"),
+    KHACH_HANG_NOT_FOUND(1021, "Khách hàng không tồn tại!"),
 
     THUONGHIEU_ALREADY_EXISTS(1012, "Thuong hieu da ton tai !"),
     THUONGHIEU_NOT_FOUND(1013, "Thuong hieu khong ton tai !"),
@@ -66,9 +69,11 @@ public enum ErrorCode {
     HOA_DON_INVALID(2000, "Không thể tạo hóa đơn"),
     HOA_DON_NOT_FOUND(2000,"Hóa đơn không tồn tại !"),
     HOA_DON_CHI_TIET_NOT_FOUND_LIST(2000,"Danh sách hóa đơn chi tiết by id hóa đơn không tồn tại"),
-    NHANVIEN_NOT_FOUND(2000,"Nhân viên không tồn tại !")
+    NHANVIEN_NOT_FOUND(2000,"Nhân viên không tồn tại !"),
 
-
+    SOLUONG_SANPHAM_KHONG_DU(2000,"Số lượng sản phẩm mua nhiều hơn số lượng có sẵn"),
+    ID_GIO_HANG_CANT_BE_NULL(2000,"Id giỏ hàng không được null"),
+    CART_DONT_HAVE_PRODUCT(2000,"Giỏ hàng không có sản phẩm nào"),
     ;
     private int code;
     private String message;

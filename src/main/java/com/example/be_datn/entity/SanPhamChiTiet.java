@@ -1,6 +1,7 @@
 package com.example.be_datn.entity;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -27,6 +28,7 @@ public class SanPhamChiTiet extends BaseEntity {
     KichThuoc kichThuoc;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_san_pham")
+    @JsonIgnore
     SanPham sanPham;
     @Column(name = "ma_san_pham")
     String maSanPham;
@@ -38,5 +40,13 @@ public class SanPhamChiTiet extends BaseEntity {
     int trangThai;
     @OneToMany(mappedBy = "sanPhamChiTiet", fetch = FetchType.LAZY)
     List<HinhAnh> hinhAnhList;
+
+
+
+
+
+
+
+
 }
 

@@ -40,4 +40,19 @@ public class GioHangChiTietController {
                 .build();
     }
 
+    @DeleteMapping("/san-pham-chi-tiet/{id}")
+    public ApiResponse xoaGioHangChiTietBySanPhamChiTiet(@PathVariable(name = "id") Long idSpct, @RequestParam(name = "idGioHang") Long idGioHang) {
+        return ApiResponse.builder()
+                .data(gioHangChiTietService.xoaKhoiGioHangBySanPhamChiTiet(idSpct, idGioHang))
+                .message("xoa gio hang chi tiet thanh cong")
+                .build();
+    }
+    @PutMapping("/update")
+    public ApiResponse updateGioHangChiTiet(@RequestParam(name = "idSanPhamChiTiet") Long idSanPhamChiTiet, @RequestParam(name = "idGioHang") Long idGioHang, @RequestParam(name = "soLuong") int soLuong) {
+        gioHangChiTietService.updateGioHangChiTiet(idSanPhamChiTiet, idGioHang, soLuong);
+        return ApiResponse.builder()
+                .message("update successfull")
+                .build();
+    }
+
 }

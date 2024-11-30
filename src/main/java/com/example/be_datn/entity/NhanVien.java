@@ -5,6 +5,7 @@ import jakarta.validation.constraints.Size;
 import lombok.*;
 
 import java.time.Instant;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Getter
@@ -14,7 +15,7 @@ import java.time.LocalDateTime;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class NhanVien {
+public class NhanVien extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
@@ -24,9 +25,8 @@ public class NhanVien {
     @Column(name = "ten")
     private String ten;
 
-    @OneToOne
-    @JoinColumn(name = "id_tai_khoan")
-    TaiKhoan taiKhoan;
+    @Column(name = "id_tai_khoan")
+    private Long idTaiKhoan;
 
     @Size(max = 255)
     @Column(name = "email")
@@ -41,7 +41,7 @@ public class NhanVien {
     private String avatar;
 
     @Column(name = "ngay_sinh")
-    private LocalDateTime ngaySinh;
+    private LocalDate ngaySinh;
 
     @Size(max = 255)
     @Column(name = "dia_chi")
@@ -50,11 +50,6 @@ public class NhanVien {
     @Column(name = "gioi_tinh")
     private Boolean gioiTinh;
 
-    @Column(name = "created_at")
-    private Instant createdAt;
-
-    @Column(name = "updated_at")
-    private Instant updatedAt;
 
     @Column(name = "trang_thai")
     private int trangThai;

@@ -3,6 +3,8 @@ package com.example.be_datn.controller;
 import com.example.be_datn.dto.Request.HoaDonRequest;
 import com.example.be_datn.dto.Response.ApiResponse;
 import com.example.be_datn.dto.Response.HoaDonResponse;
+import com.example.be_datn.repository.LichSuThanhToanRepository;
+import com.example.be_datn.service.IHoaDonService;
 import com.example.be_datn.service.impl.PaymentService;
 import com.example.be_datn.service.impl.ShopOnlineService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -14,8 +16,6 @@ import lombok.experimental.FieldDefaults;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/api/payment")
@@ -25,6 +25,8 @@ import java.util.Map;
 public class PaymentController {
     PaymentService paymentService;
     ShopOnlineService shopOnlineService;
+    private final LichSuThanhToanRepository lichSuThanhToanRepository;
+    IHoaDonService hoaDonService;
 
 
     @PostMapping("/submitOrder")
@@ -35,9 +37,10 @@ public class PaymentController {
         String baseUrl = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort();
         Integer amount = (int) Math.ceil(hoaDonResponse.getTongTien());
         String vnpayUrl = paymentService.createOrder(request, amount, hoaDonResponse.getMaHoaDon(), baseUrl);
+
         return ApiResponse.builder()
                 .data(vnpayUrl)
-                .message("Order submitted succesfully")
+                .message("Order submitted successfully")
                 .build();
     }
 
@@ -50,10 +53,15 @@ public class PaymentController {
         String transactionId = request.getParameter("vnp_TransactionNo");
         String totalPrice = request.getParameter("vnp_Amount");
 
+
+        HoaDonResponse hoaDonResponse = hoaDonService.findByMaHoaDon(orderInfo);
+
+
         String redirectUrl = "http://localhost:5173/hanlde-result-payment?paymentStatus=" + paymentStatus
                 + "&orderCode=" + orderInfo + "&paymentTime=" + paymentTime + "&transactionId=" + transactionId;
 
         response.sendRedirect(redirectUrl);
     }
+
 
 }

@@ -8,8 +8,10 @@ import com.example.be_datn.exception.ErrorCode;
 import com.example.be_datn.mapper.HoaDonChiTietMapper;
 import com.example.be_datn.mapper.HoaDonMapper;
 import com.example.be_datn.mapper.LichSuHoaDonMapper;
+import com.example.be_datn.mapper.LichSuThanhToanMapper;
 import com.example.be_datn.repository.*;
 import com.example.be_datn.service.IShopOnlineService;
+import jakarta.transaction.Transactional;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -22,6 +24,7 @@ import java.util.Random;
 @Service
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@Transactional
 public class ShopOnlineService implements IShopOnlineService {
     GioHangChiTietService gioHangChiTietService;
     GioHangRepository gioHangRepository;
@@ -34,10 +37,13 @@ public class ShopOnlineService implements IShopOnlineService {
     HoaDonMapper hoaDonMapper;
     LichSuHoaDonMapper lichSuHoaDonMapper;
     EmailService emailService;
+    LichSuThanhToanMapper lichSuThanhToanMapper;
 
     private static final String CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
     private static final int CODE_LENGTH = 10;
     private final GioHangChiTietRepository gioHangChiTietRepository;
+    private final LichSuThanhToanRepository lichSuThanhToanRepository;
+    private final SanPhamChiTietRepository sanPhamChiTietRepository;
 
     public String generateBillCode() {
         StringBuilder billCode = new StringBuilder();
@@ -62,7 +68,7 @@ public class ShopOnlineService implements IShopOnlineService {
         }
         double totalPrice = 0;
         for (GioHangChiTietResponse gioHangChiTietResponse : gioHangChiTietResponses) {
-            totalPrice += gioHangChiTietResponse.getSanPhamChiTietResponse().getGiaBan() * gioHangChiTietResponse.getSoLuong();
+            totalPrice += gioHangChiTietResponse.getGiaTien() * gioHangChiTietResponse.getSoLuong();
         }
         return AboutProductShopOn.builder()
                 .idGioHang(gioHang.getId())
@@ -73,6 +79,8 @@ public class ShopOnlineService implements IShopOnlineService {
 
     @Override
     public HoaDonResponse checkout(HoaDonRequest hoaDonRequest) {
+        checkSoLuongHopLe(hoaDonRequest.getIdGioHang());
+
         HoaDon hd = createHoaDon(hoaDonRequest);
         HoaDon hoaDon = hoaDonRepository.saveAndFlush(hd);
 
@@ -95,9 +103,39 @@ public class ShopOnlineService implements IShopOnlineService {
                 .map(gioHangChiTiet -> hoaDonChiTietMapper.toHoaDonCT(gioHangChiTiet, hoaDon.getId()))
                 .forEach(hoaDonChiTietRepository::saveAndFlush);
 
-        emailService.sendMailToUser("anhdeptrai7749@gmail.com", "3HST Shoes - Cảm ơn bạn đã đặt hàng tại 3HST Shoes", hoaDon.getMaHoaDon(), this.getInfoOrder(hoaDon.getMaHoaDon()));
+        gioHangChiTietRepository.deleteByGioHang_Id(hoaDonRequest.getIdGioHang());
+        handleUpdateAfterBuy(hoaDonRequest.getIdGioHang());
+
+        emailService.sendMailToUser(hoaDonRequest.getEmail(), "3HST Shoes - Cảm ơn bạn đã đặt hàng tại 3HST Shoes", hoaDon.getMaHoaDon(), this.getInfoOrder(hoaDon.getMaHoaDon()));
         return hoaDonMapper.toHoaDonResponse(hoaDon);
     }
+
+    public HoaDonResponse checkoutOnline(HoaDonRequest hoaDonRequest) {
+        HoaDon hd = createHoaDon(hoaDonRequest);
+        HoaDon hoaDon = hoaDonRepository.saveAndFlush(hd);
+
+        LichSuHoaDon lichSuHoaDon = LichSuHoaDon.builder()
+                .nhanVien(null)
+                .hoaDon(hoaDon)
+                .createdBy(null)
+                .ghiChu("Chờ xác nhận")
+                .trangThai(StatusPayment.WAITING.toString())
+                .build();
+
+        lichSuHoaDonRepository.saveAndFlush(lichSuHoaDon);
+
+        if (hoaDon == null) {
+            throw new AppException(ErrorCode.HOA_DON_INVALID);
+        }
+
+        List<GioHangChiTiet> gioHangChiTietList = gioHangChiTietRepository.findByGioHang_Id(hoaDonRequest.getIdGioHang());
+        gioHangChiTietList.stream()
+                .map(gioHangChiTiet -> hoaDonChiTietMapper.toHoaDonCT(gioHangChiTiet, hoaDon.getId()))
+                .forEach(hoaDonChiTietRepository::saveAndFlush);
+        emailService.sendMailToUser(hoaDonRequest.getEmail(), "3HST Shoes - Cảm ơn bạn đã đặt hàng tại 3HST Shoes", hoaDon.getMaHoaDon(), this.getInfoOrder(hoaDon.getMaHoaDon()));
+        return hoaDonMapper.toHoaDonResponse(hoaDon);
+    }
+
 
     @Override
     public InfoOrder getInfoOrder(String maHoaDon) {
@@ -105,16 +143,18 @@ public class ShopOnlineService implements IShopOnlineService {
             throw new AppException(ErrorCode.HOA_DON_NOT_FOUND);
         }
         HoaDon hoaDon = hoaDonRepository.findByMaHoaDon(maHoaDon);
-        if(hoaDon == null){
+        if (hoaDon == null) {
             throw new AppException(ErrorCode.HOA_DON_NOT_FOUND);
         }
         List<HoaDonCT> hoaDonCTList = hoaDonChiTietRepository.findByHoaDon_Id(hoaDon.getId());
+        double tongTienHang = hoaDonCTList.stream().mapToDouble(item -> item.getGiaTien() * item.getSoLuong()).sum();
         if (hoaDonCTList.isEmpty()) {
             throw new AppException(ErrorCode.HOA_DON_CHI_TIET_NOT_FOUND_LIST);
         }
         return InfoOrder.builder()
                 .hoaDonResponse(hoaDonMapper.toHoaDonResponse(hoaDon))
                 .hoaDonChiTietResponse(hoaDonChiTietMapper.toListResponse(hoaDonCTList))
+                .tongTienHang(tongTienHang)
                 .build();
     }
 
@@ -132,9 +172,14 @@ public class ShopOnlineService implements IShopOnlineService {
         HoaDon hoaDon = hoaDonRepository.findById(idHoaDon).orElseThrow(() -> new AppException(ErrorCode.HOA_DON_NOT_FOUND));
         HoaDonResponse hoaDonResponse = hoaDonMapper.toHoaDonResponse(hoaDon);
         List<LichSuHoaDonResponse> lichSuHoaDonResponses = lichSuHoaDonMapper.toListResponse(lichSuHoaDonRepository.findByHoaDon_Id(idHoaDon));
+        List<HoaDonChiTietResponse> hoaDonChiTietResponses = hoaDonChiTietMapper.toListResponse(hoaDonChiTietRepository.findByHoaDon_Id(hoaDon.getId()));
+        LichSuThanhToan lichSuThanhToan = lichSuThanhToanRepository.findByHoaDon_Id(hoaDon.getId());
+        LichSuThanhToanResponse lichSuThanhToanResponse = lichSuThanhToan != null ? lichSuThanhToanMapper.toResponse(lichSuThanhToan) : null;
         return DetailHistoryBillResponse.builder()
                 .hoaDonResponse(hoaDonResponse)
                 .lichSuHoaDonResponses(lichSuHoaDonResponses)
+                .hoaDonChiTietResponses(hoaDonChiTietResponses)
+                .lichSuThanhToanResponse(lichSuThanhToanResponse)
                 .build();
     }
 
@@ -168,4 +213,45 @@ public class ShopOnlineService implements IShopOnlineService {
                 .soTienGiam(hoaDonRequest.getSoTienGiam())
                 .build();
     }
+
+    public void clearGioHangChiTiet(Long idGioHang) {
+        gioHangChiTietRepository.deleteByGioHang_Id(idGioHang);
+    }
+
+    void checkSoLuongHopLe(Long idGioHang) {
+        List<GioHangChiTiet> gioHangChiTietList = gioHangChiTietRepository.findByGioHang_Id(idGioHang);
+        gioHangChiTietList.forEach(gioHangChiTiet -> {
+            if (gioHangChiTiet.getSoLuong() > gioHangChiTiet.getSanPhamChiTiet().getSoLuong()) {
+                throw new AppException(ErrorCode.SOLUONG_SANPHAM_KHONG_DU);
+            }
+        });
+    }
+
+    public void handleUpdateAfterBuy(Long idGioHang) {
+        if (idGioHang == null) {
+            throw new AppException(ErrorCode.ID_GIO_HANG_CANT_BE_NULL);
+        }
+
+        List<GioHangChiTiet> gioHangChiTietList = gioHangChiTietRepository.findByGioHang_Id(idGioHang);
+        if (gioHangChiTietList.isEmpty()) {
+            throw new AppException(ErrorCode.CART_DONT_HAVE_PRODUCT);
+        }
+
+        List<SanPhamChiTiet> updatedProducts = new ArrayList<>();
+        for (GioHangChiTiet gioHangChiTiet : gioHangChiTietList) {
+            SanPhamChiTiet sanPhamChiTiet = gioHangChiTiet.getSanPhamChiTiet();
+            int soLuongTonKho = sanPhamChiTiet.getSoLuong();
+            int soLuongTrongGio = gioHangChiTiet.getSoLuong();
+
+            if (soLuongTonKho < soLuongTrongGio) {
+                throw new AppException(ErrorCode.SOLUONG_SANPHAM_KHONG_DU);
+            }
+
+            sanPhamChiTiet.setSoLuong(soLuongTonKho - soLuongTrongGio);
+            updatedProducts.add(sanPhamChiTiet);
+        }
+
+        sanPhamChiTietRepository.saveAll(updatedProducts);
+    }
+
 }
