@@ -17,6 +17,7 @@ public class SanPhamCustumerResponse {
     private String hinhAnh;
     private String phanTramGiamGia;
     private Long soLuongBan;
+    private Integer soLuongSanPhamChiTiet;
 
 
 }

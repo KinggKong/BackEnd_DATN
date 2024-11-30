@@ -20,5 +20,7 @@ public interface ISanPhamChiTietService {
     SanPhamChiTietResponse updateStatus(Long idSanPhamChiTiet, int status);
     SanPhamChiTietResponse getSPCTByMauSacAndKichThuoc(Long idSp,Long idMauSac, Long idKichThuoc);
     Double getSanPhamChiTietByGiaTienMax();
+    Page<SanPhamChiTietResponse> getSanPhamChiTietBySoLuong(int soLuong, Pageable pageable);
+    int countSanPhamHetHang();
 
 }

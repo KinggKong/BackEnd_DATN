@@ -68,7 +68,9 @@ public class SanPhamService implements ISanPhamService {
 
         Page<SanPham> sanPhams = sanPhamRepository.findAll(spec, pageable);
         Page<SanPhamCustumerResponse> sanPhamCustumerResponses = sanPhams.map(sanPham -> {
-            List<Double> giaBan = sanPham.getSanPhamChiTietList().stream().map(SanPhamChiTiet::getGiaBan).toList();
+
+
+            List<Double> giaBan = sanPham.getSanPhamChiTietList().stream().map(SanPhamChiTiet::getGiaBanSauKhiGiam).toList();
             Double giaBanThapNhat = giaBan.stream().min(Double::compareTo).orElse(0.0);
             Double giaBanCaoNhat = giaBan.stream().max(Double::compareTo).orElse(0.0);
             String giaHienThi = giaBanThapNhat.equals(giaBanCaoNhat)
@@ -86,10 +88,10 @@ public class SanPhamService implements ISanPhamService {
             for (SanPhamChiTiet sanPhamChiTiet : sanPham.getSanPhamChiTietList()) {
                 SaleCt saleCts = sale_ctService.getSaleCtById(sanPhamChiTiet.getId());
                 if (saleCts != null) {
-                    Double giaBanMoi = sanPhamChiTiet.getGiaBan() - saleCts.getTienGiam();
-                    giaBanThapNhat = giaBanMoi;
+//                    Double giaBanMoi = sanPhamChiTiet.getGiaBan() - saleCts.getTienGiam();
+//                    giaBanThapNhat = giaBanMoi;
                     phanTramGiamGia = saleCts.getGiaTriGiam().toString();
-                    giaHienThi = String.format("%,.0f VND", giaBanMoi);
+//                    giaHienThi = String.format("%,.0f VND", giaBanMoi);
                     break;
                 }
             }
@@ -103,7 +105,8 @@ public class SanPhamService implements ISanPhamService {
                     giaHienThi,
                     hinhAnh,
                     phanTramGiamGia,
-                    0l
+                    0l,
+                    sanPham.getSanPhamChiTietList().size()
             );
         });
         return sanPhamCustumerResponses;
@@ -124,7 +127,7 @@ public class SanPhamService implements ISanPhamService {
         List<SanPhamCustumerResponse> sanPhamCustumerResponses = sanPhams.stream().map(sanPham -> {
             // Lấy danh sách giá bán
             List<Double> giaBan = sanPham.getSanPhamChiTietList().stream()
-                    .map(SanPhamChiTiet::getGiaBan)
+                    .map(SanPhamChiTiet::getGiaBanSauKhiGiam)
                     .toList();
 
             // Tìm giá thấp nhất và cao nhất
@@ -148,10 +151,10 @@ public class SanPhamService implements ISanPhamService {
             for (SanPhamChiTiet sanPhamChiTiet : sanPham.getSanPhamChiTietList()) {
                 SaleCt saleCts = sale_ctService.getSaleCtById(sanPhamChiTiet.getId());
                 if (saleCts != null) {
-                    Double giaBanMoi = sanPhamChiTiet.getGiaBan() - saleCts.getTienGiam();
-                    giaBanThapNhat = Math.min(giaBanThapNhat, giaBanMoi);
+//                    Double giaBanMoi = sanPhamChiTiet.getGiaBan() - saleCts.getTienGiam();
+//                    giaBanThapNhat = Math.min(giaBanThapNhat, giaBanMoi);
                     phanTramGiamGia = saleCts.getGiaTriGiam().toString();
-                    giaHienThi = String.format("%,.0f VND", giaBanMoi);
+//                    giaHienThi = String.format("%,.0f VND", giaBanMoi);
                     break;
                 }
             }
@@ -165,7 +168,8 @@ public class SanPhamService implements ISanPhamService {
                     giaHienThi,
                     hinhAnh,
                     phanTramGiamGia,
-                    0l
+                    0l,
+                    sanPham.getSanPhamChiTietList().size()
             );
         }).toList();
 
@@ -244,7 +248,7 @@ public class SanPhamService implements ISanPhamService {
         List<SanPhamCustumerResponse> sanPhamCustumerResponses = sanPhamGiamGias.stream().map(sanPham -> {
             // Lấy danh sách giá bán
             List<Double> giaBan = sanPham.getSanPhamChiTietList().stream()
-                    .map(SanPhamChiTiet::getGiaBan)
+                    .map(SanPhamChiTiet::getGiaBanSauKhiGiam)
                     .toList();
 
             // Tìm giá thấp nhất và cao nhất
@@ -268,10 +272,10 @@ public class SanPhamService implements ISanPhamService {
             for (SanPhamChiTiet sanPhamChiTiet : sanPham.getSanPhamChiTietList()) {
                 SaleCt saleCts = sale_ctService.getSaleCtById(sanPhamChiTiet.getId());
                 if (saleCts != null) {
-                    Double giaBanMoi = sanPhamChiTiet.getGiaBan() - saleCts.getTienGiam();
-                    giaBanThapNhat = Math.min(giaBanThapNhat, giaBanMoi);
+//                    Double giaBanMoi = sanPhamChiTiet.getGiaBan() - saleCts.getTienGiam();
+//                    giaBanThapNhat = Math.min(giaBanThapNhat, giaBanMoi);
                     phanTramGiamGia = saleCts.getGiaTriGiam().toString();
-                    giaHienThi = String.format("%,.0f VND", giaBanMoi);
+//                    giaHienThi = String.format("%,.0f VND", giaBanMoi);
                     break;
                 }
             }
@@ -285,7 +289,8 @@ public class SanPhamService implements ISanPhamService {
                     giaHienThi,
                     hinhAnh,
                     phanTramGiamGia,
-                    0l
+                    0l,
+                    sanPham.getSanPhamChiTietList().size()
             );
         }).toList();
         return sanPhamCustumerResponses;
@@ -304,7 +309,7 @@ public class SanPhamService implements ISanPhamService {
 
             // Lấy danh sách giá bán
             List<Double> giaBan = sanPham.getSanPhamChiTietList().stream()
-                    .map(SanPhamChiTiet::getGiaBan)
+                    .map(SanPhamChiTiet::getGiaBanSauKhiGiam)
                     .toList();
 
             // Tìm giá thấp nhất và cao nhất
@@ -328,10 +333,10 @@ public class SanPhamService implements ISanPhamService {
             for (SanPhamChiTiet sanPhamChiTiet : sanPham.getSanPhamChiTietList()) {
                 SaleCt saleCts = sale_ctService.getSaleCtById(sanPhamChiTiet.getId());
                 if (saleCts != null) {
-                    Double giaBanMoi = sanPhamChiTiet.getGiaBan() - saleCts.getTienGiam();
-                    giaBanThapNhat = Math.min(giaBanThapNhat, giaBanMoi);
+//                    Double giaBanMoi = sanPhamChiTiet.getGiaBan() - saleCts.getTienGiam();
+//                    giaBanThapNhat = Math.min(giaBanThapNhat, giaBanMoi);
                     phanTramGiamGia = saleCts.getGiaTriGiam().toString();
-                    giaHienThi = String.format("%,.0f VND", giaBanMoi);
+//                    giaHienThi = String.format("%,.0f VND", giaBanMoi);
                     break;
                 }
             }
@@ -345,7 +350,8 @@ public class SanPhamService implements ISanPhamService {
                     giaHienThi,
                     hinhAnh,
                     phanTramGiamGia,
-                    totalQuantity
+                    totalQuantity,
+                    sanPham.getSanPhamChiTietList().size()
             );
         }).toList();
 
