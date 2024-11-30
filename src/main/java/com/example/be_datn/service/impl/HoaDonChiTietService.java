@@ -2,15 +2,18 @@ package com.example.be_datn.service.impl;
 
 import com.example.be_datn.dto.Request.HoaDonChiTietRequest;
 import com.example.be_datn.dto.Request.HoaDonChiTietUpdateRequest;
-import com.example.be_datn.dto.Response.HoaDonChiTietResponse;
-import com.example.be_datn.dto.Response.HoaDonResponse;
+import com.example.be_datn.dto.Response.HoaDonCTResponse;
 import com.example.be_datn.entity.HoaDon;
-import com.example.be_datn.entity.HoaDonChiTiet;
+import com.example.be_datn.entity.HoaDonCT;
 import com.example.be_datn.entity.SanPhamChiTiet;
+import com.example.be_datn.entity.StatusPayment;
+import com.example.be_datn.exception.AppException;
+import com.example.be_datn.exception.ErrorCode;
 import com.example.be_datn.repository.HoaDonChiTietRepository;
 import com.example.be_datn.repository.HoaDonRepository;
 import com.example.be_datn.repository.SanPhamChiTietRepository;
 import com.example.be_datn.service.IHoaDonChiTietService;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -31,12 +34,12 @@ public class HoaDonChiTietService implements IHoaDonChiTietService {
 
 
     @Override
-    public Page<HoaDonChiTietResponse> getAllHoaDonChitiet(Pageable pageable) {
+    public Page<HoaDonCTResponse> getAllHoaDonChitiet(Pageable pageable) {
         return hoaDonChiTietRepository.getAllHdct(pageable);
     }
 
     @Override
-    public List<HoaDonChiTietResponse> getHoaDonChiTietByHoaDonId(Long hoaDonId) {
+    public List<HoaDonCTResponse> getHoaDonChiTietByHoaDonId(Long hoaDonId) {
         return hoaDonChiTietRepository.getAllHdctByIdHoaDon(hoaDonId);
     }
 
@@ -45,43 +48,37 @@ public class HoaDonChiTietService implements IHoaDonChiTietService {
     public String create(HoaDonChiTietRequest request) {
         SanPhamChiTiet sanPhamChiTiet = sanPhamChiTietRepository.findById(request.getIdSanPhamChiTiet()).get();
         HoaDon hoaDon = hoaDonRepository.findById(request.getIdHoaDon()).get();
-        Optional<HoaDonChiTiet> hoaDonChiTiet = hoaDonChiTietRepository.findByHoaDonAndSanPhamChiTiet(hoaDon, sanPhamChiTiet);
+        Optional<HoaDonCT> hoaDonChiTiet = hoaDonChiTietRepository.findByHoaDonAndSanPhamChiTiet(hoaDon, sanPhamChiTiet);
 
         if (hoaDonChiTiet.isEmpty()) {
             if (request.getSoLuong() > sanPhamChiTiet.getSoLuong() || request.getSoLuong() < 0) {
                 throw new RuntimeException("Invalid quantity");
             }
-            HoaDonChiTiet hoaDonChiTiet1 = hoaDonChiTietRepository.save(
-                    HoaDonChiTiet.builder()
+            HoaDonCT hoaDonChiTiet1 = hoaDonChiTietRepository.save(
+                    HoaDonCT.builder()
                             .hoaDon(hoaDon)
                             .sanPhamChiTiet(sanPhamChiTiet)
                             .soLuong(request.getSoLuong())
-                            .tongTien(request.getSoLuong() * sanPhamChiTiet.getGiaBan())
                             .giaTien(sanPhamChiTiet.getGiaBan())
                             .build()
             );
             updateHoaDon(hoaDon.getId());
             sanPhamChiTietService.updateSoLuongSanPhamChiTiet(sanPhamChiTiet.getId(), hoaDonChiTiet1.getSoLuong(), "minus");
         } else {
-            HoaDonChiTiet existingChiTiet = hoaDonChiTiet.get();
+            HoaDonCT existingChiTiet = hoaDonChiTiet.get();
             Integer currentSoLuong = existingChiTiet.getSoLuong() != null ? existingChiTiet.getSoLuong() : 0;
             Integer newSoLuong = currentSoLuong + request.getSoLuong();
 
             if (newSoLuong > sanPhamChiTiet.getSoLuong()) {
                 throw new RuntimeException("Not enough stock");
             }
-
-            Double currentTongTien = existingChiTiet.getTongTien() != null ? existingChiTiet.getTongTien() : 0.0;
-            Double newTongTien = currentTongTien + (request.getSoLuong() * sanPhamChiTiet.getGiaBan());
-
-            HoaDonChiTiet hoaDonChiTiet1 = hoaDonChiTietRepository.save(
-                    HoaDonChiTiet.builder()
+            HoaDonCT hoaDonChiTiet1 = hoaDonChiTietRepository.save(
+                    HoaDonCT.builder()
                             .id(existingChiTiet.getId())
                             .hoaDon(hoaDon)
                             .sanPhamChiTiet(sanPhamChiTiet)
                             .soLuong(newSoLuong)
                             .giaTien(sanPhamChiTiet.getGiaBan())
-                            .tongTien(newTongTien)
                             .build()
             );
             updateHoaDon(hoaDon.getId());
@@ -94,7 +91,9 @@ public class HoaDonChiTietService implements IHoaDonChiTietService {
     @Override
     @Transactional
     public HoaDon deleteHoaDonChiTiet(Long id) {
-        HoaDonChiTiet hoaDonChiTiet = hoaDonChiTietRepository.findById(id).get();
+        HoaDonCT hoaDonChiTiet = hoaDonChiTietRepository.findById(id)
+                .orElseThrow(() -> new AppException(ErrorCode.HOA_DON_CT_NOT_FOUND));
+
         hoaDonChiTietRepository.deleteById(id);
         updateHoaDon(hoaDonChiTiet.getHoaDon().getId());
         sanPhamChiTietService.updateSoLuongSanPhamChiTiet(hoaDonChiTiet.getSanPhamChiTiet().getId(), hoaDonChiTiet.getSoLuong(), "plus");
@@ -102,63 +101,47 @@ public class HoaDonChiTietService implements IHoaDonChiTietService {
     }
 
     @Override
-//    public HoaDonChiTietResponse update(HoaDonChiTietUpdateRequest request, Long id) {
-//        Integer tongSoLuong;
-//        HoaDonChiTiet hoaDonChiTiet = hoaDonChiTietRepository.findById(id).get();
-//        SanPhamChiTiet sanPhamChiTiet = sanPhamChiTietRepository.findById(request.getIdSanPhamChiTiet()).orElseThrow();
-//        HoaDon hoaDon = hoaDonRepository.findById(request.getIdHoaDon()).get();
-//        if (request.getMethod().equalsIgnoreCase("plus")) {
-//            if (request.getSoLuong() > sanPhamChiTiet.getSoLuong()) {
-//                throw new RuntimeException();
-//            }
-//            tongSoLuong = request.getSoLuong() + hoaDonChiTiet.getSoLuong();
-//        } else {
-//            tongSoLuong = request.getSoLuong() - hoaDonChiTiet.getSoLuong();
-//        }
-//        hoaDonChiTiet.setSoLuong(tongSoLuong);
-//        hoaDonChiTiet.setTongTien(sanPhamChiTiet.getGiaBan() * tongSoLuong);
-//        hoaDonChiTietRepository.save(hoaDonChiTiet);
-//        updateHoaDon(hoaDon.getId());
-//        if (request.getMethod().equalsIgnoreCase("minus")) {
-//            sanPhamChiTietService.updateSoLuongSanPhamChiTiet(sanPhamChiTiet.getId(), request.getSoLuong(), "plus");
-//        } else {
-//            sanPhamChiTietService.updateSoLuongSanPhamChiTiet(sanPhamChiTiet.getId(), request.getSoLuong(), "minus");
-//        }
-//        return null;
-//    }
-    public HoaDonChiTietResponse update(HoaDonChiTietUpdateRequest request, Long id) {
+    public HoaDonCTResponse update(HoaDonChiTietUpdateRequest request, Long id) {
+        if (request == null || id == null) {
+            throw new IllegalArgumentException("Request hoặc Id không được null");
+        }
+
         // Lấy thông tin cần thiết
-        HoaDonChiTiet hoaDonChiTiet = hoaDonChiTietRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Không tìm thấy hóa đơn chi tiết"));
+        HoaDonCT hoaDonChiTiet = hoaDonChiTietRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Không tìm thấy hóa đơn chi tiết"));
         SanPhamChiTiet sanPhamChiTiet = sanPhamChiTietRepository.findById(request.getIdSanPhamChiTiet())
-                .orElseThrow(() -> new RuntimeException("Không tìm thấy sản phẩm chi tiết"));
+                .orElseThrow(() -> new EntityNotFoundException("Không tìm thấy sản phẩm chi tiết"));
         HoaDon hoaDon = hoaDonRepository.findById(request.getIdHoaDon())
-                .orElseThrow(() -> new RuntimeException("Không tìm thấy hóa đơn"));
+                .orElseThrow(() -> new EntityNotFoundException("Không tìm thấy hóa đơn"));
 
         // Xử lý logic cộng/trừ
         Integer currentQuantity = hoaDonChiTiet.getSoLuong();
         Integer requestedQuantity = request.getSoLuong();
         Integer updatedQuantity;
 
-        if (request.getMethod().equalsIgnoreCase("plus")) {
-            // Kiểm tra số lượng tồn kho
-            if (requestedQuantity + currentQuantity > sanPhamChiTiet.getSoLuong()) {
-                throw new RuntimeException("Số lượng vượt quá tồn kho");
-            }
-            updatedQuantity = currentQuantity + requestedQuantity;
-        } else if (request.getMethod().equalsIgnoreCase("minus")) {
-            // Kiểm tra số lượng hợp lệ
-            if (currentQuantity - requestedQuantity < 0) {
-                throw new RuntimeException("Số lượng không hợp lệ");
-            }
-            updatedQuantity = currentQuantity - requestedQuantity;
-        } else {
-            throw new IllegalArgumentException("Phương thức không hợp lệ");
+        switch (request.getMethod().toUpperCase()) {
+            case "PLUS":
+                // Kiểm tra số lượng tồn kho
+                if (requestedQuantity + currentQuantity > sanPhamChiTiet.getSoLuong()) {
+                    throw new IllegalArgumentException("Số lượng vượt quá tồn kho");
+                }
+                updatedQuantity = currentQuantity + requestedQuantity;
+                break;
+
+            case "MINUS":
+                // Kiểm tra số lượng hợp lệ
+                if (currentQuantity - requestedQuantity < 0) {
+                    throw new IllegalArgumentException("Số lượng không hợp lệ");
+                }
+                updatedQuantity = currentQuantity - requestedQuantity;
+                break;
+
+            default:
+                throw new IllegalArgumentException("Phương thức không hợp lệ");
         }
 
         // Cập nhật hóa đơn chi tiết
         hoaDonChiTiet.setSoLuong(updatedQuantity);
-        hoaDonChiTiet.setTongTien(sanPhamChiTiet.getGiaBan() * updatedQuantity);
         hoaDonChiTietRepository.save(hoaDonChiTiet);
 
         // Cập nhật hóa đơn tổng
@@ -169,32 +152,42 @@ public class HoaDonChiTietService implements IHoaDonChiTietService {
         sanPhamChiTietService.updateSoLuongSanPhamChiTiet(sanPhamChiTiet.getId(), Math.abs(stockChange),
                 stockChange > 0 ? "plus" : "minus");
 
-        // Trả về response
-        HoaDonChiTietResponse response = new HoaDonChiTietResponse();
+        HoaDonCTResponse response = new HoaDonCTResponse();
         response.setId(hoaDonChiTiet.getId());
         response.setTenSanPhamChiTiet(sanPhamChiTiet.getSanPham().getTenSanPham());
         response.setSoLuong(updatedQuantity);
         response.setIdSanPhamChiTiet(sanPhamChiTiet.getId());
-        response.setTongTien(hoaDonChiTiet.getTongTien());
+
         return response;
     }
 
 
+
+    @Transactional
     @Modifying
     public String updateHoaDon(Long id) {
         Double tongTien = 0.0;
-        Integer soLuong = 0;
-        List<HoaDonChiTietResponse> list = getHoaDonChiTietByHoaDonId(id);
-        if (list == null || list.isEmpty()) {
-            tongTien = 0.0;
-            soLuong = 0;
+
+        HoaDon hoaDon = hoaDonRepository.findById(id)
+                .orElseThrow(() -> new AppException(ErrorCode.HOA_DON_NOT_FOUND));
+
+        List<HoaDonCTResponse> list = getHoaDonChiTietByHoaDonId(id);
+
+        if (list != null && !list.isEmpty()) {
+            for (HoaDonCTResponse response : list) {
+                double tongTienChiTiet = response.getGiaBan() * response.getSoLuong();
+                tongTien += tongTienChiTiet;
+            }
         }
-        for (HoaDonChiTietResponse response : list) {
-            tongTien += (response.getTongTien() != null ? response.getTongTien() : 0.0);
-            soLuong += response.getSoLuong();
+        if (list.size() > 0) {
+            hoaDon.setTrangThai(String.valueOf(StatusPayment.WAITING));
+        } else {
+            hoaDon.setTrangThai(String.valueOf(StatusPayment.PENDING));
         }
-        hoaDonRepository.updateHoaDon(tongTien, soLuong, id);
+        hoaDonRepository.updateHoaDon(tongTien, id);
+
         return "success";
     }
+
 
 }

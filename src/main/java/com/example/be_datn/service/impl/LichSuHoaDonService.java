@@ -1,42 +1,53 @@
 package com.example.be_datn.service.impl;
 
-import com.example.be_datn.dto.Request.LichSuThanhToanCreationRequest;
+import com.example.be_datn.dto.Request.StatusBillRequest;
+import com.example.be_datn.dto.Response.LichSuHoaDonResponse;
 import com.example.be_datn.entity.HoaDon;
-import com.example.be_datn.entity.LichSuThanhToan;
+import com.example.be_datn.entity.LichSuHoaDon;
+import com.example.be_datn.entity.NhanVien;
 import com.example.be_datn.exception.AppException;
 import com.example.be_datn.exception.ErrorCode;
-import com.example.be_datn.repository.HoaDonChiTietRepository;
+import com.example.be_datn.mapper.LichSuHoaDonMapper;
 import com.example.be_datn.repository.HoaDonRepository;
-import com.example.be_datn.repository.LichSuThanhToanRepository;
+import com.example.be_datn.repository.LichSuHoaDonRepository;
+import com.example.be_datn.repository.NhanVienRepository;
 import com.example.be_datn.service.ILichSuHoaDonService;
+import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class LichSuHoaDonService implements ILichSuHoaDonService {
-
-    private final LichSuThanhToanRepository lichSuThanhToanRepository;
-
-    private final HoaDonRepository hoaDonRepository;
+    LichSuHoaDonRepository lichSuHoaDonRepository;
+    LichSuHoaDonMapper lichSuHoaDonMapper;
+    NhanVienRepository nhanVienRepository;
+    HoaDonRepository hoaDonRepository;
 
     @Override
-    public LichSuThanhToan create(LichSuThanhToanCreationRequest request) {
-        HoaDon hoaDon = hoaDonRepository.findById(request.getHoaDonId())
-                .orElseThrow(() -> new AppException(ErrorCode.HOA_DON_NOT_FOUND));
-        LichSuThanhToan response = LichSuThanhToan.builder()
+    public LichSuHoaDonResponse insertLichSuHoaDon(StatusBillRequest statusBillRequest) {
+        NhanVien nhanVien = nhanVienRepository.findById(statusBillRequest.getIdNhanvien()).orElseThrow(() -> new AppException(ErrorCode.NHANVIEN_NOT_FOUND));
+        HoaDon hoaDon = hoaDonRepository.findById(statusBillRequest.getIdHoaDon()).orElseThrow(() -> new AppException(ErrorCode.HOA_DON_NOT_FOUND));
+
+        LichSuHoaDon lichSuHoaDon = LichSuHoaDon.builder()
+                .nhanVien(nhanVien)
                 .hoaDon(hoaDon)
-                .maGiaoDich(request.getMaGiaoDich())
-                .soTien(hoaDon.getTongTien())
-                .phuongThucThanhToan(request.getPhuongThucThanhToan())
+                .createdBy(nhanVien.getTen())
+                .trangThai(statusBillRequest.getStatus())
                 .build();
-        return lichSuThanhToanRepository.save(response);
+        LichSuHoaDon lichSuHD = lichSuHoaDonRepository.save(lichSuHoaDon);
+        hoaDon.setTrangThai(lichSuHD.getTrangThai());
+        hoaDonRepository.save(hoaDon);
+        return lichSuHoaDonMapper.toResponse(lichSuHD);
     }
 
     @Override
-    public void delete(Long id) {
-        LichSuThanhToan lichSuThanhToan = lichSuThanhToanRepository.findById(id)
-                .orElseThrow(() -> new AppException(ErrorCode.LICH_SU_THANH_TOAN_NOT_FOUND));
-        lichSuThanhToanRepository.delete(lichSuThanhToan);
+    public List<LichSuHoaDonResponse> findLichSuHoaDonByIdHoaDon(Long idHoaDon) {
+        List<LichSuHoaDon> lichSuHoaDons = lichSuHoaDonRepository.findByHoaDon_Id(idHoaDon);
+        return lichSuHoaDonMapper.toListResponse(lichSuHoaDons);
     }
 }

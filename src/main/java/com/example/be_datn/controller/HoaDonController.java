@@ -10,13 +10,13 @@ import com.example.be_datn.exception.AppException;
 import com.example.be_datn.exception.ErrorCode;
 import com.example.be_datn.repository.HoaDonRepository;
 import com.example.be_datn.repository.KhachHangRepository;
+import com.example.be_datn.repository.LichSuHoaDonRepository;
 import com.example.be_datn.service.impl.HoaDonChiTietService;
 import com.example.be_datn.service.impl.HoaDonService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -37,6 +37,9 @@ public class HoaDonController {
     private final HoaDonRepository hoaDonRepository;
     private final KhachHangRepository khachHangRepository;
     private final HoaDonChiTietService hoaDonChiTietService;
+    private LichSuHoaDonRepository lichSuHoaDonRepository;
+
+
 
     @GetMapping
     public ApiResponse<?> getAllHoaDon(
@@ -82,20 +85,13 @@ public class HoaDonController {
 
     @PatchMapping("/complete/{id}")
     public ApiResponse<?> completeOrder(@PathVariable Long id){
-        ApiResponse<HoaDon> apiResponse = new ApiResponse<>();
-        HoaDon hoaDon = hoaDonRepository.findById(id).get();
-        hoaDon.setTrangThai(0);
-        hoaDonRepository.save(hoaDon);
+        ApiResponse<HoaDonResponse> apiResponse = new ApiResponse<>();
+        apiResponse.setData(hoaDonService.completeHoaDon(id));
+        apiResponse.setCode(200);
         apiResponse.setMessage("Thanh toán thành công !");
         return apiResponse;
     }
 
-    @PutMapping("/processPayment")
-    public ApiResponse<?> processPayment(@RequestBody HoaDon hoaDon){
-        ApiResponse<HoaDon> apiResponse = new ApiResponse<>();
-        apiResponse.setData(hoaDonService.processPayment(hoaDon));
-        return apiResponse;
-    }
 
     @PutMapping("/updateSoLuongAndTongTien/{id}")
     public ApiResponse<?> updateSoLuongAndTongTien(@PathVariable Long id){
@@ -114,22 +110,19 @@ public class HoaDonController {
         KhachHang khachHang = khachHangRepository.findById(idKhachHang)
                 .orElseThrow(() -> new AppException(ErrorCode.KHACH_HANG_NOT_FOUND));
 
-        // Kiểm tra xem hóa đơn đã có khách hàng chưa
-        if (hoaDon.getKhachHang() != null) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invoice already has a customer.");
-        }   
+//        if (hoaDon.getKhachHang() != null) {
+//            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invoice already has a customer.");
+//        }
 
-        // Cập nhật thông tin khách hàng cho hóa đơn
         hoaDon.setKhachHang(khachHang);
         hoaDon.setTenNguoiNhan(khachHang.getTen());
         hoaDon.setSdt(khachHang.getSdt());
         hoaDon.setEmail(khachHang.getEmail());
 
-        // Lưu hóa đơn đã cập nhật
         hoaDonRepository.save(hoaDon);
 
-        // Trả về thông báo thành công
         return ResponseEntity.ok("Customer added to invoice successfully.");
     }
+
 
 }

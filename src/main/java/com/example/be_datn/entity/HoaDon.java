@@ -1,5 +1,8 @@
 package com.example.be_datn.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -7,6 +10,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -16,6 +20,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.FieldDefaults;
 
+import java.util.List;
+
 @Getter
 @Setter
 @Entity
@@ -24,6 +30,7 @@ import lombok.experimental.FieldDefaults;
 @AllArgsConstructor
 @NoArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class HoaDon extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -36,7 +43,6 @@ public class HoaDon extends BaseEntity {
     Double tienSauGiam;
     Double tienShip;
     String ghiChu;
-    Integer soLuong;
     String loaiHoaDon;
     String email;
     @ManyToOne(fetch = FetchType.LAZY)
@@ -46,10 +52,12 @@ public class HoaDon extends BaseEntity {
     @JoinColumn(name = "idKhachHang", referencedColumnName = "id")
     private KhachHang khachHang;
     String hinhThucThanhToan;
-    Integer trangThai;
+    String trangThai;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_voucher", referencedColumnName = "id")
     private Voucher voucher;
     Double soTienGiam;
+    @OneToMany(mappedBy = "hoaDon", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<HoaDonCT> chiTietList;
 
 }

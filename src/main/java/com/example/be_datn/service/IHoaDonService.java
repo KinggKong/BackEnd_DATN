@@ -2,6 +2,7 @@ package com.example.be_datn.service;
 
 import com.example.be_datn.dto.Request.HoaDonUpdateRequest;
 import com.example.be_datn.dto.Request.KhachHangRequest;
+import com.example.be_datn.dto.Response.HoaDonCTResponse;
 import com.example.be_datn.dto.Response.HoaDonResponse;
 import com.example.be_datn.entity.HoaDon;
 import org.springframework.data.domain.Page;
@@ -14,4 +15,5 @@ public interface IHoaDonService {
     String deleteHoaDon(Long id);
     String updateHoaDon(Long id, HoaDonUpdateRequest request);
     String updateCustomer(HoaDon hoaDon, Long idKhachHang);
+    HoaDonResponse completeHoaDon(Long id);
 }

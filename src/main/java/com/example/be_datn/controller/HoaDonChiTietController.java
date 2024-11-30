@@ -4,9 +4,10 @@ package com.example.be_datn.controller;
 import com.example.be_datn.dto.Request.HoaDonChiTietRequest;
 import com.example.be_datn.dto.Request.HoaDonChiTietUpdateRequest;
 import com.example.be_datn.dto.Response.ApiResponse;
+import com.example.be_datn.dto.Response.HoaDonCTResponse;
 import com.example.be_datn.dto.Response.HoaDonChiTietResponse;
 import com.example.be_datn.entity.HoaDon;
-import com.example.be_datn.entity.HoaDonChiTiet;
+import com.example.be_datn.entity.HoaDonCT;
 import com.example.be_datn.repository.HoaDonChiTietRepository;
 import com.example.be_datn.service.impl.HoaDonChiTietService;
 import lombok.RequiredArgsConstructor;
@@ -37,7 +38,7 @@ public class HoaDonChiTietController {
             @RequestParam(defaultValue = "1") Integer pageNo,
             @RequestParam(defaultValue = "5") Integer pageSize
     ){
-        ApiResponse<Page<HoaDonChiTietResponse>> apiResponse = new ApiResponse<>();
+        ApiResponse<Page<HoaDonCTResponse>> apiResponse = new ApiResponse<>();
         Pageable pageable = PageRequest.of(pageNo -1, pageSize);
         apiResponse.setData(hoaDonChiTietService.getAllHoaDonChitiet(pageable));
         return apiResponse;
@@ -46,7 +47,7 @@ public class HoaDonChiTietController {
     public ApiResponse<?> getAllHdctByHoaDonId(
             @PathVariable Long hoaDonId
     ){
-        ApiResponse<List<HoaDonChiTietResponse>> apiResponse = new ApiResponse<>();
+        ApiResponse<List<HoaDonCTResponse>> apiResponse = new ApiResponse<>();
         apiResponse.setData(hoaDonChiTietService.getHoaDonChiTietByHoaDonId(hoaDonId));
         return apiResponse;
     }
@@ -65,15 +66,24 @@ public class HoaDonChiTietController {
     }
     @PutMapping("/update-soLuong/{id}")
     public ApiResponse<?> updateSoLuong(@RequestBody HoaDonChiTietUpdateRequest request, @PathVariable Long id){
-        ApiResponse<HoaDonChiTietResponse> apiResponse = new ApiResponse<>();
+        ApiResponse<HoaDonCTResponse> apiResponse = new ApiResponse<>();
         apiResponse.setData(hoaDonChiTietService.update(request, id));
         return apiResponse;
     }
 
     @GetMapping("/detail/{id}")
     public ApiResponse<?> getDetail(@PathVariable Long id){
-        ApiResponse<HoaDonChiTiet> apiResponse = new ApiResponse<>();
-        apiResponse.setData(hoaDonChiTietRepository.findById(id).get());
+        ApiResponse<HoaDonCTResponse> apiResponse = new ApiResponse<>();
+        HoaDonCT hoaDonCT = hoaDonChiTietRepository.findById(id).get();
+        HoaDonCTResponse hoaDonCTResponse = new HoaDonCTResponse();
+        hoaDonCTResponse.setId(id);
+        hoaDonCTResponse.setIdSanPhamChiTiet(hoaDonCT.getSanPhamChiTiet().getId());
+        hoaDonCTResponse.setIdGioHang(hoaDonCT.getHoaDon().getId());
+        hoaDonCTResponse.setTenSanPhamChiTiet(hoaDonCT.getSanPhamChiTiet().getSanPham().getTenSanPham());
+        hoaDonCTResponse.setSoLuong(hoaDonCT.getSoLuong());
+        hoaDonCTResponse.setGiaBan(hoaDonCT.getSanPhamChiTiet().getGiaBan());
+        hoaDonCTResponse.setTongTien((hoaDonCT.getSoLuong() * hoaDonCT.getSanPhamChiTiet().getGiaBan()));
+        apiResponse.setData(hoaDonCTResponse);
         return apiResponse;
     }
 

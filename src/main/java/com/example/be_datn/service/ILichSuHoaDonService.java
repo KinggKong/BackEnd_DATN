@@ -1,9 +1,12 @@
 package com.example.be_datn.service;
 
-import com.example.be_datn.dto.Request.LichSuThanhToanCreationRequest;
-import com.example.be_datn.entity.LichSuThanhToan;
+import com.example.be_datn.dto.Request.StatusBillRequest;
+import com.example.be_datn.dto.Response.LichSuHoaDonResponse;
+
+import java.util.List;
 
 public interface ILichSuHoaDonService {
-    LichSuThanhToan create(LichSuThanhToanCreationRequest request);
-    void delete(Long id);
+    LichSuHoaDonResponse insertLichSuHoaDon(StatusBillRequest statusBillRequest);
+
+    List<LichSuHoaDonResponse> findLichSuHoaDonByIdHoaDon(Long idHoaDon);
 }

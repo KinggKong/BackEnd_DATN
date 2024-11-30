@@ -1,23 +1,19 @@
 package com.example.be_datn.dto.Response;
 
 import com.example.be_datn.entity.HoaDon;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import lombok.experimental.FieldDefaults;
 
-import java.io.Serializable;
+import java.time.LocalDateTime;
+
 
 @Getter
 @Setter
-@Builder
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class HoaDonResponse implements Serializable {
+@Builder
+public class HoaDonResponse {
     Long id;
     String maHoaDon;
     String tenNguoiNhan;
@@ -32,10 +28,12 @@ public class HoaDonResponse implements Serializable {
     String tenNhanVien;
     String tenKhachHang;
     String hinhThucThanhToan;
+    String trangThai;
     String maVoucher;
     Double soTienGiam;
-    Integer soluong;
-    Integer trangThai;
+    LocalDateTime createdAt;
+    LocalDateTime updatedAt;
+
 
     public static HoaDonResponse from(HoaDon hoaDon) {
         if (hoaDon == null) {

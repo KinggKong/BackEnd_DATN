@@ -26,10 +26,19 @@ public enum ErrorCode {
     TRANGTHAI_CHATLIEUVAI_INVALID(1004,"Trạng thái không hợp lệ !"),
     HANG_ALREADY_EXISTS(1010,"DanhMuc da ton tai!"),
     HANG_NOT_FOUND(1011,"DanhMuc khong ton tai"),
+    TAIKHOAN_NOT_FOUND(3000, "Tài khoản không tồn tại !"),
+    TEN_TAIKHOAN_INVALID(3001, "Tên tài khoản cần trên 8 kí tự"),
+    MATKHAU_TAIKHOAN_INVALID(3002, "Mật khẩu tài khoản cần trên 8 kí tự"),
+    TRANGTHAI_TAIKHOAN_INVALID(3003, "Trạng thái tài khoản không hợp lệ !"),
+    MA_TAIKHOAN_EXIST(3004, "Mã tài khoản không được trùng !"),
+    TEN_TAIKHOAN_EXISTED(3007, "Tên tài khoản đã tồn tại !"),
     // Bổ sung các mã lỗi cho voucher
     VOUCHER_ALREADY_EXISTS(1020, "Voucher đã tồn tại!"),
     VOUCHER_NOT_FOUND(1021, "Voucher không tồn tại!"),
-
+    VOUCHER_NOT_YET_STARTED(1040, "VOUCHER_NOT_YET_STARTED"),
+    VOUCHER_EXPIRED(1041, "VOUCHER_EXPIRED"),
+    LOAI_HOA_DON_INVALID(1022, "Loại hóa đơn không đúng !"),
+    LICH_SU_THANH_TOAN_NOT_FOUND(1023, "Lịch sử thanh toán không tồn tại !"),
     THUONGHIEU_ALREADY_EXISTS(1012,"Thuong hieu da ton tai !"),
     THUONGHIEU_NOT_FOUND(1013,"Thuong hieu khong ton tai !"),
     SANPHAM_NOT_FOUND(1014,"Sản phẩm không tồn tại !"),
@@ -42,15 +51,27 @@ public enum ErrorCode {
     TRANGTHAI_SANPHAM_INVALID(1014,"Trạng thái không hợp lệ !"),
     LOAIVAI_SANPHAM_INVALID(1014,"Loại vải không được để trống"),
     DIA_CHI_NOT_FOUND(2002,"Địa chỉ không tồn tại !"),
-    HOA_DON_NOT_FOUND(3004, "Hóa đơn không tồn tại !"),
-    KHACH_HANG_NOT_FOUND(5004, "Khách hàng không tồn tại !"),
-    LOAI_HOA_DON_INVALID(6004, "Error type order"),
-    LICH_SU_THANH_TOAN_NOT_FOUND(7004, "LICH_SU_THANH_TOAN_NOT_FOUND")
+
+    SANPHAMCHITIET_NOT_FOUND(1015, "Sản phẩm chi tiết không tồn tại !"),
+    SANPHAMCHITIET_EXIST(1016, "Sản phẩm chi tiết đã tồn tại !"),
+    GIA_BAN_INVALID(1017, "Giá bán không hợp lệ !"),
+    SO_LUONG_INVALID(1018, "Số lượng không hợp lệ !"),
+    Sale_NOT_FOUND(1019, "Sale không tồn tại !"),
+    TEN_SALE_INVALID(1019, "Tên sale không đã tồn tại !"),
+    THOI_GIAN_INVALID(1019, "Thời gian không hợp lệ !"),
+    KHACH_HANG_NOT_FOUND(1020,"Không tìm thấy khách hàng"),
+    TEN_TAIkHOAN_NOT_EXIST(3005, "Tên tài khoản không tồn tại !"),
+    UNAUTHENTICATED(3006, "Unauthenticated"),
+    GIO_HANG_NOT_FOUND(2000, "Giỏ hàng không tồn tại !"),
+    GIO_HANG_CHI_TIET_NOT_FOUND(2000,"Giỏ hàng chi tiết không tồn tại !"),
+    HOA_DON_INVALID(2000, "Không thể tạo hóa đơn"),
+    HOA_DON_NOT_FOUND(2000,"Hóa đơn không tồn tại !"),
+    HOA_DON_CHI_TIET_NOT_FOUND_LIST(2000,"Danh sách hóa đơn chi tiết by id hóa đơn không tồn tại"),
+    NHANVIEN_NOT_FOUND(2000,"Nhân viên không tồn tại !"),
+    LICH_SU_HOA_DON_NOT_FOUND(2004, "LICH_SU_HOA_DON_NOT_FOUND"),
+    HOA_DON_CT_NOT_FOUND(2005, "HOA_DON_CT_NOT_FOUND"),
+
     ;
-
-
-
-
     private int code;
     private String message;
 }

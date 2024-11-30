@@ -1,5 +1,6 @@
 package com.example.be_datn.dto.Request;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
@@ -16,6 +17,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class SanPhamChiTietRequest {
 
     @NotNull(message = "ID_MAUSAC_INVALID")
@@ -34,5 +36,5 @@ public class SanPhamChiTietRequest {
     Double giaBan;
     @NotNull(message = "TRANG_THAI_INVALID")
     int trangThai;
-    List<String> hinhanh;
+    List<String> hinhAnh;
 }

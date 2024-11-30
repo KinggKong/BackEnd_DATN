@@ -6,6 +6,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -30,7 +31,7 @@ public class LichSuThanhToan {
     String maGiaoDich;
     Double soTien;
     String phuongThucThanhToan;
-    @ManyToOne
+    @OneToOne
     @JoinColumn(name = "hoaDonId", referencedColumnName = "id")
     private HoaDon hoaDon;
 }

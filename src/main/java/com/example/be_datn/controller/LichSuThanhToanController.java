@@ -5,7 +5,7 @@ import com.example.be_datn.dto.Request.LichSuThanhToanCreationRequest;
 import com.example.be_datn.dto.Response.ApiResponse;
 import com.example.be_datn.entity.LichSuThanhToan;
 import com.example.be_datn.repository.LichSuThanhToanRepository;
-import com.example.be_datn.service.impl.LichSuHoaDonService;
+import com.example.be_datn.service.impl.LichSuThanhToanService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/v1/lichSuThanhToan")
 public class LichSuThanhToanController {
 
-    private final LichSuHoaDonService lichSuHoaDonService;
+    private final LichSuThanhToanService lichSuHoaDonService;
 
     private final LichSuThanhToanRepository lichSuThanhToanRepository;
 
@@ -42,7 +42,7 @@ public class LichSuThanhToanController {
     @GetMapping("/getLichSuHoaDonByHoaDonId/{id}")
     public ApiResponse<?> getDetail(@PathVariable Long id){
         ApiResponse<LichSuThanhToan> res = new ApiResponse<>();
-        lichSuThanhToanRepository.findByHoaDonIdNative(id);
+        res.setData(lichSuThanhToanRepository.findByHoaDonId(id));
         return res;
     }
 

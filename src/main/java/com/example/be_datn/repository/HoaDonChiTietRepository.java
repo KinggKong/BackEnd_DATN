@@ -1,8 +1,8 @@
 package com.example.be_datn.repository;
 
-import com.example.be_datn.dto.Response.HoaDonChiTietResponse;
+import com.example.be_datn.dto.Response.HoaDonCTResponse;
 import com.example.be_datn.entity.HoaDon;
-import com.example.be_datn.entity.HoaDonChiTiet;
+import com.example.be_datn.entity.HoaDonCT;
 import com.example.be_datn.entity.SanPhamChiTiet;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -12,31 +12,30 @@ import org.springframework.data.jpa.repository.Query;
 import java.util.List;
 import java.util.Optional;
 
-public interface HoaDonChiTietRepository extends JpaRepository<HoaDonChiTiet, Long> {
+public interface HoaDonChiTietRepository extends JpaRepository<HoaDonCT, Long> {
     @Query(
             """
-            select new com.example.be_datn.dto.Response.HoaDonChiTietResponse(
-                hdct.id, hd.id,spct.id, spct.sanPham.tenSanPham, hdct.soLuong, hdct.created_at,
-                hdct.updated_at, hdct.tongTien, hdct.trangThai
+            select new com.example.be_datn.dto.Response.HoaDonCTResponse(
+                hdct.id, hd.id,spct.id, spct.sanPham.tenSanPham, hdct.soLuong,spct.giaBan, hd.tongTien
             )
-            from HoaDonChiTiet hdct 
+            from HoaDonCT hdct 
             join hdct.hoaDon hd 
             join hdct.sanPhamChiTiet spct
             """
     )
-    Page<HoaDonChiTietResponse> getAllHdct(Pageable pageable);
+    Page<HoaDonCTResponse> getAllHdct(Pageable pageable);
 
 
     @Query(
             """
-                        select new com.example.be_datn.dto.Response.HoaDonChiTietResponse(
-                            hdct.id, hd.id,spct.id, spct.sanPham.tenSanPham, hdct.soLuong, hdct.created_at,
-                            hdct.updated_at, hdct.tongTien, hdct.trangThai
-                        ) from HoaDonChiTiet hdct join HoaDon hd on hdct.hoaDon.id = hd.id
+                        select new com.example.be_datn.dto.Response.HoaDonCTResponse(
+                hdct.id, hd.id,spct.id, spct.sanPham.tenSanPham, hdct.soLuong,spct.giaBan, hd.tongTien
+                        ) from HoaDonCT hdct join HoaDon hd on hdct.hoaDon.id = hd.id
                         join SanPhamChiTiet spct on spct.id = hdct.sanPhamChiTiet.id where hd.id=:hoaDonId
                     """
     )
-    List<HoaDonChiTietResponse> getAllHdctByIdHoaDon(Long hoaDonId);
+    List<HoaDonCTResponse> getAllHdctByIdHoaDon(Long hoaDonId);
 
-    Optional<HoaDonChiTiet> findByHoaDonAndSanPhamChiTiet(HoaDon hoaDon, SanPhamChiTiet sanPhamChiTiet);
+    Optional<HoaDonCT> findByHoaDonAndSanPhamChiTiet(HoaDon hoaDon, SanPhamChiTiet sanPhamChiTiet);
+    List<HoaDonCT> findByHoaDon_Id(Long id);
 }
