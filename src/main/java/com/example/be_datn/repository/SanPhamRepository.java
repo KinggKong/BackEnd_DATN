@@ -13,7 +13,9 @@ import java.util.List;
 public interface SanPhamRepository extends JpaRepository<SanPham, Long>, JpaSpecificationExecutor<SanPham> {
     boolean existsByTenSanPham(String tenSanPham);
     List<SanPham> getAllByTenSanPhamContainingIgnoreCase(String tenSanPham);
-    @Query(value = "SELECT sp.* FROM san_pham sp \n" +
+    @Query(value = "SELECT sp.id, sp.ten_san_pham,sp.mo_ta,sp.trang_thai, sp.id_danh_muc," +
+            "sp.id_thuong_hieu, sp.id_chat_lieu_vai, sp.id_chat_lieu_de, sp.created_at, sp.updated_at" +
+            " FROM san_pham sp \n" +
             "where (sp.id_danh_muc = '' or sp.id_danh_muc = :idDanhMuc or :idDanhMuc is null) \n" +
             "and (sp.id_thuong_hieu = '' or sp.id_thuong_hieu = :idThuongHieu or :idThuongHieu is null)\n" +
             "and (sp.id_chat_lieu_de = '' or sp.id_chat_lieu_de = :idChatLieuDe or :idChatLieuDe is null)\n" +
