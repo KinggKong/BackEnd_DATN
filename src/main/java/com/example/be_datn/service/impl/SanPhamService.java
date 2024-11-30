@@ -68,6 +68,8 @@ public class SanPhamService implements ISanPhamService {
 
         Page<SanPham> sanPhams = sanPhamRepository.findAll(spec, pageable);
         Page<SanPhamCustumerResponse> sanPhamCustumerResponses = sanPhams.map(sanPham -> {
+
+
             List<Double> giaBan = sanPham.getSanPhamChiTietList().stream().map(SanPhamChiTiet::getGiaBanSauKhiGiam).toList();
             Double giaBanThapNhat = giaBan.stream().min(Double::compareTo).orElse(0.0);
             Double giaBanCaoNhat = giaBan.stream().max(Double::compareTo).orElse(0.0);
@@ -103,7 +105,8 @@ public class SanPhamService implements ISanPhamService {
                     giaHienThi,
                     hinhAnh,
                     phanTramGiamGia,
-                    0l
+                    0l,
+                    sanPham.getSanPhamChiTietList().size()
             );
         });
         return sanPhamCustumerResponses;
@@ -165,7 +168,8 @@ public class SanPhamService implements ISanPhamService {
                     giaHienThi,
                     hinhAnh,
                     phanTramGiamGia,
-                    0l
+                    0l,
+                    sanPham.getSanPhamChiTietList().size()
             );
         }).toList();
 
@@ -285,7 +289,8 @@ public class SanPhamService implements ISanPhamService {
                     giaHienThi,
                     hinhAnh,
                     phanTramGiamGia,
-                    0l
+                    0l,
+                    sanPham.getSanPhamChiTietList().size()
             );
         }).toList();
         return sanPhamCustumerResponses;
@@ -345,7 +350,8 @@ public class SanPhamService implements ISanPhamService {
                     giaHienThi,
                     hinhAnh,
                     phanTramGiamGia,
-                    totalQuantity
+                    totalQuantity,
+                    sanPham.getSanPhamChiTietList().size()
             );
         }).toList();
 

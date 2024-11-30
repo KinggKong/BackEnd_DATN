@@ -228,5 +228,10 @@ public interface HoaDonRepository extends JpaRepository<HoaDon, Long> {
                                                  @Param("loaiHoaDon") String loaiHoaDon);
 
 
-
+    @Query(value = """
+            SELECT COUNT(*) 
+            FROM hoa_don hdb 
+            WHERE hdb.trang_thai = :trangThai 
+            """, nativeQuery = true)
+    int countByTrangThaiAllTime(@Param("trangThai") String trangThai);
 }

@@ -42,4 +42,7 @@ public interface SanPhamChiTietRepository extends JpaRepository<SanPhamChiTiet,L
     //Lấy ra sản pham theo số lượng
     @Query("select spct from SanPhamChiTiet spct join SanPham  sp on spct.sanPham.id =sp.id where  spct.soLuong <= ?1 and sp.trangThai = 1")
     Page<SanPhamChiTiet> getSanPhamChiTietBySoLuong(int soLuong, Pageable pageable);
+
+    @Query("select count(spct) from SanPhamChiTiet spct join SanPham sp on spct.sanPham.id = sp.id where spct.soLuong = 0 and sp.trangThai = 1")
+    int countSanPhamHetHang();
 }

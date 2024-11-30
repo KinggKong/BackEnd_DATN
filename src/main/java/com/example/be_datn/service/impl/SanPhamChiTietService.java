@@ -208,4 +208,9 @@ public class SanPhamChiTietService implements ISanPhamChiTietService {
     public Page<SanPhamChiTietResponse> getSanPhamChiTietBySoLuong(int soLuong, Pageable pageable) {
         return sanPhamChiTietRepository.getSanPhamChiTietBySoLuong(soLuong,pageable).map(SanPhamChiTietResponse::fromSanPhamChiTiet);
     }
+
+    @Override
+    public int countSanPhamHetHang() {
+        return sanPhamChiTietRepository.countSanPhamHetHang();
+    }
 }

@@ -4,6 +4,7 @@ import com.example.be_datn.dto.Response.ApiResponse;
 import com.example.be_datn.dto.Response.ThongKeResponse;
 
 import com.example.be_datn.dto.Response.ThongKeSanPhamBanChayResponse;
+import com.example.be_datn.dto.Response.ViecCanLamResponse;
 import com.example.be_datn.service.impl.ThongKeService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -88,6 +89,12 @@ public class ThongKeController {
         LocalDateTime date1 = LocalDate.parse(ngayBatDau, formatter).atStartOfDay();
         LocalDateTime date2 = LocalDate.parse(ngayKetThuc, formatter).atTime(23, 59, 59);
         apiResponse.setData(thongKeSerVice.getSanPhambanChayDoanhThu(date1,date2,typeSale));
+        return apiResponse;
+    }
+    @GetMapping("viec-can-lam")
+    public ApiResponse<ViecCanLamResponse> getViecCanLam() {
+        ApiResponse<ViecCanLamResponse> apiResponse = new ApiResponse<>();
+        apiResponse.setData(thongKeSerVice.getViecCanLam());
         return apiResponse;
     }
 

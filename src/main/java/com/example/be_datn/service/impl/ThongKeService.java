@@ -3,7 +3,9 @@ package com.example.be_datn.service.impl;
 import com.example.be_datn.dto.Response.ThongKeResponse;
 
 import com.example.be_datn.dto.Response.ThongKeSanPhamBanChayResponse;
+import com.example.be_datn.dto.Response.ViecCanLamResponse;
 import com.example.be_datn.repository.HoaDonRepository;
+import com.example.be_datn.repository.SanPhamChiTietRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.stereotype.Service;
@@ -21,6 +23,7 @@ import java.util.Map;
 public class ThongKeService {
     HoaDonRepository thongKeRepository;
     private final HoaDonRepository hoaDonRepository;
+    SanPhamChiTietRepository sanPhamChiTietRepository;
 
     public ThongKeResponse getAll(LocalDateTime ngayBatDau, LocalDateTime ngayKetThuc, String typeSale) {
         ThongKeResponse thongKeResponse = new ThongKeResponse();
@@ -111,6 +114,15 @@ public class ThongKeService {
             thongKeSanPhamBanChayResponses.add(thongKeSanPhamBanChayResponse);
         }
         return thongKeSanPhamBanChayResponses;
+    }
+
+    public ViecCanLamResponse getViecCanLam (){
+        ViecCanLamResponse viecCanLamResponse = new ViecCanLamResponse();
+        viecCanLamResponse.setDonChoXacNhan(hoaDonRepository.countByTrangThaiAllTime("WAITING"));
+        viecCanLamResponse.setDonChoLayHang(hoaDonRepository.countByTrangThaiAllTime("ACCEPTED"));
+        viecCanLamResponse.setDonDangGiaoHang(hoaDonRepository.countByTrangThaiAllTime("SHIPPING"));
+        viecCanLamResponse.setSanPhamHetHang(sanPhamChiTietRepository.countSanPhamHetHang());
+        return viecCanLamResponse;
     }
 }
 
