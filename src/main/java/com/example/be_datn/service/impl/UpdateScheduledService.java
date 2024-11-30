@@ -1,13 +1,7 @@
 package com.example.be_datn.service.impl;
 
-import com.example.be_datn.entity.GioHangChiTiet;
-import com.example.be_datn.entity.Sale;
-import com.example.be_datn.entity.SaleCt;
-import com.example.be_datn.entity.SanPhamChiTiet;
-import com.example.be_datn.repository.GioHangChiTietRepository;
-import com.example.be_datn.repository.SaleRepository;
-import com.example.be_datn.repository.Sale_ChiTietRepository;
-import com.example.be_datn.repository.SanPhamChiTietRepository;
+import com.example.be_datn.entity.*;
+import com.example.be_datn.repository.*;
 import jakarta.transaction.Transactional;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -27,6 +21,7 @@ public class UpdateScheduledService {
     Sale_ChiTietRepository sale_ChiTietRepository;
     SaleRepository saleRepository;
     SanPhamChiTietRepository sanPhamChiTietRepository;
+    VoucherRepository voucherRepository;
 
     @Scheduled(fixedRate = 60000)
     public void updateGiaGioHang() {
@@ -82,6 +77,16 @@ public class UpdateScheduledService {
             saleRepository.save(sale);
         }
         System.out.println("update sale");
+    }
+     @Scheduled(fixedRate = 60000)
+    public void updateVoucher(){
+        LocalDateTime now = LocalDateTime.now();
+        List<Voucher> vouchers = voucherRepository.findByNgayKetThucBefore(now);
+        for (Voucher voucher : vouchers) {
+            voucher.setTrangThai(0);
+            voucherRepository.save(voucher);
+        }
+        System.out.println("update voucher");
     }
 
 }
