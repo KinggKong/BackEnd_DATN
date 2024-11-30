@@ -32,6 +32,7 @@ public class GioHangChiTiet extends BaseEntity {
     int soLuong;
     @Column(name = "gia_tien")
     Double giaTien;
+
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
     @Column(name = "thoi_gian_giam_gia")
     LocalDateTime thoiGianGiamGia;

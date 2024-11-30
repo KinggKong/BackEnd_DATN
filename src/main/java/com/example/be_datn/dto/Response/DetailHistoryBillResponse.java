@@ -12,4 +12,6 @@ import java.util.List;
 public class DetailHistoryBillResponse {
     HoaDonResponse hoaDonResponse;
     List<LichSuHoaDonResponse> lichSuHoaDonResponses;
+    List<HoaDonChiTietResponse> hoaDonChiTietResponses;
+    LichSuThanhToanResponse lichSuThanhToanResponse;
 }

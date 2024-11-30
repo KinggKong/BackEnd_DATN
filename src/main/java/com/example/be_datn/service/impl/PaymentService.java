@@ -16,7 +16,6 @@ public class PaymentService {
 
 
     public String createOrder(HttpServletRequest request, int amount, String orderInfor, String urlReturn){
-        //Các bạn có thể tham khảo tài liệu hướng dẫn và điều chỉnh các tham số
         String vnp_Version = "2.1.0";
         String vnp_Command = "pay";
         String vnp_TxnRef = VNPayConfig.getRandomNumber(8);

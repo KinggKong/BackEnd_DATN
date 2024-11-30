@@ -21,7 +21,7 @@ public interface NhanVienRepository extends JpaRepository<NhanVien, Long> {
     // Tìm kiếm nhân viên theo trạng thái (trạng thái 0 hoặc 1)
     Page<NhanVien> findByTrangThai(Integer trangThai, Pageable pageable);
 
-
+    NhanVien findByTen(String ten);
 
     // Tìm kiếm nhân viên theo giới tính (true = Nam, false = Nữ)
     Page<NhanVien> findByGioiTinh(Boolean gioiTinh, Pageable pageable);
