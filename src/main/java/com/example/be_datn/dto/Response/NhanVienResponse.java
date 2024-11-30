@@ -23,7 +23,6 @@ public class NhanVienResponse {
     private LocalDate ngaySinh;
 
     private String diaChi;
-    private Long idTaiKhoan;
     private Boolean gioiTinh;
     private Integer trangThai;
 
@@ -37,7 +36,6 @@ public class NhanVienResponse {
                 .avatar(nhanVien.getAvatar())
                 .ngaySinh(nhanVien.getNgaySinh())
                 .diaChi(nhanVien.getDiaChi())
-                .idTaiKhoan(nhanVien.getIdTaiKhoan())
                 .gioiTinh(nhanVien.getGioiTinh())
                 .trangThai(nhanVien.getTrangThai())
                 .build();

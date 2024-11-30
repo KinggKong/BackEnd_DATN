@@ -25,8 +25,6 @@ public class NhanVien extends BaseEntity {
     @Column(name = "ten")
     private String ten;
 
-    @Column(name = "id_tai_khoan")
-    private Long idTaiKhoan;
 
     @Size(max = 255)
     @Column(name = "email")

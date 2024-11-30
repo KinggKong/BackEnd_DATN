@@ -44,8 +44,6 @@ public class KhachHangService1 implements IKhachHangService1 {
                 .sdt(khachHangRequest.getSdt())
                 .avatar(khachHangRequest.getAvatar())
                 .ngaySinh(khachHangRequest.getNgaySinh())
-                .idDiaChi(khachHangRequest.getIdDiaChi())
-                .idTaiKhoan(khachHangRequest.getIdTaiKhoan())
                 .gioiTinh(khachHangRequest.getGioiTinh())
                 .trangThai(khachHangRequest.getTrangThai())
                 .build();
@@ -76,8 +74,7 @@ public class KhachHangService1 implements IKhachHangService1 {
         khachHang.setSdt(khachHangRequest.getSdt());
         khachHang.setAvatar(khachHangRequest.getAvatar());
         khachHang.setNgaySinh(khachHangRequest.getNgaySinh());
-        khachHang.setIdDiaChi(khachHangRequest.getIdDiaChi());
-        khachHang.setIdTaiKhoan(khachHangRequest.getIdTaiKhoan());
+
         khachHang.setGioiTinh(khachHangRequest.getGioiTinh());
         khachHang.setTrangThai(khachHangRequest.getTrangThai());
 
