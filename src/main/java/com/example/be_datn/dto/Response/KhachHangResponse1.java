@@ -38,8 +38,8 @@ public class KhachHangResponse1 {
                 .sdt(khachHang.getSdt())
                 .avatar(khachHang.getAvatar())
                 .ngaySinh(khachHang.getNgaySinh())
-                .idDiaChi(khachHang.getIdDiaChi())
-                .idTaiKhoan(khachHang.getIdTaiKhoan())
+//                .idDiaChi(khachHang.getIdDiaChi())
+//                .idTaiKhoan(khachHang.getIdTaiKhoan())
                 .gioiTinh(khachHang.getGioiTinh())
                 .trangThai(khachHang.getTrangThai())
                 .build();

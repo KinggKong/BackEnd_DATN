@@ -45,7 +45,7 @@ public class NhanVienService implements INhanVienService {
                 .avatar(nhanVienRequest.getAvatar())
                 .ngaySinh(nhanVienRequest.getNgaySinh())
                 .diaChi(nhanVienRequest.getDiaChi())
-                .idTaiKhoan(nhanVienRequest.getIdTaiKhoan())
+//                .idTaiKhoan(nhanVienRequest.getIdTaiKhoan())
                 .gioiTinh(nhanVienRequest.getGioiTinh())
                 .trangThai(nhanVienRequest.getTrangThai())
                 .build();
@@ -76,7 +76,7 @@ public class NhanVienService implements INhanVienService {
         nhanVien.setAvatar(nhanVienRequest.getAvatar());
         nhanVien.setNgaySinh(nhanVienRequest.getNgaySinh());
         nhanVien.setDiaChi(nhanVienRequest.getDiaChi());
-        nhanVien.setIdTaiKhoan(nhanVienRequest.getIdTaiKhoan());
+//        nhanVien.setIdTaiKhoan(nhanVienRequest.getIdTaiKhoan());
         nhanVien.setGioiTinh(nhanVienRequest.getGioiTinh());
         nhanVien.setTrangThai(nhanVienRequest.getTrangThai());
 
