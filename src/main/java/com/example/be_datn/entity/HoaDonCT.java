@@ -1,6 +1,7 @@
 package com.example.be_datn.entity;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -22,6 +23,7 @@ import org.hibernate.annotations.ColumnDefault;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "hoa_don_ct")
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class HoaDonCT extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

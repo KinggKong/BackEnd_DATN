@@ -30,7 +30,6 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class HoaDon extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -57,6 +56,7 @@ public class HoaDon extends BaseEntity {
     @JoinColumn(name = "id_voucher", referencedColumnName = "id")
     private Voucher voucher;
     Double soTienGiam;
+    @JsonIgnore
     @OneToMany(mappedBy = "hoaDon", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<HoaDonCT> chiTietList;
 

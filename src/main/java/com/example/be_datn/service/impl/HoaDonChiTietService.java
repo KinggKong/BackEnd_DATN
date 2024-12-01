@@ -59,7 +59,7 @@ public class HoaDonChiTietService implements IHoaDonChiTietService {
                             .hoaDon(hoaDon)
                             .sanPhamChiTiet(sanPhamChiTiet)
                             .soLuong(request.getSoLuong())
-                            .giaTien(sanPhamChiTiet.getGiaBan())
+                            .giaTien(sanPhamChiTiet.getGiaBanSauKhiGiam())
                             .build()
             );
             updateHoaDon(hoaDon.getId());
@@ -78,7 +78,7 @@ public class HoaDonChiTietService implements IHoaDonChiTietService {
                             .hoaDon(hoaDon)
                             .sanPhamChiTiet(sanPhamChiTiet)
                             .soLuong(newSoLuong)
-                            .giaTien(sanPhamChiTiet.getGiaBan())
+                            .giaTien(sanPhamChiTiet.getGiaBanSauKhiGiam())
                             .build()
             );
             updateHoaDon(hoaDon.getId());
