@@ -102,17 +102,11 @@ public class HoaDonController {
 
     @PutMapping("/invoices/{idHoaDon}/addCustomer/{idKhachHang}")
     public ResponseEntity<String> addCustomerToInvoice(@PathVariable Long idHoaDon, @PathVariable Long idKhachHang) {
-        // Tìm hóa đơn theo ID
         HoaDon hoaDon = hoaDonRepository.findById(idHoaDon)
                 .orElseThrow(() -> new AppException(ErrorCode.HOA_DON_NOT_FOUND));
 
-        // Tìm khách hàng theo ID
         KhachHang khachHang = khachHangRepository.findById(idKhachHang)
                 .orElseThrow(() -> new AppException(ErrorCode.KHACH_HANG_NOT_FOUND));
-
-//        if (hoaDon.getKhachHang() != null) {
-//            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invoice already has a customer.");
-//        }
 
         hoaDon.setKhachHang(khachHang);
         hoaDon.setTenNguoiNhan(khachHang.getTen());
