@@ -21,20 +21,50 @@ import java.time.LocalDateTime;
 @Builder
 @Table(name = "khach_hang")
 public class KhachHang {
-    @Id
+   @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id", nullable = false)
     private Long id;
+
+    @Size(max = 255)
+    @Column(name = "ten")
     private String ten;
-    private String tenDangNhap;
-    private String matKhau;
-    private String sdt;
-    private String avatar;
-    private LocalDateTime ngaySinh;
-    private Long idDiaChi;
-    private Boolean gioiTinh;
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
-    private Integer trangThai;
+
+//    @Size(max = 255)
+//    @Column(name = "ten_dang_nhap")
+//    private String tenDangNhap;
+//
+//    @Size(max = 255)
+//    @Column(name = "mat_khau")
+//    private String matKhau;
+
     private String email;
+
+    @Size(max = 11)
+    @Column(name = "sdt", length = 11)
+    private String sdt;
+
+    @Size(max = 255)
+    @Column(name = "avatar")
+    private String avatar;
+
+    @Column(name = "ngay_sinh")
+    private Instant ngaySinh;
+
+//    @Column(name = "id_dia_chi")
+//    private Long idDiaChi;
+
+    @Column(name = "gioi_tinh")
+    private Boolean gioiTinh;
+
+    @Column(name = "created_at")
+    private Instant createdAt;
+
+    @Column(name = "updated_at")
+    private Instant updatedAt;
+
+    @Column(name = "trang_thai")
+    private Integer trangThai;
+
 
 }

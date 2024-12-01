@@ -29,6 +29,7 @@ public interface SaleRepository extends JpaRepository<Sale,Long> {
     Page<Sale> findAllByFilter(String tenChienDich, LocalDateTime ngayBatDau, LocalDateTime ngayKetThuc, Integer trangThai, Pageable pageable);
 
     List<Sale> findByThoiGianKetThucBefore(LocalDateTime localDateTime);
+    List<Sale> findByThoiGianBatDauBeforeAndTrangThai(LocalDateTime localDateTime, int trangThai);
 
     @Query("SELECT COUNT(s) > 0 FROM Sale s JOIN s.saleCts saleCt WHERE saleCt.idSanPhamCt = :sanPhamChiTietId AND s.thoiGianKetThuc > :now and s.trangThai = 1")
     boolean existsBySaleCtsIdSanPhamCtAndThoiGianKetThucAfter(@Param("sanPhamChiTietId") Long sanPhamChiTietId, @Param("now") LocalDateTime now);
