@@ -12,13 +12,8 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class TaiKhoanResponse {
     Long id;
-
     String tenDangNhap;
-
     String ma;
-
-
     VaiTro vaiTro;
-
     int trangThai;
 }

@@ -22,10 +22,10 @@ public interface KhachHangRepository1 extends JpaRepository<KhachHang1, Long> {
     Page<KhachHang1> findByTrangThai(Integer trangThai, Pageable pageable);
 
     // Tìm kiếm khách hàng theo ID địa chỉ
-    Page<KhachHang1> findByIdDiaChi(Long idDiaChi, Pageable pageable);
-
-    // Tìm kiếm khách hàng theo ID tài khoản
-    Page<KhachHang1> findByIdTaiKhoan(Long idTaiKhoan, Pageable pageable);
+//    Page<KhachHang1> findByIdDiaChi(Long idDiaChi, Pageable pageable);
+//
+//    // Tìm kiếm khách hàng theo ID tài khoản
+//    Page<KhachHang1> findByIdTaiKhoan(Long idTaiKhoan, Pageable pageable);
 
     // Tìm kiếm khách hàng theo giới tính (true = Nam, false = Nữ)
     Page<KhachHang1> findByGioiTinh(Boolean gioiTinh, Pageable pageable);

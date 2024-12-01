@@ -47,6 +47,7 @@ public class UpdateScheduledService {
     public void updateSale() {
         LocalDateTime now = LocalDateTime.now();
         List<Sale> sales = saleRepository.findByThoiGianKetThucBefore(now);
+
         for (Sale sale : sales) {
             sale.setTrangThai(0);
             List<SaleCt> saleCts = sale.getSaleCts();
@@ -76,6 +77,30 @@ public class UpdateScheduledService {
             // Lưu lại Sale sau khi xử lý
             saleRepository.save(sale);
         }
+
+        // 2. Tự động bật sale đến ngày bắt đầu
+//        List<Sale> upcomingSales = saleRepository.findByThoiGianBatDauBeforeAndTrangThai(now, 0);
+//        for (Sale sale : upcomingSales) {
+//            sale.setTrangThai(1);
+//            List<SaleCt> saleCts = sale.getSaleCts();
+//            if (saleCts != null) {
+//                for (SaleCt saleCt : saleCts) {
+//                    Optional<SanPhamChiTiet> optionalSanPhamChiTiet = sanPhamChiTietRepository.findById(saleCt.getIdSanPhamCt());
+//                    if (optionalSanPhamChiTiet.isPresent()) {
+//                        SanPhamChiTiet sanPhamChiTiet = optionalSanPhamChiTiet.get();
+//
+//                        // Cập nhật giá bán sau khi giảm khi sale bật
+//                        sanPhamChiTiet.setGiaBanSauKhiGiam(sanPhamChiTiet.getGiaBan() * (100 - saleCt.getGiaTriGiam()) / 100);
+//                        sanPhamChiTietRepository.save(sanPhamChiTiet);
+//                    }
+//
+//                    // Cập nhật trạng thái của SaleCt
+//                    saleCt.setTrangThai(1);
+//                    sale_ChiTietRepository.save(saleCt);
+//                }
+//            }
+//            saleRepository.save(sale);
+//        }
         System.out.println("update sale");
     }
      @Scheduled(fixedRate = 60000)

@@ -80,7 +80,7 @@ public class ShopOnlineService implements IShopOnlineService {
     @Override
     public HoaDonResponse checkout(HoaDonRequest hoaDonRequest) {
         checkSoLuongHopLe(hoaDonRequest.getIdGioHang());
-
+        handleUpdateAfterBuy(hoaDonRequest.getIdGioHang());
         HoaDon hd = createHoaDon(hoaDonRequest);
         HoaDon hoaDon = hoaDonRepository.saveAndFlush(hd);
 
@@ -104,7 +104,7 @@ public class ShopOnlineService implements IShopOnlineService {
                 .forEach(hoaDonChiTietRepository::saveAndFlush);
 
         gioHangChiTietRepository.deleteByGioHang_Id(hoaDonRequest.getIdGioHang());
-        handleUpdateAfterBuy(hoaDonRequest.getIdGioHang());
+
 
         emailService.sendMailToUser(hoaDonRequest.getEmail(), "3HST Shoes - Cảm ơn bạn đã đặt hàng tại 3HST Shoes", hoaDon.getMaHoaDon(), this.getInfoOrder(hoaDon.getMaHoaDon()));
         return hoaDonMapper.toHoaDonResponse(hoaDon);

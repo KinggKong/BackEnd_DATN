@@ -41,11 +41,11 @@ public class KhachHang1 extends BaseEntity {
     @Column(name = "ngay_sinh")
     private LocalDate ngaySinh;
 
-    @Column(name = "id_dia_chi")
-    private Long idDiaChi;
+//    @Column(name = "id_dia_chi")
+//    private Long idDiaChi;
 
-    @Column(name = "id_tai_khoan")
-    private Long idTaiKhoan;
+//    @Column(name = "id_tai_khoan")
+//    private Long idTaiKhoan;
 
     @Column(name = "gioi_tinh")
     private Boolean gioiTinh;

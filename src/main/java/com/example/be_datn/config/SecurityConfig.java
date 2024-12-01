@@ -1,71 +1,98 @@
 package com.example.be_datn.config;
 
-import org.springframework.beans.factory.annotation.Value;
+import com.example.be_datn.config.exception.Forbidden;
+import com.example.be_datn.config.exception.Unauthorized;
+import com.example.be_datn.config.jwtConfig.JwtAuthenticationFilter;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
-import org.springframework.security.oauth2.jose.jws.MacAlgorithm;
-import org.springframework.security.oauth2.jwt.JwtDecoder;
-import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
-import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
-import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-
-import javax.crypto.spec.SecretKeySpec;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
-    private final String[] PUBLIC_ENDPOINTS = {
-            "/api/v1/mausacs/**",
-            "/auth/**",
-            "/api/v1/taikhoans/**"
-    };
+//    private final String[] PUBLIC_ENDPOINTS = {
+//            "/api/v1/mausacs/**",
+//            "/auth/**",
+//            "/api/v1/taikhoans/**"
+//    };
 
-    private final String ROLE_ADMIN = "ADMIN";
-
-    @Value("${jwt.signerKey}")
-    private String signerKey;
+    @Autowired
+    JwtAuthenticationFilter jwtAuthenticationFilter;
+    @Autowired
+    Unauthorized unauthorized;
+    @Autowired
+    Forbidden forbidden;
 
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
-//        httpSecurity.authorizeHttpRequests(requests ->
-//                requests.requestMatchers(HttpMethod.GET, PUBLIC_ENDPOINTS).permitAll()
-//                        .requestMatchers(HttpMethod.POST, PUBLIC_ENDPOINTS).permitAll()
-//                        .requestMatchers(HttpMethod.GET, "/api/v1/taikhoans").hasRole(ROLE_ADMIN)
-//                        .anyRequest().authenticated());
-        httpSecurity.authorizeHttpRequests(requests -> requests
-                .anyRequest().permitAll());
-        httpSecurity.oauth2ResourceServer(oauth2 -> oauth2.jwt(jwtConfigurer -> jwtConfigurer.decoder(jwtDecoder())
-                .jwtAuthenticationConverter(jwtAuthenticationConverter())));
-
-        httpSecurity.csrf(AbstractHttpConfigurer::disable);
-        return httpSecurity.build();
+    public WebMvcConfigurer configurer() {
+        return new WebMvcConfigurer() {
+            @Override
+            public void addCorsMappings(CorsRegistry registry) {
+                registry.addMapping("/**")
+                        .allowedOrigins("http://localhost:5173", "http://localhost:3000")
+                        .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH")
+                        .allowedHeaders("*")
+                        .allowCredentials(true);
+            }
+        };
     }
 
     @Bean
-    JwtAuthenticationConverter jwtAuthenticationConverter() {
-        JwtGrantedAuthoritiesConverter jwtGrantedAuthoritiesConverter = new JwtGrantedAuthoritiesConverter();
-        jwtGrantedAuthoritiesConverter.setAuthorityPrefix("ROLE_");
-
-        JwtAuthenticationConverter jwtAuthenticationConverter = new JwtAuthenticationConverter();
-        jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(jwtGrantedAuthoritiesConverter);
-        return jwtAuthenticationConverter;
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
     }
 
     @Bean
-    JwtDecoder jwtDecoder() {
-        SecretKeySpec secretKeySpec = new SecretKeySpec(signerKey.getBytes(), "HS512");
-        return NimbusJwtDecoder
-                .withSecretKey(secretKeySpec)
-                .macAlgorithm(MacAlgorithm.HS512)
-                .build();
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
+        return authenticationConfiguration.getAuthenticationManager();
     }
 
-    ;
+    @Bean
+    public SecurityFilterChain configure(HttpSecurity http) throws Exception {
+        http.csrf().disable();
+        http.cors().disable();
+        http
+                .authorizeHttpRequests((requests) -> {
+                            try {
+                                requests
+                                        .requestMatchers(new AntPathRequestMatcher("/public/**"),
+                                                new AntPathRequestMatcher("/error"),
+                                                new AntPathRequestMatcher("/api/v1/auth/**"),
+                                                new AntPathRequestMatcher("/swagger-ui/**"),
+                                                new AntPathRequestMatcher("/v3/api-docs/**")
+//                                                new AntPathRequestMatcher("/**")
+                                        )
+                                        .permitAll()
+//                                        .requestMatchers("/v1/api/users/**")
+//                                        .authenticated()
+                                        .anyRequest()
+                                        .authenticated()
+                                        .and()
+                                        .exceptionHandling()
+                                        .authenticationEntryPoint(unauthorized)
+                                        .accessDeniedHandler(forbidden)
+                                        .and()
+                                        .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+                            } catch (Exception e) {
+                                throw new RuntimeException(e);
+                            }
+                        }
+                )
+                .httpBasic();
+        return http.build();
+    }
+
 
 
 }

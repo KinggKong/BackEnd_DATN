@@ -18,6 +18,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -59,7 +60,13 @@ public class SaleService implements ISaleService {
                 saleRequest.getThoiGianKetThuc().isEqual(saleRequest.getThoiGianBatDau())){
             throw new AppException(ErrorCode.THOI_GIAN_INVALID);
         }
+
         Sale sale = buildSale(saleRequest);
+        if(saleRequest.getThoiGianBatDau().isAfter(LocalDateTime.now())){
+            sale.setTrangThai(0);
+        }else {
+            sale.setTrangThai(saleRequest.getTrangThai());
+        }
         SaleResponse saleResponse = SaleResponse.fromSale(saleRepository.save(sale));
         Sale saleSave = saleRepository.getReferenceById(saleResponse.getId());
         List<SaleCt> saleCts = new ArrayList<>();
@@ -95,12 +102,17 @@ public class SaleService implements ISaleService {
         saleRequest.getThoiGianKetThuc().isEqual(saleRequest.getThoiGianBatDau())){
             throw new AppException(ErrorCode.THOI_GIAN_INVALID);
         }
+        if(saleRequest.getThoiGianBatDau().isAfter(LocalDateTime.now())){
+            sale.setTrangThai(0);
+        }else {
+            sale.setTrangThai(saleRequest.getTrangThai());
+        }
         sale.setTenChienDich(saleRequest.getTenChienDich());
         sale.setHinhThucGiam(saleRequest.getHinhThucGiam());
         sale.setGiaTriGiam(saleRequest.getGiaTriGiam());
         sale.setThoiGianBatDau(saleRequest.getThoiGianBatDau());
         sale.setThoiGianKetThuc(saleRequest.getThoiGianKetThuc());
-        sale.setTrangThai(saleRequest.getTrangThai());
+
         SaleResponse saleResponse = SaleResponse.fromSale(saleRepository.save(sale));
         Sale saleSave = saleRepository.getReferenceById(saleResponse.getId());
         List<SaleCt> saleCts = sale.getSaleCts();

@@ -26,7 +26,8 @@ public interface SanPhamChiTietRepository extends JpaRepository<SanPhamChiTiet,L
             "and (sp.id_thuong_hieu = '' or sp.id_thuong_hieu = :idThuongHieu or :idThuongHieu is null) " +
             "and (sp.id_chat_lieu_de = '' or sp.id_chat_lieu_de = :idChatLieuDe or :idChatLieuDe is null) " +
             "and (sp.id_chat_lieu_vai = '' or sp.id_chat_lieu_vai = :idChatLieuVai or :idChatLieuVai is null) " +
-            "AND (sp.id = '' OR sp.id = :idSanPham OR :idSanPham IS NULL)", nativeQuery = true)
+            "AND (sp.id = '' OR sp.id = :idSanPham OR :idSanPham IS NULL) " +
+            "ORDER BY spct.updated_at DESC", nativeQuery = true)
     Page<SanPhamChiTiet> getAllByFilter(@Param("idDanhMuc") Long idDanhMuc,
                                  @Param("idThuongHieu") Long idThuongHieu,
                                  @Param("idChatLieuVai") Long idChatLieuVai,

@@ -28,13 +28,23 @@ public class KhachHang {
     @Column(name = "ten")
     private String ten;
 
-    @Size(max = 255)
-    @Column(name = "ten_dang_nhap")
-    private String tenDangNhap;
+//    @Size(max = 255)
+//    @Column(name = "ten_dang_nhap")
+//    private String tenDangNhap;
+//
+//    @Size(max = 255)
+//    @Column(name = "mat_khau")
+//    private String matKhau;
+    private String ma;
 
-    @Size(max = 255)
-    @Column(name = "mat_khau")
-    private String matKhau;
+
+//    @Size(max = 255)
+//    @Column(name = "ten_dang_nhap")
+//    private String tenDangNhap;
+//
+//    @Size(max = 255)
+//    @Column(name = "mat_khau")
+//    private String matKhau;
 
     private String email;
 
@@ -49,8 +59,8 @@ public class KhachHang {
     @Column(name = "ngay_sinh")
     private Instant ngaySinh;
 
-    @Column(name = "id_dia_chi")
-    private Long idDiaChi;
+//    @Column(name = "id_dia_chi")
+//    private Long idDiaChi;
 
     @Column(name = "gioi_tinh")
     private Boolean gioiTinh;

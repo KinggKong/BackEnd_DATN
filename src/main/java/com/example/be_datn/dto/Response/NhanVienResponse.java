@@ -37,7 +37,7 @@ public class NhanVienResponse {
                 .avatar(nhanVien.getAvatar())
                 .ngaySinh(nhanVien.getNgaySinh())
                 .diaChi(nhanVien.getDiaChi())
-                .idTaiKhoan(nhanVien.getIdTaiKhoan())
+//                .idTaiKhoan(nhanVien.getIdTaiKhoan())
                 .gioiTinh(nhanVien.getGioiTinh())
                 .trangThai(nhanVien.getTrangThai())
                 .build();

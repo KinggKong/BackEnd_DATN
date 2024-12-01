@@ -65,16 +65,21 @@ public enum ErrorCode {
 
 
     GIO_HANG_NOT_FOUND(2000, "Giỏ hàng không tồn tại !"),
-    GIO_HANG_CHI_TIET_NOT_FOUND(2000,"Giỏ hàng chi tiết không tồn tại !"),
+    GIO_HANG_CHI_TIET_NOT_FOUND(2000, "Giỏ hàng chi tiết không tồn tại !"),
     HOA_DON_INVALID(2000, "Không thể tạo hóa đơn"),
-    HOA_DON_NOT_FOUND(2000,"Hóa đơn không tồn tại !"),
-    HOA_DON_CHI_TIET_NOT_FOUND_LIST(2000,"Danh sách hóa đơn chi tiết by id hóa đơn không tồn tại"),
-    NHANVIEN_NOT_FOUND(2000,"Nhân viên không tồn tại !"),
+    HOA_DON_NOT_FOUND(2000, "Hóa đơn không tồn tại !"),
+    HOA_DON_CHI_TIET_NOT_FOUND_LIST(2000, "Danh sách hóa đơn chi tiết by id hóa đơn không tồn tại"),
+    NHANVIEN_NOT_FOUND(2000, "Nhân viên không tồn tại !"),
 
-    SOLUONG_SANPHAM_KHONG_DU(2000,"Số lượng sản phẩm mua nhiều hơn số lượng có sẵn"),
-    ID_GIO_HANG_CANT_BE_NULL(2000,"Id giỏ hàng không được null"),
-    CART_DONT_HAVE_PRODUCT(2000,"Giỏ hàng không có sản phẩm nào"),
-    ;
+    SOLUONG_SANPHAM_KHONG_DU(2000, "Số lượng sản phẩm mua nhiều hơn số lượng có sẵn"),
+    ID_GIO_HANG_CANT_BE_NULL(2000, "Id giỏ hàng không được null"),
+    CART_DONT_HAVE_PRODUCT(2000, "Giỏ hàng không có sản phẩm nào"),
+    LOGIN_FAILED(2000, "Login thất bại"), LOGOUT_FAILED(2000, "Logout thất bại"),
+    REGISTER_ACCOUNT_FAILED(2000, "Đăng ký thất bại"),
+    USER_USERNAME_EXISTED(2000, "Tên tài khoản đã tồn tại"),
+    ACCOUNT_EMAIL_EXISTED(2000, "Email tài khoản đã tồn tại"),
+    USER_CANT_CREATE_USER(2000, "Không thể tạo mới khách hàng"),
+    ROLE_NOT_FOUND(2000,"Vai trò không tồn tại" );
     private int code;
     private String message;
 }
