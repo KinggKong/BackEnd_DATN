@@ -1,3 +1,4 @@
+
 package com.example.be_datn.dto.Request;
 
 import jakarta.validation.constraints.*;
@@ -35,8 +36,6 @@ public class NhanVienRequest {
     @Size(max = 255, message = "DIA_CHI_INVALID")
     private String diaChi; // Địa chỉ nhân viên
 
-    @NotNull(message = "ID_TAI_KHOAN_INVALID")
-    private Long idTaiKhoan; // ID tài khoản của nhân viên
 
     @NotNull(message = "GIOI_TINH_INVALID")
     private Boolean gioiTinh; // Giới tính nhân viên

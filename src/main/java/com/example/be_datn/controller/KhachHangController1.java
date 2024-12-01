@@ -3,7 +3,7 @@ package com.example.be_datn.controller;
 import com.example.be_datn.dto.Response.ApiResponse;
 import com.example.be_datn.dto.Request.KhachHangRequest1;
 import com.example.be_datn.dto.Response.KhachHangResponse1;
-import com.example.be_datn.service.IKhachHangService1;
+import com.example.be_datn.service.IKhachHangService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.*;
 @FieldDefaults(level = lombok.AccessLevel.PRIVATE, makeFinal = true)
 public class KhachHangController1 {
 
-    IKhachHangService1 khachHangService;
+    IKhachHangService khachHangService;
 
     @GetMapping("")
     ApiResponse<Page<KhachHangResponse1>> getAllKhachHangs(@RequestParam(name = "pageNumber", defaultValue = "0") int pageNumber,
