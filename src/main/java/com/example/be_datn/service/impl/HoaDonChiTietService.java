@@ -21,6 +21,7 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -33,15 +34,6 @@ public class HoaDonChiTietService implements IHoaDonChiTietService {
     private final SanPhamChiTietService sanPhamChiTietService;
 
 
-    @Override
-    public Page<HoaDonCTResponse> getAllHoaDonChitiet(Pageable pageable) {
-        return hoaDonChiTietRepository.getAllHdct(pageable);
-    }
-
-    @Override
-    public List<HoaDonCTResponse> getHoaDonChiTietByHoaDonId(Long hoaDonId) {
-        return hoaDonChiTietRepository.getAllHdctByIdHoaDon(hoaDonId);
-    }
 
 
     @Override
@@ -90,14 +82,14 @@ public class HoaDonChiTietService implements IHoaDonChiTietService {
 
     @Override
     @Transactional
-    public HoaDon deleteHoaDonChiTiet(Long id) {
+    public String deleteHoaDonChiTiet(Long id) {
         HoaDonCT hoaDonChiTiet = hoaDonChiTietRepository.findById(id)
                 .orElseThrow(() -> new AppException(ErrorCode.HOA_DON_CT_NOT_FOUND));
 
         hoaDonChiTietRepository.deleteById(id);
         updateHoaDon(hoaDonChiTiet.getHoaDon().getId());
         sanPhamChiTietService.updateSoLuongSanPhamChiTiet(hoaDonChiTiet.getSanPhamChiTiet().getId(), hoaDonChiTiet.getSoLuong(), "plus");
-        return hoaDonRepository.findById(hoaDonChiTiet.getHoaDon().getId()).get();
+        return "Success";
     }
 
     @Override
@@ -161,6 +153,31 @@ public class HoaDonChiTietService implements IHoaDonChiTietService {
         return response;
     }
 
+    @Override
+    public Page<HoaDonCTResponse> getAllHdct(Pageable pageable, Long id) {
+
+
+        return null;
+    }
+
+    @Override
+    public List<HoaDonCTResponse> getAllHdctByIdHoaDon(Long hoaDonId) {
+        List<HoaDonCT> list =  hoaDonChiTietRepository.getAllByHoaDon_Id(hoaDonId);
+        List<HoaDonCTResponse> responseList = new ArrayList<>();
+        for(HoaDonCT hoaDonCT : list){
+            HoaDonCTResponse response = new HoaDonCTResponse();
+            response.setId(hoaDonCT.getId());
+            response.setIdGioHang(hoaDonCT.getHoaDon().getId());
+            response.setIdSanPhamChiTiet(hoaDonCT.getSanPhamChiTiet().getId());
+            response.setTenSanPhamChiTiet(hoaDonCT.getSanPhamChiTiet().getSanPham().getTenSanPham());
+            response.setSoLuong(hoaDonCT.getSoLuong());
+            response.setGiaBan(hoaDonCT.getGiaTien());
+            response.setTongTien(hoaDonCT.getSoLuong() * hoaDonCT.getGiaTien());
+            response.setHinhAnhList(hoaDonCT.getSanPhamChiTiet().getHinhAnhList());
+            responseList.add(response);
+        }
+        return responseList;
+    }
 
 
     @Transactional
@@ -171,7 +188,7 @@ public class HoaDonChiTietService implements IHoaDonChiTietService {
         HoaDon hoaDon = hoaDonRepository.findById(id)
                 .orElseThrow(() -> new AppException(ErrorCode.HOA_DON_NOT_FOUND));
 
-        List<HoaDonCTResponse> list = getHoaDonChiTietByHoaDonId(id);
+        List<HoaDonCTResponse> list = getAllHdctByIdHoaDon(id);
 
         if (list != null && !list.isEmpty()) {
             for (HoaDonCTResponse response : list) {

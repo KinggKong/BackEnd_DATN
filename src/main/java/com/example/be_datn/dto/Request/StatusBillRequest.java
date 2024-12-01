@@ -11,5 +11,6 @@ public class StatusBillRequest {
     Long idNhanvien;
     Long idHoaDon;
     String status;
+    String ghiChu;
 }
 

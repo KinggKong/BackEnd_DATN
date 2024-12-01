@@ -10,5 +10,10 @@ public interface IGioHangChiTietService {
 
     GioHangChiTietResponse themGioHangChiTiet(GioHangChiTietRequest gioHangChiTietRequest);
 
+
     int xoaKhoiGioHang(Long idGioHangChiTiet);
+    int xoaKhoiGioHangBySanPhamChiTiet(Long idSanPhamChiTiet, Long idGioHang);
+
+    void updateGioHangChiTiet(Long idSanPhamChiTiet, Long idGioHang, int soLuong);
+
 }

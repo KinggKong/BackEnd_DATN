@@ -93,7 +93,7 @@ public class EmailService implements IEmailService {
                                 </div>
                             
                                 <div style="text-align: center; margin: 30px 0;">
-                                    <a href="https://3hst.com/track-order/%s" 
+                                    <a href="https://3hst.com/invoice-lookup/%s" 
                                        style="background-color: #007bff; color: white; padding: 12px 25px; text-decoration: none; 
                                        border-radius: 5px; font-weight: bold; display: inline-block;">Theo dõi đơn hàng</a>
                                 </div>
@@ -192,7 +192,7 @@ public class EmailService implements IEmailService {
         StringBuilder html = new StringBuilder();
         for (HoaDonChiTietResponse item : items) {
             SanPhamChiTietResponse sp = item.getSanPhamChiTietResponse();
-            String imageUrl = sp.getHinhAnhList().get(0).getUrl(); // Lấy ảnh đầu tiên
+            String imageUrl = sp.getHinhAnhList().get(0).getUrl();
 
             html.append(String.format("""
                             <tr>

@@ -129,4 +129,19 @@ public class SanPhamChiTietController {
         apiResponse.setData(sanPhamChiTietService.getById(id));
         return apiResponse;
     }
+    @GetMapping("/max-price")
+    public ApiResponse<Double> getSanPhamChiTietByGiaTienMax() {
+        ApiResponse<Double> apiResponse = new ApiResponse<>();
+        apiResponse.setData(sanPhamChiTietService.getSanPhamChiTietByGiaTienMax());
+        return apiResponse;
+    }
+    @GetMapping("/so-luong")
+    public ApiResponse<Page<SanPhamChiTietResponse>> getSanPhamChiTietBySoLuong(@RequestParam("soLuong") int soLuong,
+                                                                               @RequestParam(name = "pageNumber", defaultValue = "0") int pageNumber,
+                                                                               @RequestParam(name = "pageSize", defaultValue = "5") int pageSize) {
+        Pageable pageable = PageRequest.of(Math.max(0, pageNumber), Math.max(1, pageSize));
+        ApiResponse<Page<SanPhamChiTietResponse>> apiResponse = new ApiResponse<>();
+        apiResponse.setData(sanPhamChiTietService.getSanPhamChiTietBySoLuong(soLuong, pageable));
+        return apiResponse;
+    }
 }

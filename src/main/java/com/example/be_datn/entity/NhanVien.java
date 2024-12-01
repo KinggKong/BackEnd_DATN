@@ -1,37 +1,57 @@
 package com.example.be_datn.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
-import lombok.Getter;
-import lombok.Setter;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.Size;
+import lombok.*;
 
+import java.time.Instant;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Getter
 @Setter
 @Entity
 @Table(name = "nhan_vien")
-public class NhanVien {
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class NhanVien extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
     private Long id;
+
+    @Size(max = 255)
+    @Column(name = "ten")
     private String ten;
-    private String tenDangNhap;
-    private String matKhau;
+
+    @Column(name = "id_tai_khoan")
+    private Long idTaiKhoan;
+
+    @Size(max = 255)
+    @Column(name = "email")
     private String email;
+
+    @Size(max = 11)
+    @Column(name = "sdt", length = 11)
     private String sdt;
+
+    @Size(max = 255)
+    @Column(name = "avatar")
     private String avatar;
-    private LocalDateTime ngaySinh;
+
+    @Column(name = "ngay_sinh")
+    private LocalDate ngaySinh;
+
+    @Size(max = 255)
+    @Column(name = "dia_chi")
     private String diaChi;
-    private Integer vaiTro;
+
+    @Column(name = "gioi_tinh")
     private Boolean gioiTinh;
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
-    private Integer trangThai;
+
+
+    @Column(name = "trang_thai")
+    private int trangThai;
 
 }

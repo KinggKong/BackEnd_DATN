@@ -18,4 +18,5 @@ public interface ISaleService {
     String delete(Long id);
     SaleResponse updateStatus(Long id, int status);
     List<String> getAllTenChienDich();
+
 }

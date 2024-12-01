@@ -1,10 +1,13 @@
 package com.example.be_datn.dto.Response;
 
 
+import com.example.be_datn.entity.HinhAnh;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
+import java.util.List;
 
 @Getter
 @Setter
@@ -18,5 +21,5 @@ public class HoaDonCTResponse {
     Integer soLuong;
     Double giaBan;
     Double tongTien;
-
+    List<HinhAnh> hinhAnhList;
 }

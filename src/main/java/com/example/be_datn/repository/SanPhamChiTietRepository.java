@@ -20,7 +20,7 @@ public interface SanPhamChiTietRepository extends JpaRepository<SanPhamChiTiet,L
     @Query("select spct from SanPhamChiTiet spct where spct.sanPham.id = ?1")
     List<SanPhamChiTiet> getAllSPCTBySanPhamId(Long id);
 
-    @Query(value = "SELECT spct.id, spct.id_mau_sac, spct.id_kich_thuoc, spct.id_san_pham,spct.so_luong,spct.gia_tien,spct.trang_thai,spct.created_at,spct.updated_at,spct.ma_san_pham FROM san_pham_chi_tiet spct join san_pham sp " +
+    @Query(value = "SELECT spct.id, spct.id_mau_sac, spct.id_kich_thuoc, spct.id_san_pham,spct.so_luong,spct.gia_tien,spct.trang_thai,spct.created_at,spct.updated_at,spct.ma_san_pham,spct.gia_ban_sau_khi_giam FROM san_pham_chi_tiet spct join san_pham sp " +
             "on spct.id_san_pham = sp.id " +
             "where (sp.id_danh_muc = '' or sp.id_danh_muc = :idDanhMuc or :idDanhMuc is null) " +
             "and (sp.id_thuong_hieu = '' or sp.id_thuong_hieu = :idThuongHieu or :idThuongHieu is null) " +
@@ -34,4 +34,15 @@ public interface SanPhamChiTietRepository extends JpaRepository<SanPhamChiTiet,L
                                  @Param(("idSanPham")) Long idSanPham,
                                  Pageable pageable);
 //    Page<SanPhamChiTiet> getAll(Pageable pageable);
+
+    //lấy ra sản phẩm chi tiết có giá cao nhất
+    @Query(value = "SELECT spct.gia_tien FROM san_pham_chi_tiet spct WHERE gia_tien = (SELECT MAX(gia_tien) FROM san_pham_chi_tiet) limit 1", nativeQuery = true)
+    Double getSanPhamChiTietByGiaTienMax();
+
+    //Lấy ra sản pham theo số lượng
+    @Query("select spct from SanPhamChiTiet spct join SanPham  sp on spct.sanPham.id =sp.id where  spct.soLuong <= ?1 and sp.trangThai = 1")
+    Page<SanPhamChiTiet> getSanPhamChiTietBySoLuong(int soLuong, Pageable pageable);
+
+    @Query("select count(spct) from SanPhamChiTiet spct join SanPham sp on spct.sanPham.id = sp.id where spct.soLuong = 0 and sp.trangThai = 1")
+    int countSanPhamHetHang();
 }

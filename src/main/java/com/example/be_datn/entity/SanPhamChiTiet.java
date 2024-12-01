@@ -1,23 +1,9 @@
 package com.example.be_datn.entity;
 
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.Table;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.persistence.*;
+import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 import java.util.List;
@@ -42,6 +28,7 @@ public class SanPhamChiTiet extends BaseEntity {
     KichThuoc kichThuoc;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_san_pham")
+    @JsonIgnore
     SanPham sanPham;
     @Column(name = "ma_san_pham")
     String maSanPham;
@@ -54,7 +41,14 @@ public class SanPhamChiTiet extends BaseEntity {
     @Column(name = "trang_thai")
     int trangThai;
     @OneToMany(mappedBy = "sanPhamChiTiet", fetch = FetchType.LAZY)
-    @JsonBackReference
     List<HinhAnh> hinhAnhList;
+
+
+
+
+
+
+
+
 }
 

@@ -13,6 +13,7 @@ import com.example.be_datn.entity.TypeBill;
 import com.example.be_datn.entity.Voucher;
 import com.example.be_datn.exception.AppException;
 import com.example.be_datn.exception.ErrorCode;
+import com.example.be_datn.mapper.HoaDonMapper;
 import com.example.be_datn.repository.HoaDonChiTietRepository;
 import com.example.be_datn.repository.HoaDonRepository;
 import com.example.be_datn.repository.KhachHangRepository;
@@ -20,7 +21,9 @@ import com.example.be_datn.repository.LichSuHoaDonRepository;
 import com.example.be_datn.repository.SanPhamChiTietRepository;
 import com.example.be_datn.repository.VoucherRepository;
 import com.example.be_datn.service.IHoaDonService;
+import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -33,13 +36,13 @@ import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
-import java.util.Optional;
 import java.util.Random;
 import java.util.stream.Collectors;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class HoaDonService implements IHoaDonService {
     private final HoaDonRepository hoaDonRepository;
 
@@ -108,13 +111,12 @@ public class HoaDonService implements IHoaDonService {
         hoaDon.setLoaiHoaDon(String.valueOf(TypeBill.OFFLINE));
         hoaDon.setTrangThai(String.valueOf(StatusPayment.PENDING));
         hoaDon.setMaHoaDon(generateInvoiceCode());
-        // try
         hoaDon.setTenNguoiNhan(khachHangLe.getTen());
         hoaDonRepository.save(hoaDon);
-        Long id = hoaDonRepository.save(hoaDon).getId();
+        HoaDon hd = hoaDonRepository.save(hoaDon);
         LichSuHoaDon lichSuHoaDon = LichSuHoaDon.builder()
                 .nhanVien(null)
-                .hoaDon(hoaDon)
+                .hoaDon(hd)
                 .ghiChu("PENDING")
                 .createdBy(null)
                 .trangThai(StatusPayment.PENDING.toString())
@@ -141,7 +143,9 @@ public class HoaDonService implements IHoaDonService {
     }
 
 
-    @Override
+    HoaDonMapper hoaDonMapper;
+
+
     public String updateHoaDon(Long id, HoaDonUpdateRequest request) {
         HoaDon hoaDon = hoaDonRepository.findById(id)
                 .orElseThrow(() -> new AppException(ErrorCode.HOA_DON_NOT_FOUND));
@@ -194,60 +198,49 @@ public class HoaDonService implements IHoaDonService {
 
     @Override
     @Transactional
-    public HoaDonResponse completeHoaDon(Long id) {
+    public String completeHoaDon(Long id) {
         // Retrieve the HoaDon entity or throw an exception if not found
         HoaDon hoaDon = hoaDonRepository.findById(id)
                 .orElseThrow(() -> new AppException(ErrorCode.HOA_DON_NOT_FOUND));
 
-        // Set the HoaDon status to DONE
         hoaDon.setTrangThai(StatusPayment.DONE.toString());
 
-        // Save the updated HoaDon entity
         HoaDon updatedHoaDon = hoaDonRepository.save(hoaDon);
 
-        // Retrieve the corresponding LichSuHoaDon, ensure it's not null
         LichSuHoaDon lichSuHoaDon = lichSuHoaDonRepository.findLichSuHoaDonByHoaDonId(updatedHoaDon.getId());
 
-        // Check if LichSuHoaDon is null, and handle accordingly
         if (lichSuHoaDon == null) {
-            // Optionally, throw an exception if you expect a LichSuHoaDon record to exist
             throw new AppException(ErrorCode.LICH_SU_HOA_DON_NOT_FOUND);
-
-            // Or create a new LichSuHoaDon if this is an expected case (e.g., new record creation)
-            // lichSuHoaDon = new LichSuHoaDon();
-            // lichSuHoaDon.setHoaDon(updatedHoaDon);
-            // lichSuHoaDon.setGhiChu("DONE");
-            // lichSuHoaDon.setTrangThai(StatusPayment.DONE.toString());
-            // lichSuHoaDonRepository.save(lichSuHoaDon);
         } else {
             // Update the existing LichSuHoaDon
             lichSuHoaDon.setGhiChu("DONE");
             lichSuHoaDon.setTrangThai(StatusPayment.DONE.toString());
             lichSuHoaDonRepository.save(lichSuHoaDon);
         }
+        return "ok";
 
         // Return a response object with the updated HoaDon data
-        return new HoaDonResponse(
-                updatedHoaDon.getId(),
-                updatedHoaDon.getMaHoaDon(),
-                updatedHoaDon.getTenNguoiNhan(),
-                updatedHoaDon.getDiaChiNhan(),
-                updatedHoaDon.getSdt(),
-                updatedHoaDon.getTongTien(),
-                updatedHoaDon.getTienSauGiam(),
-                updatedHoaDon.getTienShip(),
-                updatedHoaDon.getGhiChu(),
-                updatedHoaDon.getLoaiHoaDon(),
-                updatedHoaDon.getEmail(),
-                updatedHoaDon.getNhanVien() != null ? updatedHoaDon.getNhanVien().getTen() : null,
-                updatedHoaDon.getKhachHang() != null ? updatedHoaDon.getKhachHang().getTen() : null,
-                updatedHoaDon.getHinhThucThanhToan(),
-                updatedHoaDon.getTrangThai(),
-                updatedHoaDon.getVoucher() != null ? updatedHoaDon.getVoucher().getMaVoucher() : null,
-                updatedHoaDon.getSoTienGiam(),
-                updatedHoaDon.getCreated_at(),
-                updatedHoaDon.getUpdated_at()
-        );
+//        return new HoaDonResponse(
+//                updatedHoaDon.getId(),
+//                updatedHoaDon.getMaHoaDon(),
+//                updatedHoaDon.getTenNguoiNhan(),
+//                updatedHoaDon.getDiaChiNhan(),
+//                updatedHoaDon.getSdt(),
+//                updatedHoaDon.getTongTien(),
+//                updatedHoaDon.getTienSauGiam(),
+//                updatedHoaDon.getTienShip(),
+//                updatedHoaDon.getGhiChu(),
+//                updatedHoaDon.getLoaiHoaDon(),
+//                updatedHoaDon.getEmail(),
+//                updatedHoaDon.getNhanVien() != null ? updatedHoaDon.getNhanVien().getTen() : null,
+//                updatedHoaDon.getKhachHang() != null ? updatedHoaDon.getKhachHang().getTen() : null,
+//                updatedHoaDon.getHinhThucThanhToan(),
+//                updatedHoaDon.getTrangThai(),
+//                updatedHoaDon.getVoucher() != null ? updatedHoaDon.getVoucher().getMaVoucher() : null,
+//                updatedHoaDon.getSoTienGiam(),
+//                updatedHoaDon.getCreated_at(),
+//                updatedHoaDon.getUpdated_at()
+//        );
     }
 
 
@@ -281,14 +274,14 @@ public class HoaDonService implements IHoaDonService {
 //        }
 //        return theBestVoucher;
         List<Voucher> validVouchers = voucherList.stream()
-                .filter(voucher -> voucher.getTrangThai() ==1  && hoaDon.getTongTien() >= voucher.getGiaTriDonHangToiThieu())
+                .filter(voucher -> voucher.getTrangThai() == 1 && hoaDon.getTongTien() >= voucher.getGiaTriDonHangToiThieu())
                 .sorted(Comparator.comparingDouble((Voucher voucher) -> calculateDiscount(hoaDon.getId(), voucher))
                         .reversed())
                 .collect(Collectors.toList());
         return validVouchers.stream()
                 .findFirst()
                 .orElse(null);
-     }
+    }
 
     private double calculateDiscount(double totalAmount, Voucher voucher) {
         if (voucher.getHinhThucGiam().equalsIgnoreCase("%")) {
@@ -297,8 +290,6 @@ public class HoaDonService implements IHoaDonService {
             return voucher.getGiaTriGiam();
         }
     }
-
-
 
 
     @Transactional
@@ -319,5 +310,11 @@ public class HoaDonService implements IHoaDonService {
                 hoaDonRepository.delete(order);
             }
         }
+
+    }
+
+    @Override
+    public HoaDonResponse findByMaHoaDon(String maHoaDon) {
+        return hoaDonMapper.toHoaDonResponse(hoaDonRepository.findByMaHoaDon(maHoaDon));
     }
 }

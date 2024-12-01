@@ -33,22 +33,12 @@ public class HoaDonChiTietController {
     private final HoaDonChiTietService hoaDonChiTietService;
     private final HoaDonChiTietRepository hoaDonChiTietRepository;
 
-    @GetMapping
-    public ApiResponse<?> getAll(
-            @RequestParam(defaultValue = "1") Integer pageNo,
-            @RequestParam(defaultValue = "5") Integer pageSize
-    ){
-        ApiResponse<Page<HoaDonCTResponse>> apiResponse = new ApiResponse<>();
-        Pageable pageable = PageRequest.of(pageNo -1, pageSize);
-        apiResponse.setData(hoaDonChiTietService.getAllHoaDonChitiet(pageable));
-        return apiResponse;
-    }
     @GetMapping("/{hoaDonId}")
     public ApiResponse<?> getAllHdctByHoaDonId(
             @PathVariable Long hoaDonId
     ){
         ApiResponse<List<HoaDonCTResponse>> apiResponse = new ApiResponse<>();
-        apiResponse.setData(hoaDonChiTietService.getHoaDonChiTietByHoaDonId(hoaDonId));
+        apiResponse.setData(hoaDonChiTietService.getAllHdctByIdHoaDon(hoaDonId));
         return apiResponse;
     }
 
@@ -60,7 +50,7 @@ public class HoaDonChiTietController {
     }
     @DeleteMapping("/{id}")
     public ApiResponse<?> delete(@PathVariable Long id){
-        ApiResponse<HoaDon> apiResponse = new ApiResponse<>();
+        ApiResponse<String> apiResponse = new ApiResponse<>();
         apiResponse.setData(hoaDonChiTietService.deleteHoaDonChiTiet(id));
         return apiResponse;
     }

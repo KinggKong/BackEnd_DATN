@@ -10,9 +10,11 @@ import org.springframework.data.domain.Pageable;
 import java.util.List;
 
 public interface IHoaDonChiTietService {
-    Page<HoaDonCTResponse> getAllHoaDonChitiet(Pageable pageable);
-    List<HoaDonCTResponse> getHoaDonChiTietByHoaDonId(Long hoaDonId);
+//    Page<HoaDonCTResponse> getAllHoaDonChitiet(Pageable pageable);
+//    List<HoaDonCTResponse> getHoaDonChiTietByHoaDonId(Long hoaDonId);
     String create(HoaDonChiTietRequest request);
-    HoaDon deleteHoaDonChiTiet(Long id);
+    String deleteHoaDonChiTiet(Long id);
     HoaDonCTResponse update(HoaDonChiTietUpdateRequest request, Long id);
+    Page<HoaDonCTResponse> getAllHdct(Pageable pageable, Long idHoaDonCT);
+    List<HoaDonCTResponse> getAllHdctByIdHoaDon(Long hoaDonId);
 }
