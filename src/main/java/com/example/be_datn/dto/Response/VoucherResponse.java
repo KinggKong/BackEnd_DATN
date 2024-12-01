@@ -25,9 +25,9 @@ public class VoucherResponse {
 
     private Integer trangThai;
     private String maVoucher;
-    private Float giaTriDonHangToiThieu;
-    private Float giaTriGiam;
-    private Float giaTriGiamToiDa;
+    private Double giaTriDonHangToiThieu;
+    private Double giaTriGiam;
+    private Double giaTriGiamToiDa;
     private Integer soLuong;
 
     public static VoucherResponse fromVoucher(Voucher voucher) {

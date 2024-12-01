@@ -1,11 +1,15 @@
 package com.example.be_datn.exception;
 
 import com.example.be_datn.dto.Response.ApiResponse;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.EnumUtils;
+import org.hibernate.proxy.pojo.bytebuddy.ByteBuddyInterceptor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
+@Slf4j
 @ControllerAdvice
 public class GlobalHandleException {
     @ExceptionHandler(value = Exception.class)
@@ -43,4 +47,6 @@ public class GlobalHandleException {
         apiResponse.setMessage(errorCode.getMessage());
         return ResponseEntity.badRequest().body(apiResponse);
     }
+
+
 }

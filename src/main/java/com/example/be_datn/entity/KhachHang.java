@@ -1,25 +1,27 @@
 package com.example.be_datn.entity;
 
-import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-import jakarta.validation.constraints.Size;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-import java.time.Instant;
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
 @Entity
-@Table(name = "khach_hang")
-@Builder
-@NoArgsConstructor
 @AllArgsConstructor
+@NoArgsConstructor
+@Builder
+@Table(name = "khach_hang")
 public class KhachHang {
-    @Id
+   @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
     private Long id;
@@ -63,5 +65,6 @@ public class KhachHang {
 
     @Column(name = "trang_thai")
     private Integer trangThai;
+
 
 }

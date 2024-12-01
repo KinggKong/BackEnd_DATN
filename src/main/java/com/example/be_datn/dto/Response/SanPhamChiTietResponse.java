@@ -34,6 +34,8 @@ public class SanPhamChiTietResponse {
     List<HinhAnh> hinhAnhList;
 
 
+
+
     public static SanPhamChiTietResponse fromSanPhamChiTiet(SanPhamChiTiet sanPhamChiTiet) {
         return SanPhamChiTietResponse.builder()
                 .id(sanPhamChiTiet.getId())
