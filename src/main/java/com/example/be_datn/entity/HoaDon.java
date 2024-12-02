@@ -1,18 +1,28 @@
 package com.example.be_datn.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import lombok.*;
-import org.hibernate.annotations.ColumnDefault;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.experimental.FieldDefaults;
+
+import java.util.List;
 
 @Getter
 @Setter
 @Entity
 @Table(name = "hoa_don")
 @Builder
-@NoArgsConstructor
 @AllArgsConstructor
+@NoArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class HoaDon extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -64,13 +74,13 @@ public class HoaDon extends BaseEntity {
     @Column(name = "email")
     private String email;
 
-    @ManyToOne
-    @JoinColumn(name = "id_nhan_vien")
-    NhanVien nhanVien;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "idNhanVien", referencedColumnName = "id")
+    private NhanVien nhanVien;
 
-    @ManyToOne
-    @JoinColumn(name = "id_khach_hang")
-    KhachHang khachHang;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "idKhachHang", referencedColumnName = "id")
+    private KhachHang khachHang;
 
     @Size(max = 255)
     @NotNull
@@ -81,11 +91,15 @@ public class HoaDon extends BaseEntity {
     @Column(name = "trang_thai", nullable = false)
     private String trangThai;
 
-    @ManyToOne
-    @JoinColumn(name = "id_voucher")
-    Voucher voucher;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id_voucher", referencedColumnName = "id")
+    private Voucher voucher;
 
     @Column(name = "so_tien_giam")
     private Float soTienGiam;
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "hoaDon", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<HoaDonCT> chiTietList;
 
 }

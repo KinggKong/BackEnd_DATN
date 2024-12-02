@@ -4,6 +4,7 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 import java.time.Instant;
+import java.time.LocalDate;
 
 @Getter
 @Setter
@@ -18,7 +19,7 @@ public class Profile {
     private String email;
     private String sdt;
     private String avatar;
-    private Instant ngaySinh;
+    private LocalDate ngaySinh;
     private Boolean gioiTinh;
     private Long idGioHang;
 }

@@ -44,7 +44,7 @@ public class TaiKhoanService implements ITaiKhoanService, UserDetailsService {
     public TaiKhoanResponse createTaiKhoan(TaiKhoanRequest taiKhoanRequest) {
         TaiKhoan newtaiKhoan = taiKhoanMapper.toTaiKhoan(taiKhoanRequest);
         if (taiKhoanRepository.findByTenDangNhap(taiKhoanRequest.getTenDangNhap()).isPresent()) {
-            throw new AppException(ErrorCode.TEN_TAIkHOAN_EXISTED);
+            throw new AppException(ErrorCode.TEN_TAIKHOAN_EXISTED);
         }
         String ma = generateCodeAccount();
         if (!existTaiKhoan(ma)) newtaiKhoan.setMa(ma);
