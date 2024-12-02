@@ -1,12 +1,15 @@
 package com.example.be_datn.service;
 
+import com.example.be_datn.dto.Request.ChangePasswordRequest;
 import com.example.be_datn.dto.Request.LogoutRequest;
 import com.example.be_datn.dto.Request.SignInRequest;
 import com.example.be_datn.dto.Request.SignupRequest;
+import com.example.be_datn.dto.Response.AccountResponse;
 import com.example.be_datn.dto.Response.ApiResponse;
 import com.example.be_datn.dto.Response.SignInResponse;
 import com.example.be_datn.dto.Response.TaiKhoanResponse;
 import com.example.be_datn.entity.ViaCode;
+import jakarta.mail.MessagingException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.ResponseEntity;
 
@@ -21,4 +24,8 @@ public interface IAuthService {
     String handleSendCodeToMail(String email);
 
     ApiResponse<?> getProfile();
+
+//    String sendTokenForgotPassword(String email) throws MessagingException;
+//
+//    AccountResponse resetPassword(ChangePasswordRequest changePasswrodRequest);
 }

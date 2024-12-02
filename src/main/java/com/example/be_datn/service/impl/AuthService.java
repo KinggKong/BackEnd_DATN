@@ -2,13 +2,11 @@ package com.example.be_datn.service.impl;
 
 import com.example.be_datn.config.AccountDetailsImpl;
 import com.example.be_datn.config.jwtConfig.JwtProvider;
+import com.example.be_datn.dto.Request.ChangePasswordRequest;
 import com.example.be_datn.dto.Request.LogoutRequest;
 import com.example.be_datn.dto.Request.SignInRequest;
 import com.example.be_datn.dto.Request.SignupRequest;
-import com.example.be_datn.dto.Response.ApiResponse;
-import com.example.be_datn.dto.Response.Profile;
-import com.example.be_datn.dto.Response.SignInResponse;
-import com.example.be_datn.dto.Response.TaiKhoanResponse;
+import com.example.be_datn.dto.Response.*;
 import com.example.be_datn.entity.*;
 import com.example.be_datn.exception.AppException;
 import com.example.be_datn.exception.ErrorCode;
@@ -17,6 +15,7 @@ import com.example.be_datn.mapper.TaiKhoanMapper;
 import com.example.be_datn.repository.*;
 import com.example.be_datn.service.IAuthService;
 import com.example.be_datn.utils.SecurityUtils;
+import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
@@ -34,9 +33,13 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.util.Date;
 import java.util.Optional;
 import java.util.Random;
 import java.util.UUID;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Service
 @RequiredArgsConstructor
@@ -142,6 +145,13 @@ public class AuthService implements IAuthService {
                     .trangThai(1)
                     .build();
 
+            GioHang gioHang = GioHang.builder()
+                    .ma(generateAccountCode())
+                    .khachHang(insertKhachHang)
+                    .trangThai(1)
+                    .build();
+            gioHangRepository.saveAndFlush(gioHang);
+
             return ApiResponse.<TaiKhoanResponse>builder()
                     .data(taiKhoanMapper.toTaiKhoanResponse(taiKhoanRepository.save(account)))
                     .message("register successfully")
@@ -150,6 +160,8 @@ public class AuthService implements IAuthService {
             throw new AppException(ErrorCode.REGISTER_ACCOUNT_FAILED);
         }
     }
+
+
 
     @Override
     public int sendCodeToEmail(String to, String subject, String content) {
@@ -179,6 +191,12 @@ public class AuthService implements IAuthService {
 
     @Override
     public String handleSendCodeToMail(String email) {
+        if (!isValidEmail(email.trim())) {
+            throw new AppException(ErrorCode.EMAIL_INCORRECT_FORMAT);
+        }
+        if (taiKhoanRepository.existsByEmail(email.trim())) {
+            throw new AppException(ErrorCode.ACCOUNT_EMAIL_EXISTED);
+        }
         try {
             int code = generateCode();
             int result = sendCodeToEmail(email, "Code to verifiy accout", "Code to sign up for you is: " + code);
@@ -187,6 +205,13 @@ public class AuthService implements IAuthService {
         } catch (Exception e) {
             return "send code to email failed" + e.getMessage();
         }
+    }
+
+    public static boolean isValidEmail(String email) {
+        String emailRegex = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$";
+        Pattern pattern = Pattern.compile(emailRegex);
+        Matcher matcher = pattern.matcher(email);
+        return matcher.matches();
     }
 
     @Override
@@ -216,4 +241,107 @@ public class AuthService implements IAuthService {
         String accountCode = uuid.replace("-", "").substring(0, 10).toUpperCase();
         return accountCode;
     }
+
+//    @Override
+//    public String sendTokenForgotPassword(String email) throws MessagingException {
+//        Optional<Account> optional = accountRepository.findByEmail(email);
+//        if (optional.isEmpty()) {
+//            throw new AppException(ErrorCode.ACCOUNT_NOT_FOUND);
+//        }
+//        Account account = optional.get();
+//        String token = jwtProvider.generateForgotPasswordTokenByUsername(account.getUser().getUsername());
+//
+//        account.setForgotPasswordToken(token);
+//        accountRepository.saveAndFlush(account);
+//
+//        String subtitle = "Forgot Password";
+//        String passwordResetLink = "http://localhost:5173/forgot-password?token=" + token;
+//        MimeMessage message = javaMailSender.createMimeMessage();
+//        MimeMessageHelper helper = new MimeMessageHelper(message, true);
+//
+//        String html = "<!DOCTYPE html>\n" +
+//                "<html lang=\"en\">\n" +
+//                "<head>\n" +
+//                "  <meta charset=\"UTF-8\">\n" +
+//                "  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n" +
+//                "  <title>Password Reset</title>\n" +
+//                "  <style>\n" +
+//                "    body {\n" +
+//                "      font-family: Arial, sans-serif;\n" +
+//                "      background-color: #f4f4f4;\n" +
+//                "      color: #333;\n" +
+//                "      margin: 0;\n" +
+//                "      padding: 0;\n" +
+//                "    }\n" +
+//                "    .container {\n" +
+//                "      max-width: 600px;\n" +
+//                "      margin: 0 auto;\n" +
+//                "      background-color: #ffffff;\n" +
+//                "      padding: 20px;\n" +
+//                "      border-radius: 5px;\n" +
+//                "      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);\n" +
+//                "    }\n" +
+//                "  </style>\n" +
+//                "</head>\n" +
+//                "<body>\n" +
+//                "  <div class=\"container\">\n" +
+//                "    <h2>Password Reset Request</h2>\n" +
+//                "    <p>Hello,</p>\n" +
+//                "    <p>We received a request to reset your password. Click the button below to set a new password:</p>\n" +
+//                "    <p><a href=\"{{passwordResetLink}}\" style=\"display: inline-block; padding: 10px 20px; color: #ffffff; background-color: #007bff; border-radius: 5px; text-decoration: none;\">Reset Password</a></p>\n" +
+//                "    <p>If you didn’t request a password reset, please ignore this email.</p>\n" +
+//                "    <p>Thank you, <br>Your Website Team</p>\n" +
+//                "  </div>\n" +
+//                "</body>\n" +
+//                "</html>\n";
+//
+//
+//        html = html.replace("{{passwordResetLink}}", passwordResetLink);
+//
+//        helper.setTo(email);
+//        helper.setSubject(subtitle);
+//        helper.setText(html, true);
+//
+//        javaMailSender.send(message);
+//        return "send token to reset password successfully";
+//    }
+//
+//    @Override
+//    public AccountResponse resetPassword(ChangePasswordRequest changePasswrodRequest) {
+//        String username = jwtProvider.getKeyByValueFromJWT(jwtProvider.getJWT_SECRET_FORGOT_PASSWORD_TOKEN(), "username", changePasswrodRequest.getToken(), String.class);
+//        Optional<Account> optional = accountRepository.findByUser_Username(username);
+//        if (optional.isEmpty()) {
+//            throw new AppException(ErrorCode.TOKEN_RESET_PASSWORD_INVALID);
+//        }
+//        Account account = optional.get();
+//
+//        if (account.getForgotPasswordToken() == null) {
+//            throw new AppException(ErrorCode.TOKEN_RESET_PASSWORD_INVALID);
+//        }
+//
+//        if (!validateToken(jwtProvider.getJWT_SECRET_FORGOT_PASSWORD_TOKEN(), changePasswrodRequest.getToken())) {
+//            throw new AppException(ErrorCode.TOKEN_RESET_PASSWORD_INVALID);
+//        }
+//
+//        Date expDate = jwtProvider.getKeyByValueFromJWT(
+//                jwtProvider.getJWT_SECRET_FORGOT_PASSWORD_TOKEN(),
+//                "exp",
+//                changePasswrodRequest.getToken(),
+//                Date.class
+//        );
+//
+//        if (expDate == null) {
+//            throw new AppException(ErrorCode.TOKEN_RESET_PASSWORD_INVALID);
+//        }
+//        LocalDateTime exp = expDate.toInstant()
+//                .atZone(ZoneOffset.UTC)
+//                .toLocalDateTime();
+//        if (exp.isBefore(LocalDateTime.now())) {
+//            throw new AppException(ErrorCode.TOKEN_RESET_PASSWORD_EXPIRED);
+//        }
+//
+//        account.setPassword(passwordEncoder.encode(changePasswrodRequest.getNewPasswrod()));
+//        account.setForgotPasswordToken(null);
+//        return accountMapper.toResponse(accountRepository.save(account));
+//    }
 }
