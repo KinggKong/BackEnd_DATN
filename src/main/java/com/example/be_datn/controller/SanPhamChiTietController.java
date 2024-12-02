@@ -3,10 +3,13 @@ package com.example.be_datn.controller;
 import com.example.be_datn.dto.Request.SanPhamChiTietRequest;
 import com.example.be_datn.dto.Response.ApiResponse;
 import com.example.be_datn.dto.Response.SanPhamChiTietResponse;
+import com.example.be_datn.entity.SanPhamChiTiet;
 import com.example.be_datn.service.impl.SanPhamChiTietService;
+import com.example.be_datn.utils.QrCodeService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -16,12 +19,14 @@ import org.springframework.web.bind.annotation.*;
 import java.io.IOException;
 import java.util.List;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/v1/sanphamchitiets")
 @RequiredArgsConstructor
 @FieldDefaults(level = lombok.AccessLevel.PRIVATE, makeFinal = true)
 public class SanPhamChiTietController {
     SanPhamChiTietService sanPhamChiTietService;
+    QrCodeService qrCodeService;
     @GetMapping("")
     public ApiResponse<Page<SanPhamChiTietResponse>> getAllSanPhamChiTiet(@RequestParam(name = "pageNumber", defaultValue = "0") int pageNumber,
                                                                           @RequestParam(name = "pageSize", defaultValue = "10") int pageSize,
@@ -73,13 +78,33 @@ public class SanPhamChiTietController {
         apiResponse.setData(sanPhamChiTietService.getAllPageBySanPhamId(id, pageable));
         return apiResponse;
     }
+//    @PostMapping("")
+//    public ApiResponse<List<SanPhamChiTietResponse>> createSanPhamChiTiet(@RequestBody List<SanPhamChiTietRequest> sanPhamChiTietRequests) throws IOException {
+//        ApiResponse<List<SanPhamChiTietResponse>> apiResponse = new ApiResponse<>();
+//        apiResponse.setData(sanPhamChiTietService.create(sanPhamChiTietRequests));
+//        return apiResponse;
+//    }
+
     @PostMapping("")
     public ApiResponse<List<SanPhamChiTietResponse>> createSanPhamChiTiet(@RequestBody List<SanPhamChiTietRequest> sanPhamChiTietRequests) throws IOException {
         ApiResponse<List<SanPhamChiTietResponse>> apiResponse = new ApiResponse<>();
+        List<SanPhamChiTietResponse> list = sanPhamChiTietService.create(sanPhamChiTietRequests);
+        apiResponse.setData(list);
 
-        apiResponse.setData(sanPhamChiTietService.create(sanPhamChiTietRequests));
+        for (SanPhamChiTietResponse sanPhamChiTietResponse : list) {
+            // Đảm bảo dữ liệu không rỗng trước khi tạo QR Code
+            if (sanPhamChiTietResponse != null) {
+                String qrCodeGenerated = qrCodeService.generateQrCode(sanPhamChiTietResponse);
+                if (!qrCodeGenerated.isEmpty()) {
+                    log.info("QR Code generated for SanPhamChiTiet: " + sanPhamChiTietResponse.getId() + " -> Success: " + qrCodeGenerated);
+                } else {
+                    log.error("Failed to generate QR Code for SanPhamChiTiet: " + sanPhamChiTietResponse.getId());
+                }
+            }
+        }
         return apiResponse;
     }
+
     @PutMapping("/status/{id}")
     public ApiResponse<SanPhamChiTietResponse> updateStatus(@PathVariable("id") Long id, @RequestBody int status) {
         ApiResponse<SanPhamChiTietResponse> apiResponse = new ApiResponse<>();
@@ -90,7 +115,6 @@ public class SanPhamChiTietController {
     public ApiResponse<String> deleteSanPhamChiTiet(@PathVariable("id") Long id) {
         ApiResponse<String> apiResponse = new ApiResponse<>();
         apiResponse.setMessage(sanPhamChiTietService.delete(id));
-
         return apiResponse;
     }
     @PutMapping("/{id}")
