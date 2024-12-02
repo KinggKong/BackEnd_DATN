@@ -5,6 +5,7 @@ import jakarta.validation.constraints.Size;
 import lombok.*;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -13,8 +14,7 @@ import java.time.LocalDate;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class KhachHang extends BaseEntity {
-
+public class KhachHang {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
@@ -24,8 +24,6 @@ public class KhachHang extends BaseEntity {
     @Column(name = "ten")
     private String ten;
 
-    @Size(max = 255)
-    @Column(name = "ma")
     private String ma;
 
     private String email;
@@ -44,7 +42,13 @@ public class KhachHang extends BaseEntity {
     @Column(name = "gioi_tinh")
     private Boolean gioiTinh;
 
+    @Column(name = "created_at")
+    private LocalDateTime createdAt;
+
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
 
     @Column(name = "trang_thai")
     private Integer trangThai;
+
 }

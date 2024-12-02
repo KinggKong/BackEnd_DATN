@@ -80,7 +80,7 @@ public class ShopOnlineService implements IShopOnlineService {
     @Override
     public HoaDonResponse checkout(HoaDonRequest hoaDonRequest) {
         checkSoLuongHopLe(hoaDonRequest.getIdGioHang());
-
+        handleUpdateAfterBuy(hoaDonRequest.getIdGioHang());
         HoaDon hd = createHoaDon(hoaDonRequest);
         HoaDon hoaDon = hoaDonRepository.saveAndFlush(hd);
 
@@ -104,7 +104,7 @@ public class ShopOnlineService implements IShopOnlineService {
                 .forEach(hoaDonChiTietRepository::saveAndFlush);
 
         gioHangChiTietRepository.deleteByGioHang_Id(hoaDonRequest.getIdGioHang());
-      handleUpdateAfterBuy(hoaDonRequest.getIdGioHang());
+
 
         emailService.sendMailToUser(hoaDonRequest.getEmail(), "3HST Shoes - Cảm ơn bạn đã đặt hàng tại 3HST Shoes", hoaDon.getMaHoaDon(), this.getInfoOrder(hoaDon.getMaHoaDon()));
         return hoaDonMapper.toHoaDonResponse(hoaDon);
@@ -232,10 +232,10 @@ public class ShopOnlineService implements IShopOnlineService {
             throw new AppException(ErrorCode.ID_GIO_HANG_CANT_BE_NULL);
         }
 
-       List<GioHangChiTiet> gioHangChiTietList = gioHangChiTietRepository.findByGioHang_Id(idGioHang);
-//        if (gioHangChiTietList.isEmpty()) {
-//            throw new AppException(ErrorCode.CART_DONT_HAVE_PRODUCT);
-//        }
+        List<GioHangChiTiet> gioHangChiTietList = gioHangChiTietRepository.findByGioHang_Id(idGioHang);
+        if (gioHangChiTietList.isEmpty()) {
+            throw new AppException(ErrorCode.CART_DONT_HAVE_PRODUCT);
+        }
 
         List<SanPhamChiTiet> updatedProducts = new ArrayList<>();
         for (GioHangChiTiet gioHangChiTiet : gioHangChiTietList) {
@@ -243,9 +243,9 @@ public class ShopOnlineService implements IShopOnlineService {
             int soLuongTonKho = sanPhamChiTiet.getSoLuong();
             int soLuongTrongGio = gioHangChiTiet.getSoLuong();
 
-//            if (soLuongTonKho < soLuongTrongGio) {
-//                throw new AppException(ErrorCode.SOLUONG_SANPHAM_KHONG_DU);
-//            }
+            if (soLuongTonKho < soLuongTrongGio) {
+                throw new AppException(ErrorCode.SOLUONG_SANPHAM_KHONG_DU);
+            }
 
             sanPhamChiTiet.setSoLuong(soLuongTonKho - soLuongTrongGio);
             updatedProducts.add(sanPhamChiTiet);
