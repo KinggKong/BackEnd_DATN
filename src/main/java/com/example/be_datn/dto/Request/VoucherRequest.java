@@ -21,7 +21,7 @@ public class VoucherRequest {
 
     @NotNull(message = "GIA_TRI_GIAM_INVALID")
     @PositiveOrZero(message = "GIA_TRI_GIAM_INVALID")
-    private Float giaTriGiam;
+    private Double giaTriGiam;
 
     @NotNull(message = "NGAY_BAT_DAU_INVALID")
     private LocalDateTime ngayBatDau; // Thay đổi từ Instant sang LocalDateTime
@@ -39,10 +39,10 @@ public class VoucherRequest {
 
     @NotNull(message = "GIA_TRI_DON_HANG_TOI_THIEU_INVALID")
     @PositiveOrZero(message = "GIA_TRI_DON_HANG_TOI_THIEU_INVALID")
-    private Float giaTriDonHangToiThieu;
+    private Double giaTriDonHangToiThieu;
 
     @PositiveOrZero(message = "GIA_TRI_GIAM_TOI_DA_INVALID")
-    private Float giaTriGiamToiDa;
+    private Double giaTriGiamToiDa;
 
     @Min(value = 0, message = "SO_LUONG_INVALID")
     private Integer soLuong;

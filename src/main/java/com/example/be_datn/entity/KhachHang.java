@@ -1,15 +1,11 @@
 package com.example.be_datn.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 
-import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -28,13 +24,7 @@ public class KhachHang {
     @Column(name = "ten")
     private String ten;
 
-//    @Size(max = 255)
-//    @Column(name = "ten_dang_nhap")
-//    private String tenDangNhap;
-//
-//    @Size(max = 255)
-//    @Column(name = "mat_khau")
-//    private String matKhau;
+    private String ma;
 
     private String email;
 
@@ -47,19 +37,16 @@ public class KhachHang {
     private String avatar;
 
     @Column(name = "ngay_sinh")
-    private Instant ngaySinh;
-
-//    @Column(name = "id_dia_chi")
-//    private Long idDiaChi;
+    private LocalDate ngaySinh;
 
     @Column(name = "gioi_tinh")
     private Boolean gioiTinh;
 
     @Column(name = "created_at")
-    private Instant createdAt;
+    private LocalDateTime createdAt;
 
     @Column(name = "updated_at")
-    private Instant updatedAt;
+    private LocalDateTime updatedAt;
 
     @Column(name = "trang_thai")
     private Integer trangThai;

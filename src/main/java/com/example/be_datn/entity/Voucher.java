@@ -26,7 +26,7 @@ public class Voucher extends BaseEntity {
     private String hinhThucGiam;
 
     @Column(name = "gia_tri_giam")
-    private Float giaTriGiam;
+    private Double giaTriGiam;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
     @Column(name = "ngay_bat_dau")
@@ -43,10 +43,10 @@ public class Voucher extends BaseEntity {
     private String maVoucher;
 
     @Column(name = "gia_tri_don_hang_toi_thieu")
-    private Float giaTriDonHangToiThieu;
+    private Double giaTriDonHangToiThieu;
 
     @Column(name = "gia_tri_giam_toi_da")
-    private Float giaTriGiamToiDa;
+    private Double giaTriGiamToiDa;
 
     @Column(name = "so_luong")
     private Integer soLuong;

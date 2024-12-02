@@ -1,5 +1,6 @@
 package com.example.be_datn.service.impl;
 
+import com.example.be_datn.config.AccountDetailsImpl;
 import com.example.be_datn.dto.Request.TaiKhoanRequest;
 import com.example.be_datn.dto.Response.TaiKhoanResponse;
 import com.example.be_datn.entity.TaiKhoan;
@@ -11,6 +12,9 @@ import com.example.be_datn.service.ITaiKhoanService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -22,7 +26,7 @@ import java.util.Random;
 @Service
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-public class TaiKhoanService implements ITaiKhoanService {
+public class TaiKhoanService implements ITaiKhoanService, UserDetailsService {
     private static final String CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
     private static final int CODE_LENGTH = 15;
     Random random = new Random();
@@ -40,7 +44,7 @@ public class TaiKhoanService implements ITaiKhoanService {
     public TaiKhoanResponse createTaiKhoan(TaiKhoanRequest taiKhoanRequest) {
         TaiKhoan newtaiKhoan = taiKhoanMapper.toTaiKhoan(taiKhoanRequest);
         if (taiKhoanRepository.findByTenDangNhap(taiKhoanRequest.getTenDangNhap()).isPresent()) {
-            throw new AppException(ErrorCode.TEN_TAIkHOAN_EXISTED);
+            throw new AppException(ErrorCode.TEN_TAIKHOAN_EXISTED);
         }
         String ma = generateCodeAccount();
         if (!existTaiKhoan(ma)) newtaiKhoan.setMa(ma);
@@ -90,5 +94,10 @@ public class TaiKhoanService implements ITaiKhoanService {
             billCode.append(CHARACTERS.charAt(index));
         }
         return billCode.toString();
+    }
+
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        return new AccountDetailsImpl(taiKhoanRepository.findByEmailAndUsername(username).get());
     }
 }

@@ -32,6 +32,6 @@ public class HoaDonRequest {
 
     String hinhThucThanhToan;
 
-    Float soTienGiam;
+    Double soTienGiam;
 
 }

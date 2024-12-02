@@ -2,7 +2,11 @@ package com.example.be_datn.service.impl;
 
 import com.example.be_datn.dto.Request.SanPhamChiTietRequest;
 import com.example.be_datn.dto.Response.SanPhamChiTietResponse;
-import com.example.be_datn.entity.*;
+import com.example.be_datn.entity.HinhAnh;
+import com.example.be_datn.entity.KichThuoc;
+import com.example.be_datn.entity.MauSac;
+import com.example.be_datn.entity.SanPham;
+import com.example.be_datn.entity.SanPhamChiTiet;
 import com.example.be_datn.exception.AppException;
 import com.example.be_datn.exception.ErrorCode;
 import com.example.be_datn.repository.KichThuocRepository;
@@ -16,12 +20,10 @@ import lombok.experimental.FieldDefaults;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -181,6 +183,17 @@ public class SanPhamChiTietService implements ISanPhamChiTietService {
 
         sanPhamChiTietRepository.deleteById(id);
         return "deleted successfully";
+    }
+
+    @Override
+    public void updateSoLuongSanPhamChiTiet(Long id, Integer soLuong, String method) {
+        SanPhamChiTiet sanPhamChiTiet = sanPhamChiTietRepository.findById(id).orElseThrow();
+        if(method.equalsIgnoreCase("minus")){
+            sanPhamChiTiet.setSoLuong(sanPhamChiTiet.getSoLuong() - soLuong);
+        }else {
+            sanPhamChiTiet.setSoLuong(sanPhamChiTiet.getSoLuong() + soLuong);
+        }
+        sanPhamChiTietRepository.save(sanPhamChiTiet);
     }
 
     @Override
