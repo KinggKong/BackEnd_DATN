@@ -1,27 +1,21 @@
 package com.example.be_datn.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.Size;
+import lombok.*;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 @Getter
 @Setter
 @Entity
-@AllArgsConstructor
-@NoArgsConstructor
-@Builder
 @Table(name = "khach_hang")
-public class KhachHang {
-   @Id
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class KhachHang extends BaseEntity {
+
+    @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
     private Long id;
@@ -30,13 +24,9 @@ public class KhachHang {
     @Column(name = "ten")
     private String ten;
 
-//    @Size(max = 255)
-//    @Column(name = "ten_dang_nhap")
-//    private String tenDangNhap;
-//
-//    @Size(max = 255)
-//    @Column(name = "mat_khau")
-//    private String matKhau;
+    @Size(max = 255)
+    @Column(name = "ma")
+    private String ma;
 
     private String email;
 
@@ -49,22 +39,12 @@ public class KhachHang {
     private String avatar;
 
     @Column(name = "ngay_sinh")
-    private Instant ngaySinh;
-
-//    @Column(name = "id_dia_chi")
-//    private Long idDiaChi;
+    private LocalDate ngaySinh;
 
     @Column(name = "gioi_tinh")
     private Boolean gioiTinh;
 
-    @Column(name = "created_at")
-    private Instant createdAt;
-
-    @Column(name = "updated_at")
-    private Instant updatedAt;
 
     @Column(name = "trang_thai")
     private Integer trangThai;
-
-
 }

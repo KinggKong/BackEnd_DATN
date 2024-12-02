@@ -2,11 +2,11 @@ package com.example.be_datn.service.impl;
 
 import com.example.be_datn.dto.Request.KhachHangRequest1;
 import com.example.be_datn.dto.Response.KhachHangResponse1;
-import com.example.be_datn.entity.KhachHang1;
+import com.example.be_datn.entity.KhachHang;
 import com.example.be_datn.exception.AppException;
 import com.example.be_datn.exception.ErrorCode;
-import com.example.be_datn.repository.KhachHangRepository1;
-import com.example.be_datn.service.IKhachHangService1;
+import com.example.be_datn.repository.KhachHangRepository;
+import com.example.be_datn.service.IKhachHangService;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.data.domain.Page;
@@ -16,9 +16,9 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 @FieldDefaults(level = lombok.AccessLevel.PRIVATE, makeFinal = true)
-public class KhachHangService1 implements IKhachHangService1 {
+public class KhachHangService implements IKhachHangService {
 
-    KhachHangRepository1 khachHangRepository;
+    KhachHangRepository khachHangRepository;
 
     @Override
     public Page<KhachHangResponse1> getAllKhachHangPageable(String ten, Pageable pageable) {
@@ -37,21 +37,19 @@ public class KhachHangService1 implements IKhachHangService1 {
         }
 
         // Tạo khách hàng mới từ dữ liệu request
-        KhachHang1 khachHang = KhachHang1.builder()
+        KhachHang khachHang = KhachHang.builder()
                 .ten(khachHangRequest.getTen())
                 .ma(khachHangRequest.getMa())
                 .email(khachHangRequest.getEmail())
                 .sdt(khachHangRequest.getSdt())
                 .avatar(khachHangRequest.getAvatar())
                 .ngaySinh(khachHangRequest.getNgaySinh())
-//                .idDiaChi(khachHangRequest.getIdDiaChi())
-//                .idTaiKhoan(khachHangRequest.getIdTaiKhoan())
                 .gioiTinh(khachHangRequest.getGioiTinh())
                 .trangThai(khachHangRequest.getTrangThai())
                 .build();
 
         // Lưu khách hàng vào cơ sở dữ liệu
-        KhachHang1 savedKhachHang = khachHangRepository.save(khachHang);
+        KhachHang savedKhachHang = khachHangRepository.save(khachHang);
         return KhachHangResponse1.fromKhachHang(savedKhachHang);
     }
 
@@ -66,7 +64,7 @@ public class KhachHangService1 implements IKhachHangService1 {
     @Override
     public KhachHangResponse1 updateKhachHang(Long id, KhachHangRequest1 khachHangRequest) {
         // Tìm khách hàng theo ID
-        KhachHang1 khachHang = khachHangRepository.findById(id)
+        KhachHang khachHang = khachHangRepository.findById(id)
                 .orElseThrow(() -> new AppException(ErrorCode.KHACH_HANG_NOT_FOUND));
 
         // Cập nhật thông tin khách hàng
@@ -76,8 +74,7 @@ public class KhachHangService1 implements IKhachHangService1 {
         khachHang.setSdt(khachHangRequest.getSdt());
         khachHang.setAvatar(khachHangRequest.getAvatar());
         khachHang.setNgaySinh(khachHangRequest.getNgaySinh());
-//        khachHang.setIdDiaChi(khachHangRequest.getIdDiaChi());
-//        khachHang.setIdTaiKhoan(khachHangRequest.getIdTaiKhoan());
+
         khachHang.setGioiTinh(khachHangRequest.getGioiTinh());
         khachHang.setTrangThai(khachHangRequest.getTrangThai());
 

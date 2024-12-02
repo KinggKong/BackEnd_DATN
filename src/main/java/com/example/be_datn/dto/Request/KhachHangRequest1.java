@@ -34,11 +34,6 @@ public class KhachHangRequest1 {
     @NotNull(message = "NGAY_SINH_INVALID")
     private LocalDate ngaySinh;
 
-    @NotNull(message = "ID_DIA_CHI_INVALID")
-    private Long idDiaChi;
-
-    @NotNull(message = "ID_TAI_KHOAN_INVALID")
-    private Long idTaiKhoan;
 
     @NotNull(message = "GIOI_TINH_INVALID")
     private Boolean gioiTinh;
