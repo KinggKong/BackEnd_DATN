@@ -100,5 +100,10 @@ public class GioHangChiTietService implements IGioHangChiTietService {
         gioHangChiTietRepository.save(gioHangChiTiet);
     }
 
+    @Override
+    public void xoaHetGioHang(Long idGioHang) {
+        gioHangChiTietRepository.deleteByGioHang_Id(idGioHang);
+    }
+
 
 }

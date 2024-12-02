@@ -39,4 +39,6 @@ public interface GioHangChiTietRepository extends JpaRepository<GioHangChiTiet, 
     @Transactional
     @Query(value = "delete from gio_hang_ct where id_gio_hang = :idGioHang", nativeQuery = true)
     void deleteByGioHang_Id(@Param("idGioHang") Long id);
+
+
 }

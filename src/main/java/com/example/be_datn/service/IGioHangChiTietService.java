@@ -15,5 +15,6 @@ public interface IGioHangChiTietService {
     int xoaKhoiGioHangBySanPhamChiTiet(Long idSanPhamChiTiet, Long idGioHang);
 
     void updateGioHangChiTiet(Long idSanPhamChiTiet, Long idGioHang, int soLuong);
+    void xoaHetGioHang(Long idGioHang);
 
 }

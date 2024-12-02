@@ -55,4 +55,12 @@ public class GioHangChiTietController {
                 .build();
     }
 
+    @DeleteMapping("/delete-all")
+    public ApiResponse xoaHetGioHang(@RequestParam(name = "idGioHang") Long idGioHang) {
+        gioHangChiTietService.xoaHetGioHang(idGioHang);
+        return ApiResponse.builder()
+                .message("delete all successfull")
+                .build();
+    }
+
 }
