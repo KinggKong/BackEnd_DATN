@@ -96,11 +96,11 @@ public class HoaDon extends BaseEntity {
     private String email;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "idNhanVien", referencedColumnName = "id")
+    @JoinColumn(name = "id_nhan_vien", referencedColumnName = "id")
     private NhanVien nhanVien;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "idKhachHang", referencedColumnName = "id")
+    @JoinColumn(name = "id_khach_hang", referencedColumnName = "id")
     private KhachHang khachHang;
 
     @Size(max = 255)

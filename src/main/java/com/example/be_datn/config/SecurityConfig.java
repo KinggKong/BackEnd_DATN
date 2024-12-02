@@ -67,11 +67,12 @@ public class SecurityConfig {
                             try {
                                 requests
                                         .requestMatchers(new AntPathRequestMatcher("/public/**"),
+                                                new AntPathRequestMatcher("/**"),
                                                 new AntPathRequestMatcher("/error"),
                                                 new AntPathRequestMatcher("/api/v1/auth/**"),
                                                 new AntPathRequestMatcher("/swagger-ui/**"),
                                                 new AntPathRequestMatcher("/v3/api-docs/**")
-//                                                new AntPathRequestMatcher("/**")
+
                                         )
                                         .permitAll()
 //                                        .requestMatchers("/v1/api/users/**")
