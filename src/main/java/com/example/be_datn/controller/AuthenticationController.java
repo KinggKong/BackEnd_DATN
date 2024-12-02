@@ -8,6 +8,7 @@ import com.example.be_datn.dto.Response.ApiResponse;
 import com.example.be_datn.dto.Response.SignInResponse;
 import com.example.be_datn.service.IAuthService;
 import com.example.be_datn.utils.LoginHelper;
+import jakarta.mail.MessagingException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AccessLevel;
@@ -67,4 +68,20 @@ public class AuthenticationController {
         return iAuthService.getProfile();
     }
 
+
+//    @GetMapping("/forgot-password")
+//    public ApiResponse<?> forgotPassword(@RequestParam String email) throws MessagingException {
+//        return ApiResponse.builder()
+//                .data(authenticationService.sendTokenForgotPassword(email))
+//                .message("send token to reset password successfully")
+//                .build();
+//    }
+//
+//    @PostMapping("/forot-password")
+//    public ApiResponse<?> changePassword(@RequestBody ChangePasswrodRequest changePasswrodRequest) {
+//        return ApiResponse.builder()
+//                .data(authenticationService.resetPassword(changePasswrodRequest))
+//                .message("change password successfully")
+//                .build();
+//    }
 }

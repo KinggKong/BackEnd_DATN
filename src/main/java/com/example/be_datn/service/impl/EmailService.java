@@ -93,7 +93,7 @@ public class EmailService implements IEmailService {
                                 </div>
                             
                                 <div style="text-align: center; margin: 30px 0;">
-                                    <a href="https://3hst.com/invoice-lookup/%s" 
+                                    <a href="http://localhost:5173/invoice-lookup" 
                                        style="background-color: #007bff; color: white; padding: 12px 25px; text-decoration: none; 
                                        border-radius: 5px; font-weight: bold; display: inline-block;">Theo dõi đơn hàng</a>
                                 </div>
