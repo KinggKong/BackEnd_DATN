@@ -154,17 +154,20 @@ public class SanPhamChiTietService implements ISanPhamChiTietService {
         // Ảnh mới từ request
         List<String> newImages = sanPhamChiTietRequest.getHinhAnh();
 
-        // Thêm các ảnh mới (nếu chưa tồn tại)
-        for (String src : newImages) {
-            if (!existingImages.contains(src)) {
-                hinhAnhService.addHinhAnh(src, sanPhamChiTiet.getId(), sanPhamChiTiet);
+        // Nếu danh sách ảnh mới không null và không rỗng
+        if (newImages != null && !newImages.isEmpty()) {
+            // Thêm các ảnh mới (nếu chưa tồn tại)
+            for (String src : newImages) {
+                if (!existingImages.contains(src)) {
+                    hinhAnhService.addHinhAnh(src, sanPhamChiTiet.getId(), sanPhamChiTiet);
+                }
             }
-        }
 
-        // Xóa các ảnh không còn trong request nhưng có trong database
-        for (String existingImage : existingImages) {
-            if (!newImages.contains(existingImage)) {
-                hinhAnhService.deleteHinhAnhByUrl(existingImage);
+            // Xóa các ảnh không còn trong request nhưng có trong database
+            for (String existingImage : existingImages) {
+                if (!newImages.contains(existingImage)) {
+                    hinhAnhService.deleteHinhAnhByUrl(existingImage);
+                }
             }
         }
         return SanPhamChiTietResponse.fromSanPhamChiTiet(savedSanPhamChiTiet);
