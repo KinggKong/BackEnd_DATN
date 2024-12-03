@@ -129,10 +129,11 @@ public class LoginHelper {
         String url = "https://www.googleapis.com/oauth2/v2/userinfo";
         ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, requestEntity, String.class);
         JsonObject jsonObject = new Gson().fromJson(response.getBody(), JsonObject.class);
+        String random = generateAccountCode().substring(0, 5);
 
         return ModelAccountGoogle.builder()
                 .name(jsonObject.get("name").toString().replace("\"", ""))
-                .username(jsonObject.get("name").toString().replace("\"", ""))
+                .username(random + "_" + jsonObject.get("name").toString().replace("\"", ""))
                 .email(jsonObject.get("email").toString().replace("\"", ""))
                 .password(UUID.randomUUID().toString())
                 .build();
