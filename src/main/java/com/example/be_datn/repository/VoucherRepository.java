@@ -1,10 +1,12 @@
 package com.example.be_datn.repository;
 
+import com.example.be_datn.entity.HoaDon;
 import com.example.be_datn.entity.Voucher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -20,4 +22,10 @@ public interface VoucherRepository extends JpaRepository<Voucher, Long> {
 
     //Lấy ra danh sách voucher hết hạn
     List<Voucher> findByNgayKetThucBefore(LocalDateTime localDateTime);
+
+    @Query("SELECT v FROM Voucher v WHERE v.trangThai = 1 AND :tongTien >= v.giaTriDonHangToiThieu")
+    List<Voucher> findAvailableVouchers(@Param("tongTien") double tongTien);
+
+
+
 }

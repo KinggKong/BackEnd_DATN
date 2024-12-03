@@ -23,6 +23,7 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -216,31 +217,45 @@ public class HoaDonChiTietService implements IHoaDonChiTietService {
     }
 
     public String selectTheBestVoucherAndApply(Long idHoaDon, List<Voucher> voucherList) {
+        // Lấy hóa đơn từ cơ sở dữ liệu
         HoaDon hoaDon = hoaDonRepository.findById(idHoaDon)
                 .orElseThrow(() -> new AppException(ErrorCode.HOA_DON_NOT_FOUND));
 
+        // Lấy thời gian hiện tại
+        LocalDateTime now = LocalDateTime.now();
+
+        // Tìm voucher tốt nhất
         Voucher bestVoucher = voucherList.stream()
-                .filter(voucher -> hoaDon.getTongTien() >= voucher.getGiaTriDonHangToiThieu())
+                .filter(voucher ->
+                        voucher.getTrangThai() == 1 && // Trạng thái kích hoạt
+                                voucher.getSoLuong() >= 1 &&  // Số lượng còn khả dụng
+                                voucher.getNgayBatDau().isBefore(now) && // Ngày bắt đầu trước hiện tại
+                                voucher.getNgayKetThuc().isAfter(now) && // Ngày kết thúc sau hiện tại
+                                hoaDon.getTongTien() >= voucher.getGiaTriDonHangToiThieu() // Tổng tiền thỏa mãn điều kiện
+                )
                 .sorted(Comparator.comparingDouble((Voucher voucher) -> calculateDiscount(hoaDon.getTongTien(), voucher))
                         .reversed())
                 .findFirst()
                 .orElse(null);
 
+        // Áp dụng voucher vào hóa đơn
         if (bestVoucher != null) {
             double discount = calculateDiscount(hoaDon.getTongTien(), bestVoucher);
             hoaDon.setVoucher(bestVoucher);
             hoaDon.setSoTienGiam(discount);
             hoaDon.setTienSauGiam(hoaDon.getTongTien() - discount);
-            hoaDonRepository.save(hoaDon);
         } else {
             hoaDon.setVoucher(null);
             hoaDon.setSoTienGiam(0.0);
             hoaDon.setTienSauGiam(hoaDon.getTongTien());
-            hoaDonRepository.save(hoaDon);
         }
+
+        // Lưu hóa đơn
+        hoaDonRepository.save(hoaDon);
 
         return "Success";
     }
+
 
     private double calculateDiscount(double totalAmount, Voucher voucher) {
         double discount;

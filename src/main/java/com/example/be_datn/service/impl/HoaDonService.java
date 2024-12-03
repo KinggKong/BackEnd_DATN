@@ -1,6 +1,8 @@
 package com.example.be_datn.service.impl;
 
 import com.example.be_datn.dto.Request.HoaDonUpdateRequest;
+import com.example.be_datn.dto.Response.HoaDonCTResponse;
+import com.example.be_datn.dto.Response.HoaDonChiTietResponse;
 import com.example.be_datn.dto.Response.HoaDonResponse;
 import com.example.be_datn.entity.HoaDon;
 import com.example.be_datn.entity.HoaDonCT;
@@ -14,12 +16,14 @@ import com.example.be_datn.entity.TypeBill;
 import com.example.be_datn.entity.Voucher;
 import com.example.be_datn.exception.AppException;
 import com.example.be_datn.exception.ErrorCode;
+import com.example.be_datn.mapper.HoaDonChiTietMapper;
 import com.example.be_datn.mapper.HoaDonMapper;
 import com.example.be_datn.repository.HoaDonChiTietRepository;
 import com.example.be_datn.repository.HoaDonRepository;
 import com.example.be_datn.repository.KhachHangRepository;
 import com.example.be_datn.repository.LichSuHoaDonRepository;
 import com.example.be_datn.repository.LichSuThanhToanRepository;
+import com.example.be_datn.repository.NhanVienRepository;
 import com.example.be_datn.repository.SanPhamChiTietRepository;
 import com.example.be_datn.repository.VoucherRepository;
 import com.example.be_datn.service.IHoaDonService;
@@ -57,6 +61,10 @@ public class HoaDonService implements IHoaDonService {
     private final VoucherRepository voucherRepository;
     private final SanPhamChiTietService sanPhamChiTietService;
     private final SanPhamChiTietRepository sanPhamChiTietRepository;
+
+    private final HoaDonChiTietMapper  hoaDonChiTietMapper;
+    private final InvoicePdfGenerator invoicePdfGenerator;
+    private final NhanVienRepository nhanVienRepository;
 
     public String generateInvoiceCode() {
         String date = new SimpleDateFormat("yyyyMMdd").format(new Date());
@@ -213,6 +221,12 @@ public class HoaDonService implements IHoaDonService {
         HoaDon hoaDon = hoaDonRepository.findById(id)
                 .orElseThrow(() -> new AppException(ErrorCode.HOA_DON_NOT_FOUND));
 
+        if(hoaDon.getNhanVien() != null) {
+            NhanVien nhanVien = nhanVienRepository.findById(hoaDon.getNhanVien().getId())
+                    .orElseThrow(() -> new AppException(ErrorCode.NHANVIEN_NOT_FOUND));
+            hoaDon.setNhanVien(nhanVien);
+        }
+
         // Check if the HoaDon has a voucher before attempting any voucher-related logic
         if (hoaDon.getVoucher() != null) {
             // Process the voucher if it exists
@@ -249,6 +263,7 @@ public class HoaDonService implements IHoaDonService {
             lichSuHoaDonRepository.save(lichSuHoaDon);
         }
 
+
         // Log payment transaction (LichSuThanhToan)
         LichSuThanhToan lichSuThanhToan = LichSuThanhToan.builder()
                 .soTien(updatedHoaDon.getTongTien())
@@ -258,7 +273,7 @@ public class HoaDonService implements IHoaDonService {
                 .status(StatusPayment.DONE.toString())
                 .build();
         lichSuThanhToanRepository.save(lichSuThanhToan);
-
+        invoicePdfGenerator.generateInvoice(HoaDonResponse.from(hoaDon), hoaDonChiTietMapper.toListResponse(hoaDonChiTietRepository.findByHoaDon_Id(hoaDon.getId())));
         return "ok";
     }
 
@@ -305,4 +320,6 @@ public class HoaDonService implements IHoaDonService {
         }
         hoaDonRepository.save(hoaDon);
     }
+
+
 }

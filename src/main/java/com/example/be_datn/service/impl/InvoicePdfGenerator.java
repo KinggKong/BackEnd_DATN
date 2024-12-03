@@ -1,26 +1,53 @@
 package com.example.be_datn.service.impl;
 
-
 import com.example.be_datn.dto.Response.HoaDonChiTietResponse;
 import com.example.be_datn.dto.Response.HoaDonResponse;
-import com.itextpdf.text.*;
-import com.itextpdf.text.pdf.*;
+import com.lowagie.text.Document;
+import com.lowagie.text.DocumentException;
+import com.lowagie.text.Element;
+import com.lowagie.text.Font;
+import com.lowagie.text.PageSize;
+import com.lowagie.text.Paragraph;
+import com.lowagie.text.Phrase;
+import com.lowagie.text.Rectangle;
+import com.lowagie.text.pdf.BaseFont;
+import com.lowagie.text.pdf.PdfPCell;
+import com.lowagie.text.pdf.PdfPTable;
+import com.lowagie.text.pdf.PdfWriter;
 import org.springframework.stereotype.Service;
 
+import java.awt.*;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.text.DecimalFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.text.DecimalFormat;
 import java.util.List;
 
 @Service
 public class InvoicePdfGenerator {
 
-    private static final Font TITLE_FONT = new Font(Font.FontFamily.HELVETICA, 18, Font.BOLD);
-    private static final Font HEADER_FONT = new Font(Font.FontFamily.HELVETICA, 12, Font.BOLD);
-    private static final Font NORMAL_FONT = new Font(Font.FontFamily.HELVETICA, 10, Font.NORMAL);
-    private static final Font BOLD_FONT = new Font(Font.FontFamily.HELVETICA, 10, Font.BOLD);
+    private static Font TITLE_FONT;
+    private static Font HEADER_FONT;
+    private static Font NORMAL_FONT;
+    private static Font BOLD_FONT;
+
+    public InvoicePdfGenerator() {
+        try {
+            // Load Times New Roman font for better Vietnamese support
+            BaseFont baseFont = BaseFont.createFont("times.ttf", BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
+            TITLE_FONT = new Font(baseFont, 18, Font.BOLD);
+            HEADER_FONT = new Font(baseFont, 12, Font.BOLD);
+            NORMAL_FONT = new Font(baseFont, 10, Font.NORMAL);
+            BOLD_FONT = new Font(baseFont, 10, Font.BOLD);
+        } catch (Exception e) {
+            // Fallback to default fonts if Times New Roman is not available
+            TITLE_FONT = new Font(Font.HELVETICA, 18, Font.BOLD);
+            HEADER_FONT = new Font(Font.HELVETICA, 12, Font.BOLD);
+            NORMAL_FONT = new Font(Font.HELVETICA, 10, Font.NORMAL);
+            BOLD_FONT = new Font(Font.HELVETICA, 10, Font.BOLD);
+        }
+    }
 
     public ByteArrayInputStream generateInvoice(HoaDonResponse hoaDon, List<HoaDonChiTietResponse> chiTietList) {
         try {
@@ -30,7 +57,7 @@ public class InvoicePdfGenerator {
 
             document.open();
 
-            // Logo và Thông tin cửa hàng
+            // Store information
             Paragraph storeName = new Paragraph("3HST Shoes", TITLE_FONT);
             storeName.setAlignment(Element.ALIGN_CENTER);
             document.add(storeName);
@@ -44,77 +71,54 @@ public class InvoicePdfGenerator {
             storeInfo.setAlignment(Element.ALIGN_CENTER);
             document.add(storeInfo);
 
-            // Tiêu đề hóa đơn
+            // Invoice title
             Paragraph invoiceTitle = new Paragraph("HÓA ĐƠN BÁN HÀNG", HEADER_FONT);
             invoiceTitle.setSpacingBefore(20);
             invoiceTitle.setSpacingAfter(10);
             invoiceTitle.setAlignment(Element.ALIGN_CENTER);
             document.add(invoiceTitle);
 
-            // Thông tin hóa đơn
+            // Invoice information
             document.add(new Paragraph("Mã hóa đơn: " + hoaDon.getMaHoaDon(), NORMAL_FONT));
             document.add(new Paragraph("Ngày tạo: " + formatDateTime(hoaDon.getCreatedAt().toString()), NORMAL_FONT));
             document.add(new Paragraph("Khách hàng: " + hoaDon.getTenKhachHang(), NORMAL_FONT));
             document.add(new Paragraph("Số điện thoại: " + hoaDon.getSdt(), NORMAL_FONT));
             document.add(new Paragraph("Địa chỉ: " + hoaDon.getDiaChiNhan(), NORMAL_FONT));
             document.add(new Paragraph("Email: " + hoaDon.getEmail(), NORMAL_FONT));
-            document.add(new Paragraph("Ghi chú: " + hoaDon.getGhiChu(), NORMAL_FONT));
+            document.add(new Paragraph("Ghi chú: " + (hoaDon.getGhiChu() != null ? hoaDon.getGhiChu() : ""), NORMAL_FONT));
 
-            // Bảng chi tiết sản phẩm
+            // Product details table
             PdfPTable table = new PdfPTable(5);
+            float[] columnWidths = {3f, 1f, 1f, 1f, 1.5f}; // Adjust column widths
+            table.setWidths(columnWidths);
             table.setWidthPercentage(100);
             table.setSpacingBefore(20);
             table.setSpacingAfter(20);
 
-            // Header của bảng
-            table.addCell(createCell("Tên sản phẩm", HEADER_FONT));
-            table.addCell(createCell("Màu sắc", HEADER_FONT));
-            table.addCell(createCell("Kích thước", HEADER_FONT));
-            table.addCell(createCell("Số lượng", HEADER_FONT));
-            table.addCell(createCell("Thành tiền", HEADER_FONT));
+            // Table headers
+            addTableHeader(table);
 
-            // Nội dung bảng
+            // Table content
             DecimalFormat formatter = new DecimalFormat("#,###");
             for (HoaDonChiTietResponse chiTiet : chiTietList) {
-                table.addCell(createCell(chiTiet.getSanPhamChiTietResponse().getTenSanPham(), NORMAL_FONT));
-                table.addCell(createCell(chiTiet.getSanPhamChiTietResponse().getTenMauSac(), NORMAL_FONT));
-                table.addCell(createCell(chiTiet.getSanPhamChiTietResponse().getTenKichThuoc(), NORMAL_FONT));
-                table.addCell(createCell(String.valueOf(chiTiet.getSoLuong()), NORMAL_FONT));
-                table.addCell(createCell(formatter.format(chiTiet.getGiaTien() * chiTiet.getSoLuong()) + " đ", NORMAL_FONT));
+                addTableRow(table, chiTiet, formatter);
             }
 
             document.add(table);
 
-            // Thông tin tổng tiền
-            PdfPTable totalTable = new PdfPTable(2);
-            totalTable.setWidthPercentage(50);
-            totalTable.setHorizontalAlignment(Element.ALIGN_RIGHT);
-
-            totalTable.addCell(createCell("Tổng tiền hàng:", BOLD_FONT));
-            totalTable.addCell(createCell(formatter.format(hoaDon.getTongTien() - hoaDon.getTienShip()) + " đ", NORMAL_FONT));
-
-            totalTable.addCell(createCell("Phí vận chuyển:", BOLD_FONT));
-            totalTable.addCell(createCell(formatter.format(hoaDon.getTienShip()) + " đ", NORMAL_FONT));
-
-            if (hoaDon.getSoTienGiam() > 0) {
-                totalTable.addCell(createCell("Giảm giá:", BOLD_FONT));
-                totalTable.addCell(createCell("-" + formatter.format(hoaDon.getSoTienGiam()) + " đ", NORMAL_FONT));
-            }
-
-            totalTable.addCell(createCell("Tổng thanh toán:", BOLD_FONT));
-            totalTable.addCell(createCell(formatter.format(hoaDon.getTienSauGiam()) + " đ", BOLD_FONT));
-
+            // Total information
+            PdfPTable totalTable = createTotalTable(hoaDon, formatter);
             document.add(totalTable);
 
-            // Thông tin thanh toán
+            // Payment information
             Paragraph paymentInfo = new Paragraph(
-                    "\nHình thức thanh toán: " + hoaDon.getHinhThucThanhToan().toUpperCase() +
+                    "\nHình thức thanh toán: " + hoaDon.getHinhThucThanhToan() +
                             "\nTrạng thái: " + hoaDon.getTrangThai(),
                     NORMAL_FONT
             );
             document.add(paymentInfo);
 
-            // Chân trang
+            // Footer
             Paragraph footer = new Paragraph(
                     "\n\nCảm ơn quý khách đã mua hàng tại 3HST Shoes!\n" +
                             "Mọi thắc mắc xin vui lòng liên hệ: 0123456789",
@@ -131,11 +135,76 @@ public class InvoicePdfGenerator {
         }
     }
 
-    private PdfPCell createCell(String content, Font font) {
-        PdfPCell cell = new PdfPCell(new Phrase(content, font));
-        cell.setPadding(5);
-        cell.setHorizontalAlignment(Element.ALIGN_CENTER);
+    private void addTableHeader(PdfPTable table) {
+        String[] headers = {"Tên sản phẩm", "Màu sắc", "Kích thước", "Số lượng", "Thành tiền"};
+        for (String header : headers) {
+            PdfPCell cell = new PdfPCell(new Phrase(header, HEADER_FONT));
+            cell.setHorizontalAlignment(Element.ALIGN_CENTER);
+            cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
+            cell.setPadding(5);
+            cell.setBackgroundColor(new Color(240, 240, 240));
+            table.addCell(cell);
+        }
+    }
+
+    private void addTableRow(PdfPTable table, HoaDonChiTietResponse chiTiet, DecimalFormat formatter) {
+        table.addCell(createCell(chiTiet.getSanPhamChiTietResponse().getTenSanPham(), Element.ALIGN_LEFT));
+        table.addCell(createCell(chiTiet.getSanPhamChiTietResponse().getTenMauSac(), Element.ALIGN_CENTER));
+        table.addCell(createCell(chiTiet.getSanPhamChiTietResponse().getTenKichThuoc(), Element.ALIGN_CENTER));
+        table.addCell(createCell(String.valueOf(chiTiet.getSoLuong()), Element.ALIGN_CENTER));
+        table.addCell(createCell(formatter.format(chiTiet.getGiaTien() * chiTiet.getSoLuong()) + " đ", Element.ALIGN_RIGHT));
+    }
+
+    private PdfPTable createTotalTable(HoaDonResponse hoaDon, DecimalFormat formatter) {
+        PdfPTable totalTable = new PdfPTable(2);
+        totalTable.setWidthPercentage(50);
+        totalTable.setHorizontalAlignment(Element.ALIGN_RIGHT);
+        totalTable.setSpacingBefore(10);
+
+        addTotalRow(totalTable, "Tổng tiền hàng:", formatter.format(hoaDon.getTongTien() - hoaDon.getTienShip()) + " đ");
+        addTotalRow(totalTable, "Phí vận chuyển:", formatter.format(hoaDon.getTienShip()) + " đ");
+
+        if (hoaDon.getSoTienGiam() > 0) {
+            addTotalRow(totalTable, "Giảm giá:", "-" + formatter.format(hoaDon.getSoTienGiam()) + " đ");
+        }
+
+        // Add final total with bold font
+        PdfPCell totalLabelCell = new PdfPCell(new Phrase("Tổng thanh toán:", BOLD_FONT));
+        totalLabelCell.setBorder(Rectangle.TOP);
+        totalLabelCell.setPadding(5);
+        totalLabelCell.setHorizontalAlignment(Element.ALIGN_LEFT);
+
+        PdfPCell totalValueCell = new PdfPCell(new Phrase(formatter.format(hoaDon.getTienSauGiam()) + " đ", BOLD_FONT));
+        totalValueCell.setBorder(Rectangle.TOP);
+        totalValueCell.setPadding(5);
+        totalValueCell.setHorizontalAlignment(Element.ALIGN_RIGHT);
+
+        totalTable.addCell(totalLabelCell);
+        totalTable.addCell(totalValueCell);
+
+        return totalTable;
+    }
+
+    private void addTotalRow(PdfPTable table, String label, String value) {
+        PdfPCell labelCell = new PdfPCell(new Phrase(label, NORMAL_FONT));
+        labelCell.setBorder(Rectangle.NO_BORDER);
+        labelCell.setPadding(5);
+        labelCell.setHorizontalAlignment(Element.ALIGN_LEFT);
+
+        PdfPCell valueCell = new PdfPCell(new Phrase(value, NORMAL_FONT));
+        valueCell.setBorder(Rectangle.NO_BORDER);
+        valueCell.setPadding(5);
+        valueCell.setHorizontalAlignment(Element.ALIGN_RIGHT);
+
+        table.addCell(labelCell);
+        table.addCell(valueCell);
+    }
+
+    private PdfPCell createCell(String content, int alignment) {
+        PdfPCell cell = new PdfPCell(new Phrase(content, NORMAL_FONT));
+        cell.setHorizontalAlignment(alignment);
         cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
+        cell.setPadding(5);
         return cell;
     }
 
@@ -145,3 +214,4 @@ public class InvoicePdfGenerator {
         return dt.format(formatter);
     }
 }
+
