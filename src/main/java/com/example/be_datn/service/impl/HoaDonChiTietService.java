@@ -196,11 +196,11 @@ public class HoaDonChiTietService implements IHoaDonChiTietService {
                 tongTien += tongTienChiTiet;
             }
         }
-        if (list.size() > 0) {
-            hoaDon.setTrangThai(String.valueOf(StatusPayment.WAITING));
-        } else {
-            hoaDon.setTrangThai(String.valueOf(StatusPayment.PENDING));
-        }
+//        if (list.size() > 0) {
+//            hoaDon.setTrangThai(String.valueOf(StatusPayment.WAITING));
+//        } else {
+//            hoaDon.setTrangThai(String.valueOf(StatusPayment.PENDING));
+//        }
         hoaDonRepository.updateHoaDon(tongTien, id);
 
         return "success";
