@@ -39,7 +39,7 @@ public interface HoaDonRepository extends JpaRepository<HoaDon, Long> {
                         update HoaDon hd  set hd.tongTien=:tongTien where hd.id=:id
                     """
     )
-    void updateHoaDon(Double tongTien, Long id);
+    HoaDon updateHoaDon(Double tongTien, Long id);
 
     HoaDon findByMaHoaDon(String maHoaDon);
 

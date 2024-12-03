@@ -47,39 +47,32 @@ import java.util.List;
 public class HoaDon extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id", nullable = false)
+    @Column(name = "id")
     private Long id;
 
     @Size(max = 255)
-    @NotNull
-    @Column(name = "ma_hoa_don", nullable = false)
+    @Column(name = "ma_hoa_don")
     private String maHoaDon;
 
     @Size(max = 255)
-    @NotNull
-    @Column(name = "ten_nguoi_nhan", nullable = false)
+    @Column(name = "ten_nguoi_nhan")
     private String tenNguoiNhan;
 
     @Size(max = 255)
-    @NotNull
-    @Column(name = "dia_chi_nhan", nullable = false)
+    @Column(name = "dia_chi_nhan")
     private String diaChiNhan;
 
     @Size(max = 10)
-    @NotNull
-    @Column(name = "sdt", nullable = false, length = 10)
+    @Column(name = "sdt", length = 10)
     private String sdt;
 
-    @NotNull
-    @Column(name = "tong_tien", nullable = false)
+    @Column(name = "tong_tien")
     private Double tongTien;
 
-    @NotNull
-    @Column(name = "tien_sau_giam", nullable = false)
+    @Column(name = "tien_sau_giam")
     private Double tienSauGiam;
 
-    @NotNull
-    @Column(name = "tien_ship", nullable = false)
+    @Column(name = "tien_ship")
     private Double tienShip;
 
     @Lob
@@ -87,8 +80,7 @@ public class HoaDon extends BaseEntity {
     private String ghiChu;
 
     @Size(max = 255)
-    @NotNull
-    @Column(name = "loai_hoa_don", nullable = false)
+    @Column(name = "loai_hoa_don")
     private String loaiHoaDon;
 
     @Size(max = 255)
@@ -104,12 +96,10 @@ public class HoaDon extends BaseEntity {
     private KhachHang khachHang;
 
     @Size(max = 255)
-    @NotNull
-    @Column(name = "hinh_thuc_thanh_toan", nullable = false)
+    @Column(name = "hinh_thuc_thanh_toan")
     private String hinhThucThanhToan;
 
-    @NotNull
-    @Column(name = "trang_thai", nullable = false)
+    @Column(name = "trang_thai")
     private String trangThai;
 
     @ManyToOne(fetch = FetchType.LAZY)
