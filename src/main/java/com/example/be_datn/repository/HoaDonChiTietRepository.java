@@ -1,29 +1,15 @@
 package com.example.be_datn.repository;
 
-import com.example.be_datn.dto.Response.HoaDonCTResponse;
 import com.example.be_datn.entity.HoaDon;
 import com.example.be_datn.entity.HoaDonCT;
 import com.example.be_datn.entity.SanPhamChiTiet;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 import java.util.Optional;
 
 public interface HoaDonChiTietRepository extends JpaRepository<HoaDonCT, Long> {
-//        @Query(
-//            """
-//                    select new com.example.be_datn.dto.Response.HoaDonCTResponse(
-//                        hdct.id, hd.id,spct.id, spct.sanPham.tenSanPham, hdct.soLuong,spct.giaBan, hd.tongTien
-//                    )
-//                    from HoaDonCT hdct
-//                    join hdct.hoaDon hd
-//                    left join hdct.sanPhamChiTiet spct
-//                    """
-//    )
-//    Page<HoaDonCTResponse> getAllHdct(Pageable pageable);
+
 //
 //
 //    @Query(
