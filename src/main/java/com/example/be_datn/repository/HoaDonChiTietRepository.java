@@ -40,4 +40,6 @@ public interface HoaDonChiTietRepository extends JpaRepository<HoaDonCT, Long> {
     Optional<HoaDonCT> findByHoaDonAndSanPhamChiTiet(HoaDon hoaDon, SanPhamChiTiet sanPhamChiTiet);
 
     List<HoaDonCT> findByHoaDon_Id(Long id);
+
+    void deleteByHoaDon_Id(Long id);
 }

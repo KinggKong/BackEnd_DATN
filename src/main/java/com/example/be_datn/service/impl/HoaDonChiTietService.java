@@ -97,6 +97,7 @@ public class HoaDonChiTietService implements IHoaDonChiTietService {
     }
 
     @Override
+    @Transactional
     public HoaDonCTResponse update(HoaDonChiTietUpdateRequest request, Long id) {
         if (request == null || id == null) {
             throw new IllegalArgumentException("Request hoặc Id không được null");
@@ -197,14 +198,14 @@ public class HoaDonChiTietService implements IHoaDonChiTietService {
         }
 
         // Cập nhật trạng thái của hóa đơn
-        if (list.size() > 0) {
-            hoaDon.setTrangThai(String.valueOf(StatusPayment.WAITING));
-        } else {
-            hoaDon.setTrangThai(String.valueOf(StatusPayment.PENDING));
-            hoaDon.setVoucher(null);
-            hoaDon.setSoTienGiam(0.0);
-            hoaDon.setTienSauGiam(0.0);
-        }
+//        if (list.size() > 0) {
+//            hoaDon.setTrangThai(String.valueOf(StatusPayment.WAITING));
+//        } else {
+//            hoaDon.setTrangThai(String.valueOf(StatusPayment.PENDING));
+//            hoaDon.setVoucher(null);
+//            hoaDon.setSoTienGiam(0.0);
+//            hoaDon.setTienSauGiam(0.0);
+//        }
 
         hoaDon.setTongTien(tongTien);
         hoaDonRepository.save(hoaDon);

@@ -118,5 +118,12 @@ public class HoaDonController {
         return ResponseEntity.ok("Customer added to invoice successfully.");
     }
 
+    @PutMapping("/changeTypeBill/{id}")
+    public ApiResponse<?> changeTypeBill(@PathVariable Long id){
+        ApiResponse<String> apiResponse = new ApiResponse<>();
+        hoaDonService.changeTypeBill(id);
+        return apiResponse;
+    }
+
 
 }

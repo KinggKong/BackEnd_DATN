@@ -17,4 +17,5 @@ public interface IHoaDonService {
     String updateCustomer(HoaDon hoaDon, Long idKhachHang);
     String completeHoaDon(Long id, String method);
     HoaDonResponse findByMaHoaDon(String maHoaDon);
+    void changeTypeBill(Long idHoaDon);
 }
