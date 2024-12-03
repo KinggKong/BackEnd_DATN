@@ -28,7 +28,7 @@ public interface HoaDonRepository extends JpaRepository<HoaDon, Long> {
                left join hd.nhanVien nv 
                left join hd.khachHang kh 
                left join hd.voucher v  
-               where hd.trangThai = 'WAITING' or hd.trangThai = 'PENDING'
+               where  hd.trangThai = 'PENDING'
             """)
     Page<HoaDonResponse> findAllHoaDon(Pageable pageable);
 
