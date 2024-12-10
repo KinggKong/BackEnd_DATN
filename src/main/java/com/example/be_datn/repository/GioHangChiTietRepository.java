@@ -41,4 +41,7 @@ public interface GioHangChiTietRepository extends JpaRepository<GioHangChiTiet, 
     void deleteByGioHang_Id(@Param("idGioHang") Long id);
 
 
+    List<GioHangChiTiet> findBySanPhamChiTietTrangThai(int trangThai);
+
+
 }

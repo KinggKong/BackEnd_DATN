@@ -18,6 +18,7 @@ import jakarta.transaction.Transactional;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import javax.swing.text.html.Option;
@@ -103,6 +104,22 @@ public class GioHangChiTietService implements IGioHangChiTietService {
     @Override
     public void xoaHetGioHang(Long idGioHang) {
         gioHangChiTietRepository.deleteByGioHang_Id(idGioHang);
+    }
+
+    @Scheduled(fixedRate = 10000)
+    @Transactional
+    public void updateSanPhamTrongGio(){
+        List<GioHangChiTiet> sanPhamNgungBan = gioHangChiTietRepository.findBySanPhamChiTietTrangThai(0);
+        for (GioHangChiTiet gioHangChiTiet : sanPhamNgungBan) {
+            gioHangChiTiet.setTrangThai(0);
+            gioHangChiTietRepository.save(gioHangChiTiet);
+
+        }
+        List<GioHangChiTiet> sanPhamDangBan = gioHangChiTietRepository.findBySanPhamChiTietTrangThai(1);
+        for (GioHangChiTiet gioHangChiTiet : sanPhamDangBan) {
+            gioHangChiTiet.setTrangThai(1);
+            gioHangChiTietRepository.save(gioHangChiTiet);
+        }
     }
 
 
