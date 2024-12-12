@@ -11,6 +11,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 public interface GioHangChiTietRepository extends JpaRepository<GioHangChiTiet, Long> {
+
+    List<GioHangChiTiet> findByGioHang_IdAndTrangThai(Long id, int trangThai);
     List<GioHangChiTiet> findByGioHang_Id(Long id);
 
 
@@ -39,6 +41,9 @@ public interface GioHangChiTietRepository extends JpaRepository<GioHangChiTiet, 
     @Transactional
     @Query(value = "delete from gio_hang_ct where id_gio_hang = :idGioHang", nativeQuery = true)
     void deleteByGioHang_Id(@Param("idGioHang") Long id);
+
+
+    List<GioHangChiTiet> findBySanPhamChiTietTrangThai(int trangThai);
 
 
 }

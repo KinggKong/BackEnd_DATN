@@ -35,6 +35,9 @@ public class LichSuHoaDonService implements ILichSuHoaDonService {
         }
 
         NhanVien nhanVien = new NhanVien();
+        if(statusBillRequest.getStatus().equals(StatusPayment.CANCELLED.toString())){
+            updateAfterCancel(statusBillRequest.getIdHoaDon());
+        }
 
         if (statusBillRequest.getIdNhanvien() == null) {
             NhanVien existedNhanVien = nhanVienRepository.findByTen("BOT");

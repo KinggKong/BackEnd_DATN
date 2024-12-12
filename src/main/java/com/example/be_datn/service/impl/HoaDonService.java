@@ -1,6 +1,8 @@
 package com.example.be_datn.service.impl;
 
 import com.example.be_datn.dto.Request.HoaDonUpdateRequest;
+import com.example.be_datn.dto.Response.HoaDonCTResponse;
+import com.example.be_datn.dto.Response.HoaDonChiTietResponse;
 import com.example.be_datn.dto.Response.HoaDonResponse;
 import com.example.be_datn.entity.HoaDon;
 import com.example.be_datn.entity.HoaDonCT;
@@ -14,12 +16,14 @@ import com.example.be_datn.entity.TypeBill;
 import com.example.be_datn.entity.Voucher;
 import com.example.be_datn.exception.AppException;
 import com.example.be_datn.exception.ErrorCode;
+import com.example.be_datn.mapper.HoaDonChiTietMapper;
 import com.example.be_datn.mapper.HoaDonMapper;
 import com.example.be_datn.repository.HoaDonChiTietRepository;
 import com.example.be_datn.repository.HoaDonRepository;
 import com.example.be_datn.repository.KhachHangRepository;
 import com.example.be_datn.repository.LichSuHoaDonRepository;
 import com.example.be_datn.repository.LichSuThanhToanRepository;
+import com.example.be_datn.repository.NhanVienRepository;
 import com.example.be_datn.repository.SanPhamChiTietRepository;
 import com.example.be_datn.repository.VoucherRepository;
 import com.example.be_datn.service.IHoaDonService;
@@ -55,8 +59,12 @@ public class HoaDonService implements IHoaDonService {
     private final LichSuThanhToanRepository lichSuThanhToanRepository;
 
     private final VoucherRepository voucherRepository;
-    private final SanPhamChiTietService sanPhamChiTietService;
+
     private final SanPhamChiTietRepository sanPhamChiTietRepository;
+
+    private final HoaDonChiTietMapper  hoaDonChiTietMapper;
+    private final InvoicePdfGenerator invoicePdfGenerator;
+    private final NhanVienRepository nhanVienRepository;
 
     public String generateInvoiceCode() {
         String date = new SimpleDateFormat("yyyyMMdd").format(new Date());
@@ -103,6 +111,29 @@ public class HoaDonService implements IHoaDonService {
         );
     }
 
+    //    @Override
+//    public Long createHoaDon() {
+//        HoaDon hoaDon = new HoaDon();
+//        KhachHang khachHangLe = khachHangRepository.findByTen("Khách lẻ");
+//        hoaDon.setKhachHang(khachHangLe);
+//        hoaDon.setTongTien(0.0);
+//        hoaDon.setHinhThucThanhToan(null);
+//        hoaDon.setLoaiHoaDon(String.valueOf(TypeBill.OFFLINE));
+//        hoaDon.setTrangThai(String.valueOf(StatusPayment.PENDING));
+//        hoaDon.setMaHoaDon(generateInvoiceCode());
+//        hoaDon.setTenNguoiNhan(khachHangLe.getTen());
+//        hoaDonRepository.save(hoaDon);
+//        HoaDon hd = hoaDonRepository.save(hoaDon);
+//        LichSuHoaDon lichSuHoaDon = LichSuHoaDon.builder()
+//                .nhanVien(null)
+//                .hoaDon(hd)
+//                .ghiChu("PENDING")
+//                .createdBy(null)
+//                .trangThai(StatusPayment.PENDING.toString())
+//                .build();
+//        lichSuHoaDonRepository.save(lichSuHoaDon);
+//        return 1L;
+//    }
     @Override
     public Long createHoaDon() {
         HoaDon hoaDon = new HoaDon();
@@ -213,6 +244,12 @@ public class HoaDonService implements IHoaDonService {
         HoaDon hoaDon = hoaDonRepository.findById(id)
                 .orElseThrow(() -> new AppException(ErrorCode.HOA_DON_NOT_FOUND));
 
+        if(hoaDon.getNhanVien() != null) {
+            NhanVien nhanVien = nhanVienRepository.findById(hoaDon.getNhanVien().getId())
+                    .orElseThrow(() -> new AppException(ErrorCode.NHANVIEN_NOT_FOUND));
+            hoaDon.setNhanVien(nhanVien);
+        }
+
         // Check if the HoaDon has a voucher before attempting any voucher-related logic
         if (hoaDon.getVoucher() != null) {
             // Process the voucher if it exists
@@ -249,6 +286,7 @@ public class HoaDonService implements IHoaDonService {
             lichSuHoaDonRepository.save(lichSuHoaDon);
         }
 
+
         // Log payment transaction (LichSuThanhToan)
         LichSuThanhToan lichSuThanhToan = LichSuThanhToan.builder()
                 .soTien(updatedHoaDon.getTongTien())
@@ -258,7 +296,7 @@ public class HoaDonService implements IHoaDonService {
                 .status(StatusPayment.DONE.toString())
                 .build();
         lichSuThanhToanRepository.save(lichSuThanhToan);
-
+        invoicePdfGenerator.generateInvoice(HoaDonResponse.from(hoaDon), hoaDonChiTietMapper.toListResponse(hoaDonChiTietRepository.findByHoaDon_Id(hoaDon.getId())));
         return "ok";
     }
 
@@ -267,17 +305,14 @@ public class HoaDonService implements IHoaDonService {
     @Transactional
     @Scheduled(fixedRate = 600000)
     public void cancelExpiredOrders() {
-        LocalDateTime oneMinuteAgo = LocalDateTime.now().minusHours(2); // Sử dụng 1 phút thay vì 2 giờ
-
+        LocalDateTime twoHours = LocalDateTime.now().minusHours(2);
         List<HoaDon> ordersToCancel = hoaDonRepository.selectOrderWhereStatusIsPending();
         for (HoaDon order : ordersToCancel) {
-            if (order.getCreated_at().isBefore(oneMinuteAgo)) {  // Kiểm tra xem hóa đơn có quá 1 phút hay không
-                // Xóa lịch sử hóa đơn trước khi xóa hóa đơn
-                lichSuHoaDonRepository.deleteByHoaDon_Id(order.getId()); // Xóa tất cả bản ghi trong lịch sử hóa đơn
-                // Lặp qua tất cả chi tiết hóa đơn và cập nhật lại số lượng sản phẩm
+            if (order.getCreated_at().isBefore(twoHours)) {
+                lichSuHoaDonRepository.deleteByHoaDon_Id(order.getId());
                 for (HoaDonCT detail : order.getChiTietList()) {
                     SanPhamChiTiet spct = detail.getSanPhamChiTiet();
-                    spct.setSoLuong(spct.getSoLuong() + detail.getSoLuong());  // Cập nhật số lượng sản phẩm
+                    spct.setSoLuong(spct.getSoLuong() + detail.getSoLuong());
                     sanPhamChiTietRepository.save(spct);
                 }
 
@@ -298,11 +333,18 @@ public class HoaDonService implements IHoaDonService {
     public void changeTypeBill(Long idHoaDon) {
         HoaDon hoaDon = hoaDonRepository.findById(idHoaDon)
                 .orElseThrow(() -> new AppException(ErrorCode.HOA_DON_NOT_FOUND));
-        if(hoaDon.getLoaiHoaDon().equalsIgnoreCase(TypeBill.OFFLINE.toString())) {
-            hoaDon.setLoaiHoaDon(TypeBill.ONLINE.toString());
-        }else {
-            hoaDon.setLoaiHoaDon(TypeBill.OFFLINE.toString());
-        }
+
+        hoaDon.setLoaiHoaDon(toggleBillType(hoaDon.getLoaiHoaDon()));
+
         hoaDonRepository.save(hoaDon);
     }
+
+    private String toggleBillType(String currentType) {
+        return TypeBill.OFFLINE.toString().equals(currentType)
+                ? TypeBill.ONLINE.toString()
+                : TypeBill.OFFLINE.toString();
+    }
+
+
+
 }

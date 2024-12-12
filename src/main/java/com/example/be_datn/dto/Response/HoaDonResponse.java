@@ -38,25 +38,48 @@ public class HoaDonResponse {
     public static HoaDonResponse from(HoaDon hoaDon) {
         if (hoaDon == null) {
             return null;
+
+//       return HoaDonResponse.builder()
+//               .maHoaDon(hoaDon.getMaHoaDon())
+//               .tenNguoiNhan(hoaDon.getTenNguoiNhan())
+//               .diaChiNhan(hoaDon.getDiaChiNhan())
+//               .sdt(hoaDon.getSdt())
+//               .tongTien(hoaDon.getTongTien())
+//               .tienSauGiam(hoaDon.getTienSauGiam())
+//               .tienShip(hoaDon.getTienShip())
+//               .ghiChu(hoaDon.getGhiChu())
+//               .loaiHoaDon(hoaDon.getLoaiHoaDon())
+//               .email(hoaDon.getEmail())
+//               .tenNhanVien(hoaDon.getNhanVien().getTen())
+//               .tenKhachHang(hoaDon.getKhachHang().getTen())
+//               .hinhThucThanhToan(hoaDon.getHinhThucThanhToan())
+//               .maVoucher(hoaDon.getVoucher().getMaVoucher())
+//               .soTienGiam(hoaDon.getSoTienGiam())
+//               .trangThai(hoaDon.getTrangThai())
+//               .build();
+//    }
         }
-       return HoaDonResponse.builder()
-               .maHoaDon(hoaDon.getMaHoaDon())
-               .tenNguoiNhan(hoaDon.getTenNguoiNhan())
-               .diaChiNhan(hoaDon.getDiaChiNhan())
-               .sdt(hoaDon.getSdt())
-               .tongTien(hoaDon.getTongTien())
-               .tienSauGiam(hoaDon.getTienSauGiam())
-               .tienShip(hoaDon.getTienShip())
-               .ghiChu(hoaDon.getGhiChu())
-               .loaiHoaDon(hoaDon.getLoaiHoaDon())
-               .email(hoaDon.getEmail())
-               .tenNhanVien(hoaDon.getNhanVien().getTen())
-               .tenKhachHang(hoaDon.getKhachHang().getTen())
-               .hinhThucThanhToan(hoaDon.getHinhThucThanhToan())
-               .maVoucher(hoaDon.getVoucher().getMaVoucher())
-               .soTienGiam(hoaDon.getSoTienGiam())
-               .trangThai(hoaDon.getTrangThai())
-               .build();
-    }
+            return HoaDonResponse.builder()
+                    .maHoaDon(hoaDon.getMaHoaDon())
+                    .tenNguoiNhan(hoaDon.getTenNguoiNhan())
+                    .diaChiNhan(hoaDon.getDiaChiNhan())
+                    .sdt(hoaDon.getSdt())
+                    .tongTien(hoaDon.getTongTien())
+                    .tienSauGiam(hoaDon.getTienSauGiam())
+                    .tienShip(hoaDon.getTienShip())
+                    .ghiChu(hoaDon.getGhiChu())
+                    .loaiHoaDon(hoaDon.getLoaiHoaDon())
+                    .email(hoaDon.getEmail())
+                    .tenNhanVien(hoaDon.getNhanVien() != null ? hoaDon.getNhanVien().getTen() : null)
+                    .tenKhachHang(hoaDon.getKhachHang() != null ? hoaDon.getKhachHang().getTen() : null)
+                    .hinhThucThanhToan(hoaDon.getHinhThucThanhToan())
+                    .maVoucher(hoaDon.getVoucher() != null ? hoaDon.getVoucher().getMaVoucher() : null)
+                    .soTienGiam(hoaDon.getSoTienGiam())
+                    .trangThai(hoaDon.getTrangThai())
+                    .createdAt(hoaDon.getCreated_at() != null ? hoaDon.getCreated_at() : LocalDateTime.now()) // Default value if null
+                    .updatedAt(hoaDon.getUpdated_at())
+                    .build();
+        }
+
 
 }

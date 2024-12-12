@@ -5,9 +5,11 @@ import com.example.be_datn.dto.Response.VoucherResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.time.LocalDateTime;
+
 public interface IVoucherService {
 
-    Page<VoucherResponse> getAllVoucherPageable(String tenChienDich, Pageable pageable);
+    Page<VoucherResponse> getAllVoucherPageable(String tenChienDich, LocalDateTime ngayBatDau, LocalDateTime ngayKetThuc, Integer trangThai, Pageable pageable);
 
     VoucherResponse createVoucher(VoucherRequest voucherRequest);
 

@@ -1,11 +1,13 @@
 package com.example.be_datn.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @Setter
@@ -50,5 +52,10 @@ public class KhachHang {
 
     @Column(name = "trang_thai")
     private Integer trangThai;
+
+    @OneToMany(mappedBy = "khachHang")
+    @JsonIgnore
+    private List<DiaChi> diaChiList;
+
 
 }
