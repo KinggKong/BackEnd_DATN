@@ -84,9 +84,9 @@ public class HoaDonController {
     }
 
     @PatchMapping("/complete/{id}")
-    public ApiResponse<?> completeOrder(@PathVariable Long id){
+    public ApiResponse<?> completeOrder(@PathVariable Long id, @RequestParam String method){
         ApiResponse<String> apiResponse = new ApiResponse<>();
-        apiResponse.setData(hoaDonService.completeHoaDon(id));
+        apiResponse.setData(hoaDonService.completeHoaDon(id, method));
         apiResponse.setCode(200);
         apiResponse.setMessage("Thanh toán thành công !");
         return apiResponse;
@@ -116,6 +116,13 @@ public class HoaDonController {
         hoaDonRepository.save(hoaDon);
 
         return ResponseEntity.ok("Customer added to invoice successfully.");
+    }
+
+    @PutMapping("/changeTypeBill/{id}")
+    public ApiResponse<?> changeTypeBill(@PathVariable Long id){
+        ApiResponse<String> apiResponse = new ApiResponse<>();
+        hoaDonService.changeTypeBill(id);
+        return apiResponse;
     }
 
 

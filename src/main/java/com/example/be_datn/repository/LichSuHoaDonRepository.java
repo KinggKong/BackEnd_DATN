@@ -15,4 +15,5 @@ public interface LichSuHoaDonRepository extends JpaRepository<LichSuHoaDon, Long
 select lshd from LichSuHoaDon lshd where lshd.hoaDon.id=?1
 """)
     LichSuHoaDon findLichSuHoaDonByHoaDonId(Long id);
+    void deleteByHoaDon_Id(Long id);
 }
