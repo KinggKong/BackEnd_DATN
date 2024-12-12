@@ -94,14 +94,10 @@ public class VoucherService implements IVoucherService {
                 .orElseThrow(() -> new AppException(ErrorCode.VOUCHER_NOT_FOUND));
 
         if (voucher.getTrangThai() != 1) {
-            // Lấy danh sách hóa đơn đang sử dụng voucher này
             List<HoaDon> affectedInvoices = hoaDonRepository.findByVoucher(voucher);
 
             for (HoaDon hoaDon : affectedInvoices) {
-                // Lấy danh sách voucher khả dụng
                 List<Voucher> availableVouchers = voucherRepository.findAvailableVouchers(hoaDon.getTongTien());
-
-                // Tìm voucher mới phù hợp nhất
                 Voucher bestVoucher = availableVouchers.stream()
                         .sorted(Comparator.comparingDouble((Voucher v) -> calculateDiscount(hoaDon.getTongTien(), v))
                                 .reversed())
@@ -118,8 +114,6 @@ public class VoucherService implements IVoucherService {
                     hoaDon.setSoTienGiam(0.0);
                     hoaDon.setTienSauGiam(hoaDon.getTongTien());
                 }
-
-                // Lưu hóa đơn
                 hoaDonRepository.save(hoaDon);
             }
         }

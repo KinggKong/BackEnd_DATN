@@ -6,7 +6,6 @@ import com.example.be_datn.dto.Response.HoaDonCTResponse;
 import com.example.be_datn.entity.HoaDon;
 import com.example.be_datn.entity.HoaDonCT;
 import com.example.be_datn.entity.SanPhamChiTiet;
-import com.example.be_datn.entity.StatusPayment;
 import com.example.be_datn.entity.Voucher;
 import com.example.be_datn.exception.AppException;
 import com.example.be_datn.exception.ErrorCode;
@@ -23,10 +22,12 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.text.NumberFormat;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 
 @Service
@@ -37,8 +38,6 @@ public class HoaDonChiTietService implements IHoaDonChiTietService {
     private final SanPhamChiTietRepository sanPhamChiTietRepository;
     private final SanPhamChiTietService sanPhamChiTietService;
     private final VoucherRepository voucherRepository;
-
-
 
 
     @Override
@@ -118,7 +117,7 @@ public class HoaDonChiTietService implements IHoaDonChiTietService {
 
         switch (request.getMethod().toUpperCase()) {
             case "PLUS":
-                if (requestedQuantity + currentQuantity > sanPhamChiTiet.getSoLuong()) {
+                if (requestedQuantity > sanPhamChiTiet.getSoLuong()) {
                     throw new IllegalArgumentException("Số lượng vượt quá tồn kho");
                 }
                 updatedQuantity = currentQuantity + requestedQuantity;
@@ -161,14 +160,31 @@ public class HoaDonChiTietService implements IHoaDonChiTietService {
 
     @Override
     public List<HoaDonCTResponse> getAllHdctByIdHoaDon(Long hoaDonId) {
-        List<HoaDonCT> list =  hoaDonChiTietRepository.getAllByHoaDon_Id(hoaDonId);
+        List<HoaDonCT> list = hoaDonChiTietRepository.getAllByHoaDon_Id(hoaDonId);
         List<HoaDonCTResponse> responseList = new ArrayList<>();
-        for(HoaDonCT hoaDonCT : list){
+        for (HoaDonCT hoaDonCT : list) {
             HoaDonCTResponse response = new HoaDonCTResponse();
             response.setId(hoaDonCT.getId());
             response.setIdGioHang(hoaDonCT.getHoaDon().getId());
             response.setIdSanPhamChiTiet(hoaDonCT.getSanPhamChiTiet().getId());
-            response.setTenSanPhamChiTiet(hoaDonCT.getSanPhamChiTiet().getSanPham().getTenSanPham());
+            response.setTenSanPhamChiTiet(
+                    hoaDonCT.getSanPhamChiTiet().getSanPham().getTenSanPham()
+                            + "[" + "  "
+                            + hoaDonCT.getSanPhamChiTiet().getSanPham().getThuongHieu().getTenThuongHieu()
+                            + "]\n" // Đây là chỗ xuống dòng
+                            + "Kích cỡ: "
+                            + hoaDonCT.getSanPhamChiTiet().getKichThuoc().getTenKichThuoc()
+                            + "\n" // Thêm xuống dòng ở đây nữa nếu cần
+                            + "Màu sắc: "
+                            + hoaDonCT.getSanPhamChiTiet().getMauSac().getTenMau()
+                            + "\n" // Và ở đây nữa
+                            + NumberFormat.getInstance(new Locale("vi", "VN")).format(
+                            Long.parseLong(String.valueOf(hoaDonCT.getSanPhamChiTiet().getGiaBanSauKhiGiam()).substring(0,
+                                    String.valueOf(hoaDonCT.getSanPhamChiTiet().getGiaBanSauKhiGiam()).length() - 2))
+                    ) + " VND"
+            );
+
+
             response.setSoLuong(hoaDonCT.getSoLuong());
             response.setGiaBan(hoaDonCT.getGiaTien());
             response.setTongTien(hoaDonCT.getSoLuong() * hoaDonCT.getGiaTien());
@@ -187,26 +203,14 @@ public class HoaDonChiTietService implements IHoaDonChiTietService {
         HoaDon hoaDon = hoaDonRepository.findById(id)
                 .orElseThrow(() -> new AppException(ErrorCode.HOA_DON_NOT_FOUND));
 
-        // Lấy danh sách chi tiết hóa đơn
         List<HoaDonCTResponse> list = getAllHdctByIdHoaDon(id);
 
-        // Tính tổng tiền từ các chi tiết hóa đơn
         if (list != null && !list.isEmpty()) {
             for (HoaDonCTResponse response : list) {
                 double tongTienChiTiet = response.getGiaBan() * response.getSoLuong();
                 tongTien += tongTienChiTiet;
             }
         }
-
-        // Cập nhật trạng thái của hóa đơn
-//        if (list.size() > 0) {
-//            hoaDon.setTrangThai(String.valueOf(StatusPayment.WAITING));
-//        } else {
-//            hoaDon.setTrangThai(String.valueOf(StatusPayment.PENDING));
-//            hoaDon.setVoucher(null);
-//            hoaDon.setSoTienGiam(0.0);
-//            hoaDon.setTienSauGiam(0.0);
-//        }
 
         hoaDon.setTongTien(tongTien);
         hoaDonRepository.save(hoaDon);
@@ -217,28 +221,24 @@ public class HoaDonChiTietService implements IHoaDonChiTietService {
     }
 
     public String selectTheBestVoucherAndApply(Long idHoaDon, List<Voucher> voucherList) {
-        // Lấy hóa đơn từ cơ sở dữ liệu
         HoaDon hoaDon = hoaDonRepository.findById(idHoaDon)
                 .orElseThrow(() -> new AppException(ErrorCode.HOA_DON_NOT_FOUND));
 
-        // Lấy thời gian hiện tại
         LocalDateTime now = LocalDateTime.now();
 
-        // Tìm voucher tốt nhất
         Voucher bestVoucher = voucherList.stream()
                 .filter(voucher ->
-                        voucher.getTrangThai() == 1 && // Trạng thái kích hoạt
-                                voucher.getSoLuong() >= 1 &&  // Số lượng còn khả dụng
-                                voucher.getNgayBatDau().isBefore(now) && // Ngày bắt đầu trước hiện tại
-                                voucher.getNgayKetThuc().isAfter(now) && // Ngày kết thúc sau hiện tại
-                                hoaDon.getTongTien() >= voucher.getGiaTriDonHangToiThieu() // Tổng tiền thỏa mãn điều kiện
+                        voucher.getTrangThai() == 1 &&
+                                voucher.getSoLuong() >= 1 &&
+                                voucher.getNgayBatDau().isBefore(now) &&
+                                voucher.getNgayKetThuc().isAfter(now) &&
+                                hoaDon.getTongTien() >= voucher.getGiaTriDonHangToiThieu()
                 )
                 .sorted(Comparator.comparingDouble((Voucher voucher) -> calculateDiscount(hoaDon.getTongTien(), voucher))
                         .reversed())
                 .findFirst()
                 .orElse(null);
 
-        // Áp dụng voucher vào hóa đơn
         if (bestVoucher != null) {
             double discount = calculateDiscount(hoaDon.getTongTien(), bestVoucher);
             hoaDon.setVoucher(bestVoucher);
@@ -249,8 +249,6 @@ public class HoaDonChiTietService implements IHoaDonChiTietService {
             hoaDon.setSoTienGiam(0.0);
             hoaDon.setTienSauGiam(hoaDon.getTongTien());
         }
-
-        // Lưu hóa đơn
         hoaDonRepository.save(hoaDon);
 
         return "Success";
@@ -258,19 +256,15 @@ public class HoaDonChiTietService implements IHoaDonChiTietService {
 
 
     private double calculateDiscount(double totalAmount, Voucher voucher) {
-        double discount;
-
+        double discount =0.0;
         if (voucher.getHinhThucGiam().equalsIgnoreCase("%")) {
             discount = totalAmount * (voucher.getGiaTriGiam() / 100);
         } else {
             discount = voucher.getGiaTriGiam();
         }
-
-        // Check if the discount exceeds the maximum allowable discount (giaTriGiamToiDa)
         if (voucher.getGiaTriGiamToiDa() != null && discount > voucher.getGiaTriGiamToiDa()) {
-            return voucher.getGiaTriGiamToiDa(); // Apply the max discount if exceeded
+            return voucher.getGiaTriGiamToiDa();
         }
-
         return discount;
     }
 

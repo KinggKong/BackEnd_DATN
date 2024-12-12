@@ -1,6 +1,5 @@
 package com.example.be_datn.repository;
 
-import com.example.be_datn.entity.HoaDon;
 import com.example.be_datn.entity.Voucher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -25,7 +24,6 @@ public interface VoucherRepository extends JpaRepository<Voucher, Long> {
 
     @Query("SELECT v FROM Voucher v WHERE v.trangThai = 1 AND :tongTien >= v.giaTriDonHangToiThieu")
     List<Voucher> findAvailableVouchers(@Param("tongTien") double tongTien);
-
 
 
 }

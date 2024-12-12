@@ -59,7 +59,7 @@ public class HoaDonService implements IHoaDonService {
     private final LichSuThanhToanRepository lichSuThanhToanRepository;
 
     private final VoucherRepository voucherRepository;
-    private final SanPhamChiTietService sanPhamChiTietService;
+
     private final SanPhamChiTietRepository sanPhamChiTietRepository;
 
     private final HoaDonChiTietMapper  hoaDonChiTietMapper;
@@ -282,17 +282,14 @@ public class HoaDonService implements IHoaDonService {
     @Transactional
     @Scheduled(fixedRate = 600000)
     public void cancelExpiredOrders() {
-        LocalDateTime oneMinuteAgo = LocalDateTime.now().minusHours(2); // Sử dụng 1 phút thay vì 2 giờ
-
+        LocalDateTime twoHours = LocalDateTime.now().minusHours(2);
         List<HoaDon> ordersToCancel = hoaDonRepository.selectOrderWhereStatusIsPending();
         for (HoaDon order : ordersToCancel) {
-            if (order.getCreated_at().isBefore(oneMinuteAgo)) {  // Kiểm tra xem hóa đơn có quá 1 phút hay không
-                // Xóa lịch sử hóa đơn trước khi xóa hóa đơn
-                lichSuHoaDonRepository.deleteByHoaDon_Id(order.getId()); // Xóa tất cả bản ghi trong lịch sử hóa đơn
-                // Lặp qua tất cả chi tiết hóa đơn và cập nhật lại số lượng sản phẩm
+            if (order.getCreated_at().isBefore(twoHours)) {
+                lichSuHoaDonRepository.deleteByHoaDon_Id(order.getId());
                 for (HoaDonCT detail : order.getChiTietList()) {
                     SanPhamChiTiet spct = detail.getSanPhamChiTiet();
-                    spct.setSoLuong(spct.getSoLuong() + detail.getSoLuong());  // Cập nhật số lượng sản phẩm
+                    spct.setSoLuong(spct.getSoLuong() + detail.getSoLuong());
                     sanPhamChiTietRepository.save(spct);
                 }
 
@@ -313,13 +310,18 @@ public class HoaDonService implements IHoaDonService {
     public void changeTypeBill(Long idHoaDon) {
         HoaDon hoaDon = hoaDonRepository.findById(idHoaDon)
                 .orElseThrow(() -> new AppException(ErrorCode.HOA_DON_NOT_FOUND));
-        if(hoaDon.getLoaiHoaDon().equalsIgnoreCase(TypeBill.OFFLINE.toString())) {
-            hoaDon.setLoaiHoaDon(TypeBill.ONLINE.toString());
-        }else {
-            hoaDon.setLoaiHoaDon(TypeBill.OFFLINE.toString());
-        }
+
+        hoaDon.setLoaiHoaDon(toggleBillType(hoaDon.getLoaiHoaDon()));
+
         hoaDonRepository.save(hoaDon);
     }
+
+    private String toggleBillType(String currentType) {
+        return TypeBill.OFFLINE.toString().equals(currentType)
+                ? TypeBill.ONLINE.toString()
+                : TypeBill.OFFLINE.toString();
+    }
+
 
 
 }
