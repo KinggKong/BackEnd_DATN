@@ -35,6 +35,28 @@ public class HistoryBillResponse {
     LocalDateTime updatedAt;
     List<HoaDonChiTietResponse> hoaDonChiTietResponse;
 
+    public HistoryBillResponse(Long id, String maHoaDon, String tenNguoiNhan, String diaChiNhan, String sdt, Double tongTien, Double tienSauGiam, Double tienShip, String ghiChu, String loaiHoaDon, String email, String tenNhanVien, String tenKhachHang, String hinhThucThanhToan, String trangThai, String maVoucher, Double soTienGiam, LocalDateTime createdAt, LocalDateTime updatedAt) {
+        this.id = id;
+        this.maHoaDon = maHoaDon;
+        this.tenNguoiNhan = tenNguoiNhan;
+        this.diaChiNhan = diaChiNhan;
+        this.sdt = sdt;
+        this.tongTien = tongTien;
+        this.tienSauGiam = tienSauGiam;
+        this.tienShip = tienShip;
+        this.ghiChu = ghiChu;
+        this.loaiHoaDon = loaiHoaDon;
+        this.email = email;
+        this.tenNhanVien = tenNhanVien;
+        this.tenKhachHang = tenKhachHang;
+        this.hinhThucThanhToan = hinhThucThanhToan;
+        this.trangThai = trangThai;
+        this.maVoucher = maVoucher;
+        this.soTienGiam = soTienGiam;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
+    }
+
     public static HistoryBillResponse from(HoaDon hoaDon) {
         if (hoaDon == null) {
             return null;

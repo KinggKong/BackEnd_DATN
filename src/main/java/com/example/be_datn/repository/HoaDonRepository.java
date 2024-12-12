@@ -1,5 +1,6 @@
 package com.example.be_datn.repository;
 
+import com.example.be_datn.dto.Response.HistoryBillResponse;
 import com.example.be_datn.dto.Response.HoaDonResponse;
 import com.example.be_datn.entity.HoaDon;
 import org.springframework.data.domain.Page;
@@ -10,7 +11,6 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.example.be_datn.dto.Response.HoaDonResponse;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
@@ -47,37 +47,52 @@ public interface HoaDonRepository extends JpaRepository<HoaDon, Long> {
     List<HoaDon> findByTrangThai(@Param("trangThai") String trangThai);
 
     @Query("""
+               select new com.example.be_datn.dto.Response.HistoryBillResponse(
+                hd.id,
+                hd.maHoaDon, hd.tenNguoiNhan, hd.diaChiNhan, hd.sdt, hd.tongTien,
+                hd.tienSauGiam, hd.tienShip, hd.ghiChu, hd.loaiHoaDon, hd.email,
+                nv.ten, kh.ten, hd.hinhThucThanhToan, hd.trangThai, v.maVoucher, hd.soTienGiam,
+               hd.created_at, hd.updated_at
+               ) from HoaDon hd 
+               left join hd.nhanVien nv 
+               left join hd.khachHang kh 
+               left join hd.voucher v  
+               where hd.khachHang.id =:idKhachHang
+            """)
+    List<HistoryBillResponse> getAllHistoryBillByIdKhachHang(@Param("idKhachHang") Long idKhachHang);
+
+
+
+    @Query("""
                select hd from HoaDon hd where hd.trangThai = 'PENDING'
             """)
     List<HoaDon> selectOrderWhereStatusIsPending();
 
 
-
-
-
     @Query(value = """
-    SELECT COUNT(*) 
-    FROM hoa_don hdb 
-    WHERE hdb.trang_thai = :trangThai 
-      AND hdb.created_at >= :ngayBatDau 
-      AND hdb.created_at <= :ngayKetThuc 
-      AND ( :loaiHoaDon ='' OR hdb.loai_hoa_don = :loaiHoaDon or  :loaiHoaDon IS NULL)
-    """, nativeQuery = true)
+            SELECT COUNT(*) 
+            FROM hoa_don hdb 
+            WHERE hdb.trang_thai = :trangThai 
+              AND hdb.created_at >= :ngayBatDau 
+              AND hdb.created_at <= :ngayKetThuc 
+              AND ( :loaiHoaDon ='' OR hdb.loai_hoa_don = :loaiHoaDon or  :loaiHoaDon IS NULL)
+            """, nativeQuery = true)
     int countByTrangThai(@Param("trangThai") String trangThai,
-                               @Param("ngayBatDau") LocalDateTime ngayBatDau,
-                               @Param("ngayKetThuc") LocalDateTime ngayKetThuc,
-                               @Param("loaiHoaDon") String loaiHoaDon);
+                         @Param("ngayBatDau") LocalDateTime ngayBatDau,
+                         @Param("ngayKetThuc") LocalDateTime ngayKetThuc,
+                         @Param("loaiHoaDon") String loaiHoaDon);
 
     @Query("select sum(hdb.tongTien) from HoaDon hdb where hdb.trangThai='DONE' and hdb.created_at >= ?1 and hdb.created_at <= ?2")
     Float tongDoanhThu(LocalDateTime ngayBatDau, LocalDateTime ngayKetThuc);
+
     @Query(value = """
-    SELECT SUM(hdb.tien_sau_giam - hdb.tien_ship) 
-    FROM hoa_don hdb 
-    WHERE hdb.trang_thai = 'DONE' 
-      AND hdb.created_at >= :ngayBatDau 
-      AND hdb.created_at <= :ngayKetThuc 
-      AND ( :loaiHoaDon ='' OR hdb.loai_hoa_don = :loaiHoaDon or  :loaiHoaDon IS NULL)
-    """, nativeQuery = true)
+            SELECT SUM(hdb.tien_sau_giam - hdb.tien_ship) 
+            FROM hoa_don hdb 
+            WHERE hdb.trang_thai = 'DONE' 
+              AND hdb.created_at >= :ngayBatDau 
+              AND hdb.created_at <= :ngayKetThuc 
+              AND ( :loaiHoaDon ='' OR hdb.loai_hoa_don = :loaiHoaDon or  :loaiHoaDon IS NULL)
+            """, nativeQuery = true)
     Float tongDoanhThuNative(@Param("ngayBatDau") LocalDateTime ngayBatDau,
                              @Param("ngayKetThuc") LocalDateTime ngayKetThuc,
                              @Param("loaiHoaDon") String loaiHoaDon);
@@ -85,15 +100,17 @@ public interface HoaDonRepository extends JpaRepository<HoaDon, Long> {
     @Query("select sum(hdct.soLuong) from HoaDonCT hdct join HoaDon hd on hdct.hoaDon.id = hd.id where hd.trangThai ='DONE' and  hd.created_at >= ?1 and hd.created_at <= ?2")
     Integer tongSanPhamBan(LocalDateTime ngayBatDau, LocalDateTime ngayKetThuc);
 
+
+
     @Query(value = """
-    SELECT SUM(hdct.so_luong) 
-    FROM hoa_don_ct hdct 
-    JOIN hoa_don hd ON hdct.id_hoa_don = hd.id 
-    WHERE hd.trang_thai = 'DONE' 
-      AND hd.created_at >= :ngayBatDau 
-      AND hd.created_at <= :ngayKetThuc
-     AND (:loaiHoaDon ='' OR hd.loai_hoa_don = :loaiHoaDon or  :loaiHoaDon IS NULL)
-    """, nativeQuery = true)
+            SELECT SUM(hdct.so_luong) 
+            FROM hoa_don_ct hdct 
+            JOIN hoa_don hd ON hdct.id_hoa_don = hd.id 
+            WHERE hd.trang_thai = 'DONE' 
+              AND hd.created_at >= :ngayBatDau 
+              AND hd.created_at <= :ngayKetThuc
+             AND (:loaiHoaDon ='' OR hd.loai_hoa_don = :loaiHoaDon or  :loaiHoaDon IS NULL)
+            """, nativeQuery = true)
     Integer tongSanPhamBanNative(@Param("ngayBatDau") LocalDateTime ngayBatDau,
                                  @Param("ngayKetThuc") LocalDateTime ngayKetThuc,
                                  @Param("loaiHoaDon") String loaiHoaDon);
