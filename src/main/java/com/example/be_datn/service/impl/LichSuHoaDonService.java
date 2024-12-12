@@ -6,16 +6,14 @@ import com.example.be_datn.entity.*;
 import com.example.be_datn.exception.AppException;
 import com.example.be_datn.exception.ErrorCode;
 import com.example.be_datn.mapper.LichSuHoaDonMapper;
-import com.example.be_datn.repository.HoaDonRepository;
-import com.example.be_datn.repository.LichSuHoaDonRepository;
-import com.example.be_datn.repository.LichSuThanhToanRepository;
-import com.example.be_datn.repository.NhanVienRepository;
+import com.example.be_datn.repository.*;
 import com.example.be_datn.service.ILichSuHoaDonService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -27,10 +25,15 @@ public class LichSuHoaDonService implements ILichSuHoaDonService {
     NhanVienRepository nhanVienRepository;
     HoaDonRepository hoaDonRepository;
     private final LichSuThanhToanRepository lichSuThanhToanRepository;
+    private final HoaDonChiTietRepository hoaDonChiTietRepository;
+    private final SanPhamChiTietRepository sanPhamChiTietRepository;
 
     @Override
     public LichSuHoaDonResponse insertLichSuHoaDon(StatusBillRequest statusBillRequest) {
         NhanVien nhanVien = new NhanVien();
+        if(statusBillRequest.getStatus().equals(StatusPayment.CANCELLED.toString())){
+            updateAfterCancel(statusBillRequest.getIdHoaDon());
+        }
 
         if (statusBillRequest.getIdNhanvien() == null) {
             NhanVien existedNhanVien = nhanVienRepository.findByTen("BOT");
@@ -78,4 +81,19 @@ public class LichSuHoaDonService implements ILichSuHoaDonService {
         List<LichSuHoaDon> lichSuHoaDons = lichSuHoaDonRepository.findByHoaDon_Id(idHoaDon);
         return lichSuHoaDonMapper.toListResponse(lichSuHoaDons);
     }
+
+    public void updateAfterCancel(Long idHoaDon) {
+        List<HoaDonCT> hoaDonCTList = hoaDonChiTietRepository.findByHoaDon_Id(idHoaDon);
+        List<SanPhamChiTiet> newSanPhamChiTiets = new ArrayList<>();
+
+        hoaDonCTList.stream().forEach(hdct -> {
+            int soLuongGioHang = hdct.getSoLuong();
+            int soLuongSanPhamChiTiet = hdct.getSanPhamChiTiet().getSoLuong();
+
+            hdct.getSanPhamChiTiet().setSoLuong(soLuongSanPhamChiTiet + soLuongGioHang);
+            newSanPhamChiTiets.add(hdct.getSanPhamChiTiet());
+        });
+        sanPhamChiTietRepository.saveAll(newSanPhamChiTiets);
+    }
+
 }

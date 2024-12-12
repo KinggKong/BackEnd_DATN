@@ -98,7 +98,7 @@ public class ShopOnlineService implements IShopOnlineService {
             throw new AppException(ErrorCode.HOA_DON_INVALID);
         }
 
-        List<GioHangChiTiet> gioHangChiTietList = gioHangChiTietRepository.findByGioHang_Id(hoaDonRequest.getIdGioHang());
+        List<GioHangChiTiet> gioHangChiTietList = gioHangChiTietRepository.findByGioHang_IdAndTrangThai(hoaDonRequest.getIdGioHang(),1);
         gioHangChiTietList.stream()
                 .map(gioHangChiTiet -> hoaDonChiTietMapper.toHoaDonCT(gioHangChiTiet, hoaDon.getId()))
                 .forEach(hoaDonChiTietRepository::saveAndFlush);
@@ -128,7 +128,7 @@ public class ShopOnlineService implements IShopOnlineService {
             throw new AppException(ErrorCode.HOA_DON_INVALID);
         }
 
-        List<GioHangChiTiet> gioHangChiTietList = gioHangChiTietRepository.findByGioHang_Id(hoaDonRequest.getIdGioHang());
+        List<GioHangChiTiet> gioHangChiTietList = gioHangChiTietRepository.findByGioHang_IdAndTrangThai(hoaDonRequest.getIdGioHang(),1);
         gioHangChiTietList.stream()
                 .map(gioHangChiTiet -> hoaDonChiTietMapper.toHoaDonCT(gioHangChiTiet, hoaDon.getId()))
                 .forEach(hoaDonChiTietRepository::saveAndFlush);
@@ -219,7 +219,7 @@ public class ShopOnlineService implements IShopOnlineService {
     }
 
     void checkSoLuongHopLe(Long idGioHang) {
-        List<GioHangChiTiet> gioHangChiTietList = gioHangChiTietRepository.findByGioHang_Id(idGioHang);
+        List<GioHangChiTiet> gioHangChiTietList = gioHangChiTietRepository.findByGioHang_IdAndTrangThai(idGioHang,1);
         gioHangChiTietList.forEach(gioHangChiTiet -> {
             if (gioHangChiTiet.getSoLuong() > gioHangChiTiet.getSanPhamChiTiet().getSoLuong()) {
                 throw new AppException(ErrorCode.SOLUONG_SANPHAM_KHONG_DU);
@@ -232,7 +232,7 @@ public class ShopOnlineService implements IShopOnlineService {
             throw new AppException(ErrorCode.ID_GIO_HANG_CANT_BE_NULL);
         }
 
-        List<GioHangChiTiet> gioHangChiTietList = gioHangChiTietRepository.findByGioHang_Id(idGioHang);
+        List<GioHangChiTiet> gioHangChiTietList = gioHangChiTietRepository.findByGioHang_IdAndTrangThai(idGioHang,1);
         if (gioHangChiTietList.isEmpty()) {
             throw new AppException(ErrorCode.CART_DONT_HAVE_PRODUCT);
         }

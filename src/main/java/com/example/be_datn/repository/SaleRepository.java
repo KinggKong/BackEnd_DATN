@@ -20,10 +20,10 @@ public interface SaleRepository extends JpaRepository<Sale,Long> {
 
     @Query(value = "SELECT * \n" +
             "FROM sale s\n" +
-            "WHERE (:tenChienDich IS NULL OR :tenChienDich = '' OR s.ten_Chien_Dich LIKE CONCAT('%', :tenChienDich, '%'))\n" +
-            "  AND (:ngayBatDau IS NULL OR s.thoi_Gian_Bat_Dau >= :ngayBatDau)\n" +
-            "  AND (:ngayKetThuc IS NULL OR s.thoi_Gian_Ket_Thuc <= :ngayKetThuc)\n" +
-            "  AND (:trangThai IS NULL OR :trangThai = '' OR s.trang_Thai = :trangThai)" +
+            "WHERE (:tenChienDich IS NULL OR :tenChienDich = '' OR s.ten_chien_dich LIKE CONCAT('%', :tenChienDich, '%'))\n" +
+            "  AND (:ngayBatDau IS NULL OR s.thoi_gian_bat_dau >= :ngayBatDau)\n" +
+            "  AND (:ngayKetThuc IS NULL OR s.thoi_gian_ket_thuc <= :ngayKetThuc)\n" +
+            "  AND (:trangThai IS NULL OR s.trang_thai = :trangThai)" +
             "ORDER BY s.updated_at DESC",
             nativeQuery = true)
     Page<Sale> findAllByFilter(String tenChienDich, LocalDateTime ngayBatDau, LocalDateTime ngayKetThuc, Integer trangThai, Pageable pageable);

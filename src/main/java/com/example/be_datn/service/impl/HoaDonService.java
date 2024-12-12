@@ -111,6 +111,29 @@ public class HoaDonService implements IHoaDonService {
         );
     }
 
+    //    @Override
+//    public Long createHoaDon() {
+//        HoaDon hoaDon = new HoaDon();
+//        KhachHang khachHangLe = khachHangRepository.findByTen("Khách lẻ");
+//        hoaDon.setKhachHang(khachHangLe);
+//        hoaDon.setTongTien(0.0);
+//        hoaDon.setHinhThucThanhToan(null);
+//        hoaDon.setLoaiHoaDon(String.valueOf(TypeBill.OFFLINE));
+//        hoaDon.setTrangThai(String.valueOf(StatusPayment.PENDING));
+//        hoaDon.setMaHoaDon(generateInvoiceCode());
+//        hoaDon.setTenNguoiNhan(khachHangLe.getTen());
+//        hoaDonRepository.save(hoaDon);
+//        HoaDon hd = hoaDonRepository.save(hoaDon);
+//        LichSuHoaDon lichSuHoaDon = LichSuHoaDon.builder()
+//                .nhanVien(null)
+//                .hoaDon(hd)
+//                .ghiChu("PENDING")
+//                .createdBy(null)
+//                .trangThai(StatusPayment.PENDING.toString())
+//                .build();
+//        lichSuHoaDonRepository.save(lichSuHoaDon);
+//        return 1L;
+//    }
     @Override
     public Long createHoaDon() {
         HoaDon hoaDon = new HoaDon();

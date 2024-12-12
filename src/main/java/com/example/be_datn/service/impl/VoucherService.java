@@ -15,8 +15,12 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+
 import java.util.Comparator;
 import java.util.List;
+
+import java.time.LocalDateTime;
+
 
 @Service
 @RequiredArgsConstructor
@@ -26,8 +30,10 @@ public class VoucherService implements IVoucherService {
     HoaDonRepository hoaDonRepository;
 
     @Override
-    public Page<VoucherResponse> getAllVoucherPageable(String tenChienDich, Pageable pageable) {
-        return voucherRepository.findVoucherByTenVoucherLike("%" + tenChienDich + "%", pageable)
+    public Page<VoucherResponse> getAllVoucherPageable(String tenChienDich, LocalDateTime ngayBatDau, LocalDateTime ngayKetThuc, Integer trangThai, Pageable pageable) {
+//        return voucherRepository.findVoucherByTenVoucherLike("%" + tenChienDich + "%", pageable)
+//                .map(VoucherResponse::fromVoucher);
+        return  voucherRepository.findAllByFilter(tenChienDich,ngayBatDau,ngayKetThuc,trangThai, pageable)
                 .map(VoucherResponse::fromVoucher);
     }
 

@@ -212,10 +212,28 @@ public class HoaDonChiTietService implements IHoaDonChiTietService {
             }
         }
 
+
+
+        // Cập nhật trạng thái của hóa đơn
+
+//        if (list.size() > 0) {
+//            hoaDon.setTrangThai(String.valueOf(StatusPayment.WAITING));
+//        } else {
+//            hoaDon.setTrangThai(String.valueOf(StatusPayment.PENDING));
+
+//        }
+        hoaDonRepository.updateHoaDon(tongTien, id);
+
+//            hoaDon.setVoucher(null);
+//            hoaDon.setSoTienGiam(0.0);
+//            hoaDon.setTienSauGiam(0.0);
+//        }
+
         hoaDon.setTongTien(tongTien);
         hoaDonRepository.save(hoaDon);
         List<Voucher> voucherList = voucherRepository.findAll();
         selectTheBestVoucherAndApply(hoaDon.getId(), voucherList);
+
 
         return "success";
     }
