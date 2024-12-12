@@ -2,9 +2,11 @@ package com.example.be_datn.service.impl;
 
 import com.example.be_datn.dto.Request.VoucherRequest;
 import com.example.be_datn.dto.Response.VoucherResponse;
+import com.example.be_datn.entity.HoaDon;
 import com.example.be_datn.entity.Voucher;
 import com.example.be_datn.exception.AppException;
 import com.example.be_datn.exception.ErrorCode;
+import com.example.be_datn.repository.HoaDonRepository;
 import com.example.be_datn.repository.VoucherRepository;
 import com.example.be_datn.service.IVoucherService;
 import lombok.RequiredArgsConstructor;
@@ -13,11 +15,15 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.Comparator;
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 @FieldDefaults(level = lombok.AccessLevel.PRIVATE, makeFinal = true)
 public class VoucherService implements IVoucherService {
     VoucherRepository voucherRepository;
+    HoaDonRepository hoaDonRepository;
 
     @Override
     public Page<VoucherResponse> getAllVoucherPageable(String tenChienDich, Pageable pageable) {
@@ -68,6 +74,10 @@ public class VoucherService implements IVoucherService {
         voucher.setGiaTriDonHangToiThieu(voucherRequest.getGiaTriDonHangToiThieu());
         voucher.setGiaTriGiamToiDa(voucherRequest.getGiaTriGiamToiDa());
         voucher.setSoLuong(voucherRequest.getSoLuong());
+        if(voucher.getTrangThai() !=1) {
+            updateVoucherForInvoices(voucher.getId());
+        }
+
 
         return VoucherResponse.fromVoucher(voucherRepository.save(voucher));
     }
@@ -78,4 +88,52 @@ public class VoucherService implements IVoucherService {
         voucherRepository.deleteById(id);
         return "deleted successfully";
     }
+
+    public void updateVoucherForInvoices(Long idVoucher) {
+        Voucher voucher = voucherRepository.findById(idVoucher)
+                .orElseThrow(() -> new AppException(ErrorCode.VOUCHER_NOT_FOUND));
+
+        if (voucher.getTrangThai() != 1) {
+            List<HoaDon> affectedInvoices = hoaDonRepository.findByVoucher(voucher);
+
+            for (HoaDon hoaDon : affectedInvoices) {
+                List<Voucher> availableVouchers = voucherRepository.findAvailableVouchers(hoaDon.getTongTien());
+                Voucher bestVoucher = availableVouchers.stream()
+                        .sorted(Comparator.comparingDouble((Voucher v) -> calculateDiscount(hoaDon.getTongTien(), v))
+                                .reversed())
+                        .findFirst()
+                        .orElse(null);
+
+                if (bestVoucher != null) {
+                    double discount = calculateDiscount(hoaDon.getTongTien(), bestVoucher);
+                    hoaDon.setVoucher(bestVoucher);
+                    hoaDon.setSoTienGiam(discount);
+                    hoaDon.setTienSauGiam(hoaDon.getTongTien() - discount);
+                } else {
+                    hoaDon.setVoucher(null);
+                    hoaDon.setSoTienGiam(0.0);
+                    hoaDon.setTienSauGiam(hoaDon.getTongTien());
+                }
+                hoaDonRepository.save(hoaDon);
+            }
+        }
+    }
+
+    private double calculateDiscount(double totalAmount, Voucher voucher) {
+        double discount;
+
+        if (voucher.getHinhThucGiam().equalsIgnoreCase("%")) {
+            discount = totalAmount * (voucher.getGiaTriGiam() / 100);
+        } else {
+            discount = voucher.getGiaTriGiam();
+        }
+
+        // Check if the discount exceeds the maximum allowable discount (giaTriGiamToiDa)
+        if (voucher.getGiaTriGiamToiDa() != null && discount > voucher.getGiaTriGiamToiDa()) {
+            return voucher.getGiaTriGiamToiDa(); // Apply the max discount if exceeded
+        }
+
+        return discount;
+    }
+
 }

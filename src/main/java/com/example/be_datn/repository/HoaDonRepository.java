@@ -2,6 +2,7 @@ package com.example.be_datn.repository;
 
 import com.example.be_datn.dto.Response.HoaDonResponse;
 import com.example.be_datn.entity.HoaDon;
+import com.example.be_datn.entity.Voucher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -19,7 +20,7 @@ public interface HoaDonRepository extends JpaRepository<HoaDon, Long> {
     @Query("""
                select new com.example.be_datn.dto.Response.HoaDonResponse(
                 hd.id,
-                hd.maHoaDon, hd.tenNguoiNhan, hd.diaChiNhan, hd.sdt, hd.tongTien,
+                hd.maHoaDon, hd.tenNguoiNhan, hd.diaChiNhan, hd.sdt, hd.tienSauGiam,
                 hd.tienSauGiam, hd.tienShip, hd.ghiChu, hd.loaiHoaDon, hd.email,
                 nv.ten, kh.ten, hd.hinhThucThanhToan, hd.trangThai, v.maVoucher, hd.soTienGiam,
                hd.created_at, hd.updated_at
@@ -27,7 +28,7 @@ public interface HoaDonRepository extends JpaRepository<HoaDon, Long> {
                left join hd.nhanVien nv 
                left join hd.khachHang kh 
                left join hd.voucher v  
-               where hd.trangThai = 'WAITING' or hd.trangThai = 'PENDING'
+               where  hd.trangThai = 'PENDING' and hd.loaiHoaDon = 'OFFLINE'
             """)
     Page<HoaDonResponse> findAllHoaDon(Pageable pageable);
 
@@ -272,4 +273,7 @@ public interface HoaDonRepository extends JpaRepository<HoaDon, Long> {
             WHERE hdb.trang_thai = :trangThai 
             """, nativeQuery = true)
     int countByTrangThaiAllTime(@Param("trangThai") String trangThai);
+
+    @Query("SELECT h FROM HoaDon h WHERE h.voucher = :voucher")
+    List<HoaDon> findByVoucher(@Param("voucher") Voucher voucher);
 }

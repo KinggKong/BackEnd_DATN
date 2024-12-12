@@ -2,9 +2,14 @@ package com.example.be_datn.service.impl;
 
 import com.example.be_datn.dto.Response.HoaDonChiTietResponse;
 import com.example.be_datn.dto.Response.HoaDonResponse;
+import com.lowagie.text.Document;
+import com.lowagie.text.DocumentException;
+import com.lowagie.text.Element;
 import com.lowagie.text.Font;
+import com.lowagie.text.PageSize;
+import com.lowagie.text.Paragraph;
+import com.lowagie.text.Phrase;
 import com.lowagie.text.Rectangle;
-import com.lowagie.text.*;
 import com.lowagie.text.pdf.BaseFont;
 import com.lowagie.text.pdf.PdfPCell;
 import com.lowagie.text.pdf.PdfPTable;
@@ -74,15 +79,21 @@ public class InvoicePdfGenerator {
             document.add(invoiceTitle);
 
             // Invoice information
-            document.add(new Paragraph("Mã hóa đơn: " + hoaDon.getMaHoaDon(), NORMAL_FONT));
-            document.add(new Paragraph("Ngày tạo: " + formatDateTime(hoaDon.getCreatedAt().toString()), NORMAL_FONT));
-            document.add(new Paragraph("Khách hàng: " + hoaDon.getTenKhachHang(), NORMAL_FONT));
-            document.add(new Paragraph("Số điện thoại: " + hoaDon.getSdt(), NORMAL_FONT));
-            document.add(new Paragraph("Địa chỉ: " + hoaDon.getDiaChiNhan(), NORMAL_FONT));
-            document.add(new Paragraph("Email: " + hoaDon.getEmail(), NORMAL_FONT));
-            document.add(new Paragraph("Ghi chú: " + (hoaDon.getGhiChu() != null ? hoaDon.getGhiChu() : ""), NORMAL_FONT));
 
-            // Product details table
+            if(hoaDon.getTenNguoiNhan().equalsIgnoreCase("Khách lẻ")) {
+                document.add(new Paragraph("Mã hóa đơn: " + hoaDon.getMaHoaDon(), NORMAL_FONT));
+                document.add(new Paragraph("Ngày tạo: " + formatDateTime(hoaDon.getCreatedAt().toString()), NORMAL_FONT));
+                document.add(new Paragraph("Khách hàng: " + hoaDon.getTenKhachHang(), NORMAL_FONT));
+            } else {
+                document.add(new Paragraph("Mã hóa đơn: " + hoaDon.getMaHoaDon(), NORMAL_FONT));
+                document.add(new Paragraph("Ngày tạo: " + formatDateTime(hoaDon.getCreatedAt().toString()), NORMAL_FONT));
+                document.add(new Paragraph("Khách hàng: " + hoaDon.getTenKhachHang(), NORMAL_FONT));
+                document.add(new Paragraph("Số điện thoại: " + hoaDon.getSdt(), NORMAL_FONT));
+                document.add(new Paragraph("Địa chỉ: " + hoaDon.getDiaChiNhan(), NORMAL_FONT));
+                document.add(new Paragraph("Email: " + hoaDon.getEmail(), NORMAL_FONT));
+                document.add(new Paragraph("Ghi chú: " + (hoaDon.getGhiChu() != null ? hoaDon.getGhiChu() : ""), NORMAL_FONT));
+
+            }
             PdfPTable table = new PdfPTable(5);
             float[] columnWidths = {3f, 1f, 1f, 1f, 1.5f}; // Adjust column widths
             table.setWidths(columnWidths);
