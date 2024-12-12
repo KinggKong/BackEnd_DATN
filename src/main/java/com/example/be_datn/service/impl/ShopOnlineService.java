@@ -15,6 +15,10 @@ import jakarta.transaction.Transactional;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -181,6 +185,22 @@ public class ShopOnlineService implements IShopOnlineService {
                 .hoaDonChiTietResponses(hoaDonChiTietResponses)
                 .lichSuThanhToanResponse(lichSuThanhToanResponse)
                 .build();
+    }
+
+    @Override
+    public Page<HistoryBillResponse> getAllHistoryBill(Long idKhachHang,int pageNumber,int pageSize) {
+        pageNumber -= 1;
+        pageNumber = Math.max(0, pageNumber);
+        pageSize = Math.max(10, pageSize);
+
+        List<HistoryBillResponse> historyBillResponses = hoaDonRepository.getAllHistoryBillByIdKhachHang(idKhachHang);
+        List<HistoryBillResponse> newList = historyBillResponses.stream().peek(his -> {
+            List<HoaDonCT> hoaDonCTList = hoaDonChiTietRepository.findByHoaDon_Id(his.getId());
+            his.setHoaDonChiTietResponse(hoaDonChiTietMapper.toListResponse(hoaDonCTList));
+        }).toList();
+        Pageable pageable = PageRequest.of(pageNumber, pageSize);
+        Page<HistoryBillResponse> pages = new PageImpl<HistoryBillResponse>(newList, pageable, newList.size());
+        return pages;
     }
 
 

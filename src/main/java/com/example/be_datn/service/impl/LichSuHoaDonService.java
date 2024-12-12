@@ -30,6 +30,10 @@ public class LichSuHoaDonService implements ILichSuHoaDonService {
 
     @Override
     public LichSuHoaDonResponse insertLichSuHoaDon(StatusBillRequest statusBillRequest) {
+        if(statusBillRequest.getStatus().equals(StatusPayment.CANCELLED.toString())){
+            updateAfterCancel(statusBillRequest.getIdHoaDon());
+        }
+
         NhanVien nhanVien = new NhanVien();
         if(statusBillRequest.getStatus().equals(StatusPayment.CANCELLED.toString())){
             updateAfterCancel(statusBillRequest.getIdHoaDon());
