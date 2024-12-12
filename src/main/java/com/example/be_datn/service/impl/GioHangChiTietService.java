@@ -36,7 +36,7 @@ public class GioHangChiTietService implements IGioHangChiTietService {
 
     @Override
     public List<GioHangChiTietResponse> findByIdGioHang(Long idGioHang) {
-        return gioHangChiTietMapper.toListGioHangCtResponse(gioHangChiTietRepository.findByGioHang_Id(idGioHang));
+        return gioHangChiTietMapper.toListGioHangCtResponse(gioHangChiTietRepository.findByGioHang_IdAndTrangThai(idGioHang, 1));
     }
 
     @Override
@@ -120,6 +120,10 @@ public class GioHangChiTietService implements IGioHangChiTietService {
             gioHangChiTiet.setTrangThai(1);
             gioHangChiTietRepository.save(gioHangChiTiet);
         }
+    }
+
+    public List<GioHangChiTietResponse> findByIdGioHangAll(Long idGioHang) {
+        return gioHangChiTietMapper.toListGioHangCtResponse(gioHangChiTietRepository.findByGioHang_Id(idGioHang));
     }
 
 

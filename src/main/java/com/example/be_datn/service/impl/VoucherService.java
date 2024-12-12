@@ -13,6 +13,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+
 @Service
 @RequiredArgsConstructor
 @FieldDefaults(level = lombok.AccessLevel.PRIVATE, makeFinal = true)
@@ -20,8 +22,10 @@ public class VoucherService implements IVoucherService {
     VoucherRepository voucherRepository;
 
     @Override
-    public Page<VoucherResponse> getAllVoucherPageable(String tenChienDich, Pageable pageable) {
-        return voucherRepository.findVoucherByTenVoucherLike("%" + tenChienDich + "%", pageable)
+    public Page<VoucherResponse> getAllVoucherPageable(String tenChienDich, LocalDateTime ngayBatDau, LocalDateTime ngayKetThuc, Integer trangThai, Pageable pageable) {
+//        return voucherRepository.findVoucherByTenVoucherLike("%" + tenChienDich + "%", pageable)
+//                .map(VoucherResponse::fromVoucher);
+        return  voucherRepository.findAllByFilter(tenChienDich,ngayBatDau,ngayKetThuc,trangThai, pageable)
                 .map(VoucherResponse::fromVoucher);
     }
 

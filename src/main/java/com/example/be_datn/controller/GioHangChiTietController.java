@@ -24,6 +24,15 @@ public class GioHangChiTietController {
                 .build();
     }
 
+    @GetMapping("all")
+    public ApiResponse<?> getAllGioHangChiTietAll(@RequestParam Long idGioHang) {
+        return ApiResponse.builder()
+                .code(1000)
+                .data(gioHangChiTietService.findByIdGioHangAll(idGioHang))
+                .message("get all successfull")
+                .build();
+    }
+
     @PostMapping("")
     public ApiResponse<?> themGioHangChiTiet(@RequestBody GioHangChiTietRequest gioHangChiTietRequest) {
         return ApiResponse.builder()

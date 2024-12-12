@@ -11,6 +11,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 public interface GioHangChiTietRepository extends JpaRepository<GioHangChiTiet, Long> {
+
+    List<GioHangChiTiet> findByGioHang_IdAndTrangThai(Long id, int trangThai);
     List<GioHangChiTiet> findByGioHang_Id(Long id);
 
 
