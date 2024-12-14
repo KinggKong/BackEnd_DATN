@@ -41,4 +41,6 @@ public class KhachHangRequest1 {
     @Min(value = 0, message = "TRANG_THAI_INVALID")
     @Max(value = 1, message = "TRANG_THAI_INVALID")
     private Integer trangThai;
+
+    private String diaChiStr;
 }

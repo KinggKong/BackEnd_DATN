@@ -28,6 +28,7 @@ public class KhachHangResponse {
     LocalDate ngaySinh;
     Boolean gioiTinh;
     Integer trangThai;
+    String diaChiStr;
     DiaChiResponse diaChi;
 
 
@@ -60,6 +61,7 @@ public class KhachHangResponse {
                 .ngaySinh(khachHang.getNgaySinh())
                 .gioiTinh(khachHang.getGioiTinh())
                 .trangThai(khachHang.getTrangThai())
+                .diaChiStr(khachHang.getDiaChi())
                 .diaChi(diaChiResponse)
                 .build();
     }
