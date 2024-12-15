@@ -4,16 +4,16 @@ import com.example.be_datn.dto.Response.HoaDonChiTietResponse;
 import com.example.be_datn.dto.Response.InfoOrder;
 import com.example.be_datn.dto.Response.SanPhamChiTietResponse;
 import com.example.be_datn.service.IEmailService;
-import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import jakarta.mail.util.ByteArrayDataSource;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.stereotype.Service;
 
 import java.io.ByteArrayOutputStream;
@@ -24,14 +24,16 @@ import java.text.DecimalFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 @Service
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@EnableAsync(proxyTargetClass = true)
 public class EmailService implements IEmailService {
     JavaMailSender javaMailSender;
 
-//    @Override
+    //    @Override
 //    public String sendMailToUser(String to, String subject, String maHoaDon)  {
 //        try {
 //            MimeMessage message = javaMailSender.createMimeMessage();
@@ -55,9 +57,9 @@ public class EmailService implements IEmailService {
 //            return e.getMessage();
 //        }
 //    }
-
+    @Async
     @Override
-    public String sendMailToUser(String to, String subject, String maHoaDon, InfoOrder infoOrder) {
+    public CompletableFuture<String> sendMailToUser(String to, String subject, String maHoaDon, InfoOrder infoOrder) {
         try {
             MimeMessage message = javaMailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true);
@@ -182,9 +184,9 @@ public class EmailService implements IEmailService {
             }
 
             javaMailSender.send(message);
-            return "success";
+            return CompletableFuture.completedFuture("success");
         } catch (Exception e) {
-            return e.getMessage();
+            return CompletableFuture.completedFuture(e.getMessage());
         }
     }
 
