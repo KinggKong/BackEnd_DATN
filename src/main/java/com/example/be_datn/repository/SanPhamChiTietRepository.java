@@ -44,6 +44,24 @@ Page<SanPhamChiTiet> getAllByFilter(@Param("idDanhMuc") Long idDanhMuc,
                                  @Param("idChatLieuDe") Long idChatLieuDe,
                                  @Param(("idSanPham")) Long idSanPham,
                                  Pageable pageable);
+    @Query(value = "SELECT spct.id, spct.id_mau_sac, spct.id_kich_thuoc, spct.id_san_pham, spct.so_luong, spct.gia_tien, spct.trang_thai, spct.created_at, spct.updated_at, spct.ma_san_pham, spct.gia_ban_sau_khi_giam " +
+            "FROM san_pham_chi_tiet spct " +
+            "JOIN san_pham sp ON spct.id_san_pham = sp.id " +
+            "WHERE (sp.id_danh_muc = '' OR sp.id_danh_muc = :idDanhMuc OR :idDanhMuc IS NULL) " +
+            "AND (sp.id_thuong_hieu = '' OR sp.id_thuong_hieu = :idThuongHieu OR :idThuongHieu IS NULL) " +
+            "AND (sp.id_chat_lieu_de = '' OR sp.id_chat_lieu_de = :idChatLieuDe OR :idChatLieuDe IS NULL) " +
+            "AND (sp.id_chat_lieu_vai = '' OR sp.id_chat_lieu_vai = :idChatLieuVai OR :idChatLieuVai IS NULL) " +
+            "AND (sp.id = '' OR sp.id = :idSanPham OR :idSanPham IS NULL) " +
+            "AND sp.trang_thai = 1 AND spct.trang_thai = 1 " +
+            "AND spct.so_luong >0 " +
+            "ORDER BY spct.updated_at DESC", nativeQuery = true)
+
+    List<SanPhamChiTiet> getAllByFilterBan(@Param("idDanhMuc") Long idDanhMuc,
+                                        @Param("idThuongHieu") Long idThuongHieu,
+                                        @Param("idChatLieuVai") Long idChatLieuVai,
+                                        @Param("idChatLieuDe") Long idChatLieuDe,
+                                        @Param(("idSanPham")) Long idSanPham
+                                        );
 //    Page<SanPhamChiTiet> getAll(Pageable pageable);
 
     //lấy ra sản phẩm chi tiết có giá cao nhất

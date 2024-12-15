@@ -144,4 +144,14 @@ public class SanPhamChiTietController {
         apiResponse.setData(sanPhamChiTietService.getSanPhamChiTietBySoLuong(soLuong, pageable));
         return apiResponse;
     }
+    @GetMapping("/get-all-ban")
+    public ApiResponse<List<SanPhamChiTietResponse>> getAllBanHang(@RequestParam(value = "idDanhMuc", defaultValue = "") Long idDanhMuc,
+                                                                   @RequestParam(value = "idThuongHieu", defaultValue = "") Long idThuongHieu,
+                                                                   @RequestParam(value = "idChatLieuVai", defaultValue = "") Long idChatLieuVai,
+                                                                   @RequestParam(value = "idChatLieuDe", defaultValue = "") Long idChatLieuDe,
+                                                                   @RequestParam(value = "idSanPham", defaultValue = "") Long idSanPham) {
+        ApiResponse<List<SanPhamChiTietResponse>> apiResponse = new ApiResponse<>();
+        apiResponse.setData(sanPhamChiTietService.getAllBanHang(idDanhMuc, idThuongHieu, idChatLieuVai, idChatLieuDe, idSanPham));
+        return apiResponse;
+    }
 }

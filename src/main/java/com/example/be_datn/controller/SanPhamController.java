@@ -144,4 +144,11 @@ public class SanPhamController {
         apiResponse.setMessage("Lấy danh sách sản phẩm thành công");
         return apiResponse;
     }
+    @GetMapping("/get-all-new")
+    public ApiResponse<List<SanPhamResponse>> getSanPhamsNew() {
+        ApiResponse<List<SanPhamResponse>> apiResponse = new ApiResponse<>();
+        apiResponse.setData(sanPhamService.listSanPhamMoi());
+        apiResponse.setMessage("Lấy danh sách sản phẩm thành công");
+        return apiResponse;
+    }
 }

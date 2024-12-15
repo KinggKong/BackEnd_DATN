@@ -48,7 +48,7 @@ public class SanPhamService implements ISanPhamService {
     }
 
     @Override
-    public Page<SanPhamCustumerResponse> getAllPageableCustumerFilter(List<Long> danhMucs,List<Long> thuongHieus,List<Long> chatLieuDes,List<Long> chatLieuVai,String ten,Double min, Double max ,String sortBy, Pageable pageable) {
+    public Page<SanPhamCustumerResponse> getAllPageableCustumerFilter(List<Long> danhMucs, List<Long> thuongHieus, List<Long> chatLieuDes, List<Long> chatLieuVai, String ten, Double min, Double max, String sortBy, Pageable pageable) {
         Specification<SanPham> spec = Specification.where(SanPhamSpecification.activeUsers())
                 .and(SanPhamSpecification.byDanhMuc(danhMucs))
                 .and(SanPhamSpecification.byChatLieuDe(chatLieuDes))
@@ -237,11 +237,13 @@ public class SanPhamService implements ISanPhamService {
         List<SanPham> sanPhams = sanPhamRepository.findAll();
         List<SanPham> sanPhamGiamGias = new ArrayList<>();
         for (SanPham sanPham : sanPhams) {
-            for (SanPhamChiTiet sanPhamChiTiet : sanPham.getSanPhamChiTietList()) {
-                SaleCt saleCts = sale_ctService.getSaleCtById(sanPhamChiTiet.getId());
-                if (saleCts != null) {
-                    sanPhamGiamGias.add(sanPham);
-                    break;
+            if (sanPham.getTrangThai() == 1) {
+                for (SanPhamChiTiet sanPhamChiTiet : sanPham.getSanPhamChiTietList()) {
+                    SaleCt saleCts = sale_ctService.getSaleCtById(sanPhamChiTiet.getId());
+                    if (saleCts != null) {
+                        sanPhamGiamGias.add(sanPham);
+                        break;
+                    }
                 }
             }
         }
@@ -305,7 +307,8 @@ public class SanPhamService implements ISanPhamService {
         List<SanPhamCustumerResponse> sanPhamCustumerResponses = sanPhamData.stream().map(data -> {
             // Dữ liệu từ query
             SanPham sanPham = sanPhamRepository.findById((Long) data[0]).orElseThrow(() -> new AppException(ErrorCode.SANPHAM_NOT_FOUND));
-            Long totalQuantity =  ((BigDecimal) data[4]).longValue();; // Số lượng bán (totalQuantity)
+            Long totalQuantity = ((BigDecimal) data[4]).longValue();
+            ; // Số lượng bán (totalQuantity)
 
             // Lấy danh sách giá bán
             List<Double> giaBan = sanPham.getSanPhamChiTietList().stream()
@@ -358,6 +361,10 @@ public class SanPhamService implements ISanPhamService {
         return sanPhamCustumerResponses;
     }
 
+    @Override
+    public List<SanPhamResponse> listSanPhamMoi() {
+        return sanPhamRepository.getSanPhamNewest().stream().map(SanPhamResponse::fromSanPham).toList();
+    }
 
 
     private void validateForeignKeys(SanPhamRequest request) {

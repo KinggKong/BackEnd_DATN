@@ -59,9 +59,12 @@ public interface SanPhamRepository extends JpaRepository<SanPham, Long>, JpaSpec
             "JOIN hoa_don hd ON hdct.id_hoa_don = hd.id " +
             "WHERE hdct.trang_thai = 1 " +
             "AND hd.trang_thai = 'DONE' " +
+            "AND sp.trang_thai = 1 " +
             "GROUP BY sp.id, sp.ten_san_pham " +
             "ORDER BY totalQuantity DESC", nativeQuery = true)
     List<Object[]> findBestSellingProductsNative();
 
+    @Query("select sp from SanPham sp where sp.trangThai = 1 order by sp.updated_at desc")
+    List<SanPham> getSanPhamNewest();
 
 }
