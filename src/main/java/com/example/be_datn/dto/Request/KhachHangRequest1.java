@@ -16,9 +16,9 @@ public class KhachHangRequest1 {
     @Size(max = 255, message = "TEN_KHACH_HANG_INVALID")
     private String ten; // Tên khách hàng
 
-    @NotNull(message = "TEN_KHACH_HANG_INVALID")
-    @Size(max = 255, message = "TEN_KHACH_HANG_INVALID")
-    private String ma; // Tên khách hàng
+    @NotNull(message = "MA_KHACH_HANG_INVALID")
+    @Size(max = 255, message = "MA_KHACH_HANG_INVALID")
+    private String ma; // Max khách hàng
 
     @Email(message = "EMAIL_INVALID")
     @Size(max = 255, message = "EMAIL_INVALID")

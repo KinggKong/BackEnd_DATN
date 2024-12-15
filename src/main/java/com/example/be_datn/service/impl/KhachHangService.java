@@ -13,6 +13,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.UUID;
+
 @Service
 @RequiredArgsConstructor
 @FieldDefaults(level = lombok.AccessLevel.PRIVATE, makeFinal = true)
@@ -36,10 +38,13 @@ public class KhachHangService implements IKhachHangService {
             throw new AppException(ErrorCode.PHONE_ALREADY_EXISTS);
         }
 
+        // Tạo mã khách hàng tự động
+        String maKhachHang = generateMaKhachHang(); // Gọi hàm sinh mã khách hàng
+
         // Tạo khách hàng mới từ dữ liệu request
         KhachHang khachHang = KhachHang.builder()
                 .ten(khachHangRequest.getTen())
-                .ma(khachHangRequest.getMa())
+                .ma(maKhachHang) // Sử dụng mã tự sinh
                 .email(khachHangRequest.getEmail())
                 .sdt(khachHangRequest.getSdt())
                 .avatar(khachHangRequest.getAvatar())
@@ -52,6 +57,12 @@ public class KhachHangService implements IKhachHangService {
         // Lưu khách hàng vào cơ sở dữ liệu
         KhachHang savedKhachHang = khachHangRepository.save(khachHang);
         return KhachHangResponse1.fromKhachHang(savedKhachHang);
+    }
+
+    // Phương thức sinh mã khách hàng tự động
+    private String generateMaKhachHang() {
+        // Cách đơn giản là sử dụng UUID để tạo mã khách hàng duy nhất
+        return "KH" + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
     }
 
     @Override
