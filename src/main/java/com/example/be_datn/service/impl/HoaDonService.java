@@ -4,6 +4,7 @@ import com.example.be_datn.dto.Request.HoaDonUpdateRequest;
 import com.example.be_datn.dto.Response.HoaDonCTResponse;
 import com.example.be_datn.dto.Response.HoaDonChiTietResponse;
 import com.example.be_datn.dto.Response.HoaDonResponse;
+import com.example.be_datn.dto.Response.InfoGiaoHang;
 import com.example.be_datn.entity.HoaDon;
 import com.example.be_datn.entity.HoaDonCT;
 import com.example.be_datn.entity.KhachHang;
@@ -111,29 +112,6 @@ public class HoaDonService implements IHoaDonService {
         );
     }
 
-    //    @Override
-//    public Long createHoaDon() {
-//        HoaDon hoaDon = new HoaDon();
-//        KhachHang khachHangLe = khachHangRepository.findByTen("Khách lẻ");
-//        hoaDon.setKhachHang(khachHangLe);
-//        hoaDon.setTongTien(0.0);
-//        hoaDon.setHinhThucThanhToan(null);
-//        hoaDon.setLoaiHoaDon(String.valueOf(TypeBill.OFFLINE));
-//        hoaDon.setTrangThai(String.valueOf(StatusPayment.PENDING));
-//        hoaDon.setMaHoaDon(generateInvoiceCode());
-//        hoaDon.setTenNguoiNhan(khachHangLe.getTen());
-//        hoaDonRepository.save(hoaDon);
-//        HoaDon hd = hoaDonRepository.save(hoaDon);
-//        LichSuHoaDon lichSuHoaDon = LichSuHoaDon.builder()
-//                .nhanVien(null)
-//                .hoaDon(hd)
-//                .ghiChu("PENDING")
-//                .createdBy(null)
-//                .trangThai(StatusPayment.PENDING.toString())
-//                .build();
-//        lichSuHoaDonRepository.save(lichSuHoaDon);
-//        return 1L;
-//    }
     @Override
     public Long createHoaDon() {
         HoaDon hoaDon = new HoaDon();
@@ -240,7 +218,6 @@ public class HoaDonService implements IHoaDonService {
     @Override
     @Transactional
     public String completeHoaDon(Long id, String method) {
-        // Retrieve the HoaDon object
         HoaDon hoaDon = hoaDonRepository.findById(id)
                 .orElseThrow(() -> new AppException(ErrorCode.HOA_DON_NOT_FOUND));
 
@@ -250,18 +227,14 @@ public class HoaDonService implements IHoaDonService {
             hoaDon.setNhanVien(nhanVien);
         }
 
-        // Check if the HoaDon has a voucher before attempting any voucher-related logic
         if (hoaDon.getVoucher() != null) {
-            // Process the voucher if it exists
             Voucher voucher = voucherRepository.findById(hoaDon.getVoucher().getId())
                     .orElseThrow(() -> new AppException(ErrorCode.VOUCHER_NOT_FOUND));
 
-            // Check if the voucher quantity is available
             if (voucher.getSoLuong() <= 0) {
                 throw new AppException(ErrorCode.VOUCHER_EXPIRED);
             }
 
-            // Update the voucher quantity and save
             voucher.setSoLuong(voucher.getSoLuong() - 1);
             voucherRepository.save(voucher);
             double discount = hoaDon.getSoTienGiam();
@@ -271,7 +244,14 @@ public class HoaDonService implements IHoaDonService {
             hoaDon.setTienSauGiam(hoaDon.getTongTien());
         }
         hoaDon.setHinhThucThanhToan(method);
-        hoaDon.setTrangThai(StatusPayment.DONE.toString());
+
+        if(hoaDon.getLoaiHoaDon().equalsIgnoreCase(TypeBill.OFFLINE.toString())) {
+            hoaDon.setTrangThai(StatusPayment.DONE.toString());
+        }else {
+            hoaDon.setTienShip(hoaDon.getTienShip());
+            hoaDon.setTrangThai(StatusPayment.WAITING.toString());
+            hoaDon.setTienSauGiam(hoaDon.getTienSauGiam() + hoaDon.getTienShip());
+        }
 
         HoaDon updatedHoaDon = hoaDonRepository.save(hoaDon);
 
@@ -280,14 +260,16 @@ public class HoaDonService implements IHoaDonService {
         if (lichSuHoaDon == null) {
             throw new AppException(ErrorCode.LICH_SU_HOA_DON_NOT_FOUND);
         } else {
-            // Update the existing LichSuHoaDon
-            lichSuHoaDon.setGhiChu("DONE");
-            lichSuHoaDon.setTrangThai(StatusPayment.DONE.toString());
+            if(updatedHoaDon.getLoaiHoaDon().equalsIgnoreCase(TypeBill.OFFLINE.toString())) {
+                lichSuHoaDon.setGhiChu("WAITING");
+                lichSuHoaDon.setTrangThai(StatusPayment.WAITING.toString());
+            }else {
+                lichSuHoaDon.setGhiChu("DONE");
+                lichSuHoaDon.setTrangThai(StatusPayment.DONE.toString());
+            }
             lichSuHoaDonRepository.save(lichSuHoaDon);
         }
 
-
-        // Log payment transaction (LichSuThanhToan)
         LichSuThanhToan lichSuThanhToan = LichSuThanhToan.builder()
                 .soTien(updatedHoaDon.getTongTien())
                 .paymentMethod(updatedHoaDon.getHinhThucThanhToan())

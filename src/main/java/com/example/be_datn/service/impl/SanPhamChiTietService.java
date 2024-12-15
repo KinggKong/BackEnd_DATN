@@ -229,4 +229,10 @@ public class SanPhamChiTietService implements ISanPhamChiTietService {
     public int countSanPhamHetHang() {
         return sanPhamChiTietRepository.countSanPhamHetHang();
     }
+
+    @Override
+    public Page<SanPhamChiTietResponse> fillData(Long idDanhMuc, Long idThuongHieu, Long idChatLieuVai, Long idChatLieuDe, Long idSanPham, Pageable pageable) {
+        return sanPhamChiTietRepository.fill(idDanhMuc, idThuongHieu, idChatLieuVai, idChatLieuDe, idSanPham, pageable)
+                .map(SanPhamChiTietResponse::fromSanPhamChiTiet);
+    }
 }

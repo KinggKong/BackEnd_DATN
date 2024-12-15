@@ -82,6 +82,8 @@ public class VoucherService implements IVoucherService {
         voucher.setSoLuong(voucherRequest.getSoLuong());
         if(voucher.getTrangThai() !=1) {
             updateVoucherForInvoices(voucher.getId());
+        }else {
+            updateVoucherForInvoices(voucher.getId());
         }
 
 
@@ -96,6 +98,7 @@ public class VoucherService implements IVoucherService {
     }
 
     public void updateVoucherForInvoices(Long idVoucher) {
+        LocalDateTime now = LocalDateTime.now();
         Voucher voucher = voucherRepository.findById(idVoucher)
                 .orElseThrow(() -> new AppException(ErrorCode.VOUCHER_NOT_FOUND));
 
@@ -105,11 +108,17 @@ public class VoucherService implements IVoucherService {
             for (HoaDon hoaDon : affectedInvoices) {
                 List<Voucher> availableVouchers = voucherRepository.findAvailableVouchers(hoaDon.getTongTien());
                 Voucher bestVoucher = availableVouchers.stream()
+                        .filter(vo ->
+                        vo.getTrangThai() == 1 &&
+                                vo.getSoLuong() >= 1 &&
+                                vo.getNgayBatDau().isBefore(now) &&
+                                vo.getNgayKetThuc().isAfter(now) &&
+                                hoaDon.getTongTien() >= vo.getGiaTriDonHangToiThieu()
+                )
                         .sorted(Comparator.comparingDouble((Voucher v) -> calculateDiscount(hoaDon.getTongTien(), v))
                                 .reversed())
                         .findFirst()
                         .orElse(null);
-
                 if (bestVoucher != null) {
                     double discount = calculateDiscount(hoaDon.getTongTien(), bestVoucher);
                     hoaDon.setVoucher(bestVoucher);
@@ -133,13 +142,12 @@ public class VoucherService implements IVoucherService {
         } else {
             discount = voucher.getGiaTriGiam();
         }
-
-        // Check if the discount exceeds the maximum allowable discount (giaTriGiamToiDa)
         if (voucher.getGiaTriGiamToiDa() != null && discount > voucher.getGiaTriGiamToiDa()) {
-            return voucher.getGiaTriGiamToiDa(); // Apply the max discount if exceeded
+            return voucher.getGiaTriGiamToiDa();
         }
 
         return discount;
     }
+
 
 }

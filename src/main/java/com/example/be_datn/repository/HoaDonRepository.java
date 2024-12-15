@@ -28,7 +28,7 @@ public interface HoaDonRepository extends JpaRepository<HoaDon, Long> {
                left join hd.nhanVien nv 
                left join hd.khachHang kh 
                left join hd.voucher v  
-               where  hd.trangThai = 'PENDING' and hd.loaiHoaDon = 'OFFLINE'
+               where  hd.trangThai = 'PENDING' and hd.loaiHoaDon = 'OFFLINE' or (hd.loaiHoaDon = 'ONLINE' AND hd.trangThai = 'PENDING')
 
             """)
     Page<HoaDonResponse> findAllHoaDon(Pageable pageable);
@@ -41,7 +41,7 @@ public interface HoaDonRepository extends JpaRepository<HoaDon, Long> {
                         update HoaDon hd  set hd.tongTien=:tongTien where hd.id=:id
                     """
     )
-    HoaDon updateHoaDon(Double tongTien, Long id);
+    void updateHoaDon(Double tongTien, Long id);
 
     HoaDon findByMaHoaDon(String maHoaDon);
 
