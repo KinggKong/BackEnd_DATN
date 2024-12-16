@@ -2,12 +2,15 @@ package com.example.be_datn.service.impl;
 
 import com.example.be_datn.dto.Request.NhanVienRequest;
 import com.example.be_datn.dto.Response.NhanVienResponse;
-import com.example.be_datn.entity.*;
+import com.example.be_datn.entity.NhanVien;
+import com.example.be_datn.entity.TaiKhoan;
+import com.example.be_datn.entity.VaiTro;
 import com.example.be_datn.exception.AppException;
 import com.example.be_datn.exception.ErrorCode;
 import com.example.be_datn.repository.GioHangRepository;
 import com.example.be_datn.repository.NhanVienRepository;
 import com.example.be_datn.repository.TaiKhoanRepository;
+import com.example.be_datn.repository.VaiTroRepository;
 import com.example.be_datn.service.INhanVienService;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
@@ -38,6 +41,7 @@ public class NhanVienService implements INhanVienService {
     TaiKhoanService taikhoanService;
     TaiKhoanRepository taikhoanRepository;
     GioHangRepository gioHangRepository;
+    private final VaiTroRepository vaiTroRepository;
 
 
     @Override
@@ -119,16 +123,24 @@ public class NhanVienService implements INhanVienService {
         String password = UUID.randomUUID().toString();
         String ma = generateAccountCode();
         PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(10);
-
+        VaiTro vaiTro = vaiTroRepository.findByTenVaiTro("ROLE_STAFF");
+        if (vaiTro == null) {
+            VaiTro newVaiTro = VaiTro.builder()
+                    .tenVaiTro("ROLE_STAFF")
+                    .trangThai(1)
+                    .build();
+            vaiTro = vaiTroRepository.saveAndFlush(newVaiTro);
+        }
+//        String password = generateAccountCode();
         TaiKhoan taiKhoan = TaiKhoan.builder()
                 .tenDangNhap(random + "_" + nhanVien.getTen())
                 .email(nhanVien.getEmail())
                 .ma(ma)
-                .matKhau(passwordEncoder.encode(UUID.randomUUID().toString()))
+                .matKhau(passwordEncoder.encode(password))
                 .ownerID(nhanVien.getId())
                 .trangThai(1)
                 .vaiTro(VaiTro.builder()
-                        .id(2L)
+                        .id(vaiTro.getId())
                         .build())
                 .build();
         TaiKhoan result = taikhoanRepository.save(taiKhoan);
