@@ -11,6 +11,7 @@ import java.util.List;
 public interface ISanPhamChiTietService {
     List<SanPhamChiTietResponse> getAllBySanPhamId(Long id);
     Page<SanPhamChiTietResponse> getAllPage(Pageable pageable);
+    List<SanPhamChiTietResponse> getAllBanHang(Long idDanhMuc, Long idThuongHieu, Long idChatLieuVai, Long idChatLieuDe, Long idSanPham);
     Page<SanPhamChiTietResponse> getAllPageBySanPhamId(Long id, Pageable pageable);
     Page<SanPhamChiTietResponse> getAllByFilter(Long idDanhMuc, Long idThuongHieu, Long idChatLieuVai, Long idChatLieuDe, Long idSanPham, Pageable pageable);
     List<SanPhamChiTietResponse> create(List<SanPhamChiTietRequest> sanPhamChiTietRequest) throws IOException;

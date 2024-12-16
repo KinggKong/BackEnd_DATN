@@ -31,4 +31,5 @@ public interface ISanPhamService {
     List<SanPham> filterProducts(SanPhamFilterRequest filterRequest);
     List<SanPhamCustumerResponse> listSanPhamGiamGia();
     List<SanPhamCustumerResponse> listSanPhamBanChay();
+    List<SanPhamResponse> listSanPhamMoi();
 }

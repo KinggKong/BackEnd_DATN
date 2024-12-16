@@ -52,6 +52,8 @@ public class KhachHang {
 
     @Column(name = "trang_thai")
     private Integer trangThai;
+    @Column(name = "dia_chi")
+    private String diaChi;
 
     @OneToMany(mappedBy = "khachHang")
     @JsonIgnore

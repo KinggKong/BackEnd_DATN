@@ -47,6 +47,12 @@ public class SanPhamChiTietService implements ISanPhamChiTietService {
     }
 
     @Override
+    public List<SanPhamChiTietResponse> getAllBanHang(Long idDanhMuc, Long idThuongHieu, Long idChatLieuVai, Long idChatLieuDe, Long idSanPham) {
+        return sanPhamChiTietRepository.getAllByFilterBan(idDanhMuc, idThuongHieu, idChatLieuVai, idChatLieuDe, idSanPham)
+                .stream().map(SanPhamChiTietResponse::fromSanPhamChiTiet).toList();
+    }
+
+    @Override
     public Page<SanPhamChiTietResponse> getAllPageBySanPhamId(Long id, Pageable pageable) {
         return sanPhamChiTietRepository.findSPCTBySanPhamId(id,pageable).map(SanPhamChiTietResponse::fromSanPhamChiTiet);
     }

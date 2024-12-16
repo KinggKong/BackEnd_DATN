@@ -28,8 +28,8 @@ public interface HoaDonRepository extends JpaRepository<HoaDon, Long> {
                left join hd.nhanVien nv 
                left join hd.khachHang kh 
                left join hd.voucher v  
-               where  hd.trangThai = 'PENDING' and hd.loaiHoaDon = 'OFFLINE'
-            
+               where  hd.trangThai = 'PENDING' and hd.loaiHoaDon = 'OFFLINE' or (hd.loaiHoaDon = 'ONLINE' AND hd.trangThai = 'PENDING')
+
             """)
     Page<HoaDonResponse> findAllHoaDon(Pageable pageable);
 
@@ -41,7 +41,7 @@ public interface HoaDonRepository extends JpaRepository<HoaDon, Long> {
                         update HoaDon hd  set hd.tongTien=:tongTien where hd.id=:id
                     """
     )
-    HoaDon updateHoaDon(Double tongTien, Long id);
+    void updateHoaDon(Double tongTien, Long id);
 
     HoaDon findByMaHoaDon(String maHoaDon);
 
@@ -67,6 +67,7 @@ public interface HoaDonRepository extends JpaRepository<HoaDon, Long> {
                where hd.khachHang.id =:idKhachHang
             """)
     List<HistoryBillResponse> getAllHistoryBillByIdKhachHang(@Param("idKhachHang") Long idKhachHang);
+
 
 
     @Query("""
@@ -105,6 +106,7 @@ public interface HoaDonRepository extends JpaRepository<HoaDon, Long> {
 
     @Query("select sum(hdct.soLuong) from HoaDonCT hdct join HoaDon hd on hdct.hoaDon.id = hd.id where hd.trangThai ='DONE' and  hd.created_at >= ?1 and hd.created_at <= ?2")
     Integer tongSanPhamBan(LocalDateTime ngayBatDau, LocalDateTime ngayKetThuc);
+
 
 
     @Query(value = """

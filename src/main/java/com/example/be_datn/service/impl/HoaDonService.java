@@ -239,10 +239,16 @@ public class HoaDonService implements IHoaDonService {
 
     @Override
     @Transactional
-    public String completeHoaDon(Long id, String method) {
+    public String completeHoaDon(Long id, String method,String diaChi, Double tienShip) {
         // Retrieve the HoaDon object
         HoaDon hoaDon = hoaDonRepository.findById(id)
                 .orElseThrow(() -> new AppException(ErrorCode.HOA_DON_NOT_FOUND));
+        if(diaChi != null) {
+            hoaDon.setDiaChiNhan(diaChi);
+        }
+        if(tienShip != null) {
+            hoaDon.setTienShip(tienShip);
+        }
 
         if(hoaDon.getNhanVien() != null) {
             NhanVien nhanVien = nhanVienRepository.findById(hoaDon.getNhanVien().getId())

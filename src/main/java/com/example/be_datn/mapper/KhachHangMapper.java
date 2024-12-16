@@ -26,6 +26,7 @@ public class KhachHangMapper {
                 .ngaySinh(khachHang.getNgaySinh())
                 .gioiTinh(khachHang.getGioiTinh())
                 .trangThai(khachHang.getTrangThai())
+                .diaChiStr(khachHang.getDiaChi())
                 .diaChi(DiaChiResponse.toResponse(diaChi))
                 .build();
     }

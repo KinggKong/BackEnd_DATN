@@ -45,6 +45,7 @@ public class KhachHangService implements IKhachHangService {
                 .avatar(khachHangRequest.getAvatar())
                 .ngaySinh(khachHangRequest.getNgaySinh())
                 .gioiTinh(khachHangRequest.getGioiTinh())
+                .diaChi(khachHangRequest.getDiaChiStr())
                 .trangThai(khachHangRequest.getTrangThai())
                 .build();
 
@@ -74,7 +75,7 @@ public class KhachHangService implements IKhachHangService {
         khachHang.setSdt(khachHangRequest.getSdt());
         khachHang.setAvatar(khachHangRequest.getAvatar());
         khachHang.setNgaySinh(khachHangRequest.getNgaySinh());
-
+        khachHang.setDiaChi(khachHangRequest.getDiaChiStr());
         khachHang.setGioiTinh(khachHangRequest.getGioiTinh());
         khachHang.setTrangThai(khachHangRequest.getTrangThai());
 
