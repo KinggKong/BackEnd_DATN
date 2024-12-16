@@ -4,6 +4,7 @@ import com.example.be_datn.dto.Request.NhanVienRequest;
 import com.example.be_datn.dto.Response.ApiResponse;
 import com.example.be_datn.dto.Response.NhanVienResponse;
 import com.example.be_datn.service.INhanVienService;
+import jakarta.mail.MessagingException;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -34,7 +35,7 @@ public class NhanVienController {
 
     // Tạo mới nhân viên
     @PostMapping("")
-    ApiResponse<NhanVienResponse> createNhanVien(@RequestBody @Valid NhanVienRequest nhanVienRequest) {
+    ApiResponse<NhanVienResponse> createNhanVien(@RequestBody @Valid NhanVienRequest nhanVienRequest) throws MessagingException {
         ApiResponse<NhanVienResponse> apiResponse = new ApiResponse<>();
         apiResponse.setMessage("Thêm mới thành công nhân viên " + nhanVienRequest.getTen());
         apiResponse.setData(nhanVienService.createNhanVien(nhanVienRequest));

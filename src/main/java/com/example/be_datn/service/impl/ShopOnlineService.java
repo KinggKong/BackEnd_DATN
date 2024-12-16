@@ -21,7 +21,9 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
@@ -98,7 +100,17 @@ public class ShopOnlineService implements IShopOnlineService {
     }
 
     @Override
-    public HoaDonResponse checkout(HoaDonRequest hoaDonRequest) {
+    public ApiResponse<?> checkout(HoaDonRequest hoaDonRequest) {
+        if (hoaDonRequest.getIdVoucher() != null) {
+            if (checkVourcherCanUse(hoaDonRequest.getIdVoucher()) == null) {
+                return ApiResponse.builder()
+                        .code(2000)
+                        .data("Voucher đã không còn hoạt động")
+                        .message("Voucher đã không còn hoạt động")
+                        .build();
+            }
+        }
+
         checkSoLuongHopLe(hoaDonRequest.getIdGioHang());
         handleUpdateAfterBuy(hoaDonRequest.getIdGioHang());
         HoaDon hd = createHoaDon(hoaDonRequest);
@@ -118,7 +130,7 @@ public class ShopOnlineService implements IShopOnlineService {
             throw new AppException(ErrorCode.HOA_DON_INVALID);
         }
 
-        List<GioHangChiTiet> gioHangChiTietList = gioHangChiTietRepository.findByGioHang_IdAndTrangThai(hoaDonRequest.getIdGioHang(),1);
+        List<GioHangChiTiet> gioHangChiTietList = gioHangChiTietRepository.findByGioHang_IdAndTrangThai(hoaDonRequest.getIdGioHang(), 1);
         gioHangChiTietList.stream()
                 .map(gioHangChiTiet -> hoaDonChiTietMapper.toHoaDonCT(gioHangChiTiet, hoaDon.getId()))
                 .forEach(hoaDonChiTietRepository::saveAndFlush);
@@ -127,7 +139,10 @@ public class ShopOnlineService implements IShopOnlineService {
 
 
         emailService.sendMailToUser(hoaDonRequest.getEmail(), "3HST Shoes - Cảm ơn bạn đã đặt hàng tại 3HST Shoes", hoaDon.getMaHoaDon(), this.getInfoOrder(hoaDon.getMaHoaDon()));
-        return hoaDonMapper.toHoaDonResponse(hoaDon);
+        return ApiResponse.builder()
+                .data(hoaDonMapper.toHoaDonResponse(hoaDon))
+                .message("checkout successfully")
+                .build();
     }
 
     public HoaDonResponse checkoutOnline(HoaDonRequest hoaDonRequest) {
@@ -148,7 +163,7 @@ public class ShopOnlineService implements IShopOnlineService {
             throw new AppException(ErrorCode.HOA_DON_INVALID);
         }
 
-        List<GioHangChiTiet> gioHangChiTietList = gioHangChiTietRepository.findByGioHang_IdAndTrangThai(hoaDonRequest.getIdGioHang(),1);
+        List<GioHangChiTiet> gioHangChiTietList = gioHangChiTietRepository.findByGioHang_IdAndTrangThai(hoaDonRequest.getIdGioHang(), 1);
         gioHangChiTietList.stream()
                 .map(gioHangChiTiet -> hoaDonChiTietMapper.toHoaDonCT(gioHangChiTiet, hoaDon.getId()))
                 .forEach(hoaDonChiTietRepository::saveAndFlush);
@@ -179,8 +194,14 @@ public class ShopOnlineService implements IShopOnlineService {
     }
 
     @Override
-    public List<HoaDonResponse> getAllOrderByStatus(String trangThai) {
-        List<HoaDon> hoaDons = hoaDonRepository.findByTrangThai(trangThai);
+    public List<HoaDonResponse> getAllOrderByStatus(String trangThai, String keySearch) {
+        List<HoaDon> hoaDons = hoaDonRepository.findByTrangThai(trangThai, keySearch);
+        if (trangThai.contains("WAITING")) {
+//            hoaDons = hoaDons.stream()
+//                    .sorted(Comparator.comparing(HoaDon::getCreated_at))
+//                    .collect(Collectors.toList());
+            Collections.reverse(hoaDons);
+        }
         if (hoaDons.isEmpty()) {
             return new ArrayList<>();
         }
@@ -204,7 +225,7 @@ public class ShopOnlineService implements IShopOnlineService {
     }
 
     @Override
-    public Page<HistoryBillResponse> getAllHistoryBill(Long idKhachHang,int pageNumber,int pageSize) {
+    public Page<HistoryBillResponse> getAllHistoryBill(Long idKhachHang, int pageNumber, int pageSize) {
         pageNumber -= 1;
         pageNumber = Math.max(0, pageNumber);
         pageSize = Math.max(10, pageSize);
@@ -255,7 +276,7 @@ public class ShopOnlineService implements IShopOnlineService {
     }
 
     void checkSoLuongHopLe(Long idGioHang) {
-        List<GioHangChiTiet> gioHangChiTietList = gioHangChiTietRepository.findByGioHang_IdAndTrangThai(idGioHang,1);
+        List<GioHangChiTiet> gioHangChiTietList = gioHangChiTietRepository.findByGioHang_IdAndTrangThai(idGioHang, 1);
         gioHangChiTietList.forEach(gioHangChiTiet -> {
             if (gioHangChiTiet.getSoLuong() > gioHangChiTiet.getSanPhamChiTiet().getSoLuong()) {
                 throw new AppException(ErrorCode.SOLUONG_SANPHAM_KHONG_DU);
@@ -268,7 +289,7 @@ public class ShopOnlineService implements IShopOnlineService {
             throw new AppException(ErrorCode.ID_GIO_HANG_CANT_BE_NULL);
         }
 
-        List<GioHangChiTiet> gioHangChiTietList = gioHangChiTietRepository.findByGioHang_IdAndTrangThai(idGioHang,1);
+        List<GioHangChiTiet> gioHangChiTietList = gioHangChiTietRepository.findByGioHang_IdAndTrangThai(idGioHang, 1);
         if (gioHangChiTietList.isEmpty()) {
             throw new AppException(ErrorCode.CART_DONT_HAVE_PRODUCT);
         }
@@ -288,6 +309,17 @@ public class ShopOnlineService implements IShopOnlineService {
         }
 
         sanPhamChiTietRepository.saveAll(updatedProducts);
+    }
+
+
+    private Voucher checkVourcherCanUse(Long idVoucher) {
+        Voucher voucher = voucherRepository.findByIdAndTrangThai(idVoucher).orElse(null);
+        if (voucher != null) {
+            voucher.setSoLuong(voucher.getSoLuong() - 1);
+            voucherRepository.saveAndFlush(voucher);
+            return voucher;
+        }
+        return voucher;
     }
 
 }

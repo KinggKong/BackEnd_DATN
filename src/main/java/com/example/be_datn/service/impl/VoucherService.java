@@ -1,6 +1,7 @@
 package com.example.be_datn.service.impl;
 
 import com.example.be_datn.dto.Request.VoucherRequest;
+import com.example.be_datn.dto.Response.ApiResponse;
 import com.example.be_datn.dto.Response.VoucherResponse;
 import com.example.be_datn.entity.HoaDon;
 import com.example.be_datn.entity.Voucher;
@@ -15,11 +16,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-
+import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
-
-import java.time.LocalDateTime;
 
 
 @Service
@@ -33,7 +32,7 @@ public class VoucherService implements IVoucherService {
     public Page<VoucherResponse> getAllVoucherPageable(String tenChienDich, LocalDateTime ngayBatDau, LocalDateTime ngayKetThuc, Integer trangThai, Pageable pageable) {
 //        return voucherRepository.findVoucherByTenVoucherLike("%" + tenChienDich + "%", pageable)
 //                .map(VoucherResponse::fromVoucher);
-        return  voucherRepository.findAllByFilter(tenChienDich,ngayBatDau,ngayKetThuc,trangThai, pageable)
+        return voucherRepository.findAllByFilter(tenChienDich, ngayBatDau, ngayKetThuc, trangThai, pageable)
                 .map(VoucherResponse::fromVoucher);
     }
 
@@ -80,7 +79,7 @@ public class VoucherService implements IVoucherService {
         voucher.setGiaTriDonHangToiThieu(voucherRequest.getGiaTriDonHangToiThieu());
         voucher.setGiaTriGiamToiDa(voucherRequest.getGiaTriGiamToiDa());
         voucher.setSoLuong(voucherRequest.getSoLuong());
-        if(voucher.getTrangThai() !=1) {
+        if (voucher.getTrangThai() != 1) {
             updateVoucherForInvoices(voucher.getId());
         }
 
@@ -140,6 +139,12 @@ public class VoucherService implements IVoucherService {
         }
 
         return discount;
+    }
+
+    public ApiResponse<?> getAllVoucherCanUser(Double tongTien) {
+        return ApiResponse.builder()
+                .data(voucherRepository.getAllVoucherCanUser(LocalDateTime.now(), tongTien))
+                .build();
     }
 
 }

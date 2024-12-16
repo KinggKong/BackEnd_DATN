@@ -23,6 +23,9 @@ public class TaiKhoan extends BaseEntity {
     @Column(name = "ten_dang_nhap")
     String tenDangNhap;
 
+    @Column(name = "forgot_password_token")
+    String forgotPasswordToken;
+
     String email;
 
     @Column(name = "ma")

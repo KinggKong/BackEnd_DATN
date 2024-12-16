@@ -9,13 +9,13 @@ import java.util.List;
 public interface IShopOnlineService {
     AboutProductShopOn preCheckout(Long idKhachHang);
 
-    HoaDonResponse checkout(HoaDonRequest hoaDonRequest);
+    ApiResponse<?> checkout(HoaDonRequest hoaDonRequest);
 
     InfoOrder getInfoOrder(String maHoaDon);
 
-    List<HoaDonResponse> getAllOrderByStatus(String trangThai);
+    List<HoaDonResponse> getAllOrderByStatus(String trangThai, String keySearch);
 
     DetailHistoryBillResponse getDetailHistoryBill(Long idHoaDon);
 
-    Page<HistoryBillResponse> getAllHistoryBill(Long idKhachHang,int pageNumber,int pageSize);
+    Page<HistoryBillResponse> getAllHistoryBill(Long idKhachHang, int pageNumber, int pageSize);
 }

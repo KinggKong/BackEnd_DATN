@@ -29,11 +29,7 @@ public class ShopOnlineController {
 
     @PostMapping("/checkout")
     public ApiResponse checkout(@RequestBody HoaDonRequest hoaDonRequest) {
-        return ApiResponse.builder()
-                .code(1000)
-                .data(shopOnlineService.checkout(hoaDonRequest))
-                .message("confirm precheckout successs")
-                .build();
+        return shopOnlineService.checkout(hoaDonRequest);
     }
 
     @GetMapping("/info-order")
@@ -45,9 +41,9 @@ public class ShopOnlineController {
     }
 
     @GetMapping("/order-management")
-    public ApiResponse<?> orderManagement(@RequestParam String trangThai) {
+    public ApiResponse<?> orderManagement(@RequestParam String trangThai, @RequestParam(name = "keySearch", defaultValue = "") String keySearch) {
         return ApiResponse.builder()
-                .data(shopOnlineService.getAllOrderByStatus(trangThai))
+                .data(shopOnlineService.getAllOrderByStatus(trangThai, keySearch))
                 .message("get order management successfull")
                 .build();
     }
@@ -73,7 +69,7 @@ public class ShopOnlineController {
                                       @RequestParam(name = "pageNumber", defaultValue = "1", required = true) int pageNumber,
                                       @RequestParam(name = "pageSize", defaultValue = "10") int pageSize) {
         return ApiResponse.builder()
-                .data(shopOnlineService.getAllHistoryBill(id,pageNumber,pageSize))
+                .data(shopOnlineService.getAllHistoryBill(id, pageNumber, pageSize))
                 .message("get history bill successfull")
                 .build();
     }

@@ -9,6 +9,7 @@ import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 public interface VoucherRepository extends JpaRepository<Voucher, Long> {
 
@@ -35,5 +36,10 @@ public interface VoucherRepository extends JpaRepository<Voucher, Long> {
     @Query("SELECT v FROM Voucher v WHERE v.trangThai = 1 AND :tongTien >= v.giaTriDonHangToiThieu")
     List<Voucher> findAvailableVouchers(@Param("tongTien") double tongTien);
 
+    @Query(value = "select v from Voucher v where v.trangThai = 1 and (:locadate between v.ngayBatDau and v.ngayKetThuc) and v.soLuong >  0 and :tongTien > v.giaTriDonHangToiThieu")
+    List<Voucher> getAllVoucherCanUser(@Param("locadate") LocalDateTime localDate, @Param("tongTien") Double tongTien);
 
+
+    @Query(value = "select v from Voucher v where v.id = :idVoucher and v.trangThai = 1")
+    Optional<Voucher> findByIdAndTrangThai(@Param("idVoucher") Long idVoucher);
 }
