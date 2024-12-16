@@ -5,7 +5,7 @@ import com.example.be_datn.dto.Response.SanPhamChiTietResponse;
 import java.io.IOException;
 
 public interface QrCodeService {
-    String generateQrCode(SanPhamChiTietResponse response);
+    String generateQrCode(SanPhamChiTietResponse response) throws IOException;
     SanPhamChiTietResponse decodeQrCodeToSanPhamChiTiet(String qrCodeBase64) throws IOException;
 }
 

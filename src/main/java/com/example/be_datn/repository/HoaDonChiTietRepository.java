@@ -4,6 +4,8 @@ import com.example.be_datn.entity.HoaDon;
 import com.example.be_datn.entity.HoaDonCT;
 import com.example.be_datn.entity.SanPhamChiTiet;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 import java.util.Optional;
@@ -28,4 +30,7 @@ public interface HoaDonChiTietRepository extends JpaRepository<HoaDonCT, Long> {
     List<HoaDonCT> findByHoaDon_Id(Long id);
 
     void deleteByHoaDon_Id(Long id);
+
+    @Query("select hdct from HoaDonCT hdct where hdct.hoaDon.trangThai = 'PENDING' and hdct.hoaDon.id=:id")
+    List<HoaDonCT> findHoaDonCTByTTPenDing(@Param("id") Long id);
 }

@@ -65,6 +65,7 @@ public class HoaDonService implements IHoaDonService {
     private final HoaDonChiTietMapper  hoaDonChiTietMapper;
     private final InvoicePdfGenerator invoicePdfGenerator;
     private final NhanVienRepository nhanVienRepository;
+    private final HoaDonChiTietService hoaDonChiTietService;
 
     public String generateInvoiceCode() {
         String date = new SimpleDateFormat("yyyyMMdd").format(new Date());
@@ -87,6 +88,17 @@ public class HoaDonService implements IHoaDonService {
         NhanVien nhanVien = hoaDon.getNhanVien();
         KhachHang khachHang = hoaDon.getKhachHang();
         Voucher voucher = hoaDon.getVoucher();
+
+        hoaDonChiTietService.updateGiaHoaDonCT_Sale(id);
+        List<HoaDonCT> hoaDonCTList = hoaDon.getChiTietList();
+        Double tongTien = 0.0;
+        for (HoaDonCT hoaDonCT : hoaDonCTList) {
+            tongTien += hoaDonCT.getSoLuong() * hoaDonCT.getGiaTien();
+        }
+        hoaDon.setTongTien(tongTien);
+        hoaDon.setTienSauGiam(tongTien - hoaDon.getSoTienGiam());
+        hoaDonRepository.save(hoaDon);
+
 
         return new HoaDonResponse(
                 hoaDon.getId(),

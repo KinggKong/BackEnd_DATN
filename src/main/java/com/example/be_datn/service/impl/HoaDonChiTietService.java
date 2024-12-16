@@ -3,16 +3,10 @@ package com.example.be_datn.service.impl;
 import com.example.be_datn.dto.Request.HoaDonChiTietRequest;
 import com.example.be_datn.dto.Request.HoaDonChiTietUpdateRequest;
 import com.example.be_datn.dto.Response.HoaDonCTResponse;
-import com.example.be_datn.entity.HoaDon;
-import com.example.be_datn.entity.HoaDonCT;
-import com.example.be_datn.entity.SanPhamChiTiet;
-import com.example.be_datn.entity.Voucher;
+import com.example.be_datn.entity.*;
 import com.example.be_datn.exception.AppException;
 import com.example.be_datn.exception.ErrorCode;
-import com.example.be_datn.repository.HoaDonChiTietRepository;
-import com.example.be_datn.repository.HoaDonRepository;
-import com.example.be_datn.repository.SanPhamChiTietRepository;
-import com.example.be_datn.repository.VoucherRepository;
+import com.example.be_datn.repository.*;
 import com.example.be_datn.service.IHoaDonChiTietService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -38,6 +32,7 @@ public class HoaDonChiTietService implements IHoaDonChiTietService {
     private final SanPhamChiTietRepository sanPhamChiTietRepository;
     private final SanPhamChiTietService sanPhamChiTietService;
     private final VoucherRepository voucherRepository;
+    private final Sale_ChiTietRepository sale_ChiTietRepository;
 
 
     @Override
@@ -194,6 +189,21 @@ public class HoaDonChiTietService implements IHoaDonChiTietService {
         return responseList;
     }
 
+    @Override
+    public void updateGiaHoaDonCT_Sale(Long id) {
+        List<HoaDonCT> list = hoaDonChiTietRepository.findHoaDonCTByTTPenDing(id);
+        for (HoaDonCT hoaDonCT : list) {
+            SaleCt saleCt = sale_ChiTietRepository.findMostRecentByIdSanPhamCtAndIdSale(hoaDonCT.getSanPhamChiTiet().getId());
+            if (saleCt == null) {
+                hoaDonCT.setGiaTien(hoaDonCT.getSanPhamChiTiet().getGiaBan());
+                hoaDonChiTietRepository.save(hoaDonCT);
+            }else {
+                hoaDonCT.setGiaTien(hoaDonCT.getSanPhamChiTiet().getGiaBan() -(hoaDonCT.getSanPhamChiTiet().getGiaBan()*(saleCt.getSale().getGiaTriGiam()/100)));
+                hoaDonChiTietRepository.save(hoaDonCT);
+            }
+        }
+    }
+
 
     @Transactional
     @Modifying
@@ -285,6 +295,7 @@ public class HoaDonChiTietService implements IHoaDonChiTietService {
         }
         return discount;
     }
+
 
 
 }
