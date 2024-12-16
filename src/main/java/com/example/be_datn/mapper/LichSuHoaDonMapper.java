@@ -13,6 +13,7 @@ public class LichSuHoaDonMapper {
                 .createdAt(lichSuHoaDondon.getCreated_at())
                 .ghiChu(lichSuHoaDondon.getGhiChu())
                 .trangThai(lichSuHoaDondon.getTrangThai())
+                .createdBy(lichSuHoaDondon.getCreatedBy())
                 .build();
     }
 

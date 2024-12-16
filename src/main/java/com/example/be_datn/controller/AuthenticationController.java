@@ -1,6 +1,7 @@
 package com.example.be_datn.controller;
 
 import com.example.be_datn.config.jwtConfig.JwtProvider;
+import com.example.be_datn.dto.Request.ChangePasswordRequest;
 import com.example.be_datn.dto.Request.EmailRequest;
 import com.example.be_datn.dto.Request.SignInRequest;
 import com.example.be_datn.dto.Request.SignupRequest;
@@ -31,6 +32,11 @@ public class AuthenticationController {
     @PostMapping("/login")
     public ResponseEntity<?> authenticateUser(@RequestBody SignInRequest signInRequest, HttpServletRequest request) {
         return iAuthService.login(signInRequest, request);
+    }
+
+    @PostMapping("/admin/login")
+    public ResponseEntity<?> authenticateAdmin(@RequestBody SignInRequest signInRequest, HttpServletRequest request) {
+        return iAuthService.loginAdmin(signInRequest, request);
     }
 
     @PostMapping("/sign-up")
@@ -68,20 +74,25 @@ public class AuthenticationController {
         return iAuthService.getProfile();
     }
 
+    @GetMapping("/profile-admin")
+    public ApiResponse<?> getProfileAdmin() {
+        return iAuthService.getProfileAdmin();
+    }
 
-//    @GetMapping("/forgot-password")
-//    public ApiResponse<?> forgotPassword(@RequestParam String email) throws MessagingException {
-//        return ApiResponse.builder()
-//                .data(authenticationService.sendTokenForgotPassword(email))
-//                .message("send token to reset password successfully")
-//                .build();
-//    }
-//
-//    @PostMapping("/forot-password")
-//    public ApiResponse<?> changePassword(@RequestBody ChangePasswrodRequest changePasswrodRequest) {
-//        return ApiResponse.builder()
-//                .data(authenticationService.resetPassword(changePasswrodRequest))
-//                .message("change password successfully")
-//                .build();
-//    }
+
+    @GetMapping("/forgot-password")
+    public ApiResponse<?> forgotPassword(@RequestParam String email) throws MessagingException {
+        return ApiResponse.builder()
+                .data(iAuthService.sendTokenForgotPassword(email))
+                .message("send token to reset password successfully")
+                .build();
+    }
+
+    @PostMapping("/forgot-password")
+    public ApiResponse<?> changePassword(@RequestBody ChangePasswordRequest changePasswrodRequest) {
+        return ApiResponse.builder()
+                .data(iAuthService.resetPassword(changePasswrodRequest))
+                .message("change password successfully")
+                .build();
+    }
 }

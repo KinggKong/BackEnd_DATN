@@ -45,8 +45,13 @@ public interface HoaDonRepository extends JpaRepository<HoaDon, Long> {
 
     HoaDon findByMaHoaDon(String maHoaDon);
 
-    @Query("SELECT hd FROM HoaDon hd WHERE hd.trangThai LIKE CONCAT('%', :trangThai, '%')  AND hd.trangThai <> 'PENDING' order by hd.created_at desc")
-    List<HoaDon> findByTrangThai(@Param("trangThai") String trangThai);
+    @Query("SELECT hd FROM HoaDon hd WHERE (hd.tenNguoiNhan like CONCAT('%', :keySearch, '%')  or hd.sdt like CONCAT('%', :keySearch, '%') or hd.maHoaDon like CONCAT('%', :keySearch, '%') or hd.email like  CONCAT('%', :keySearch, '%') ) " +
+            "AND hd.trangThai LIKE CONCAT('%', :trangThai, '%')  " +
+            "AND hd.trangThai <> 'PENDING'  " +
+            "order by hd.created_at desc ")
+    List<HoaDon> findByTrangThai(@Param("trangThai") String trangThai, @Param("keySearch") String keySearch);
+
+
 
     @Query("""
                select new com.example.be_datn.dto.Response.HistoryBillResponse(

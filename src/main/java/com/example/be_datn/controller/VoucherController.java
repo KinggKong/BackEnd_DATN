@@ -1,9 +1,8 @@
 package com.example.be_datn.controller;
 
-import com.example.be_datn.dto.Response.ApiResponse;
 import com.example.be_datn.dto.Request.VoucherRequest;
+import com.example.be_datn.dto.Response.ApiResponse;
 import com.example.be_datn.dto.Response.VoucherResponse;
-import com.example.be_datn.service.IVoucherService;
 import com.example.be_datn.service.impl.VoucherService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -28,7 +27,7 @@ public class VoucherController {
                                                       @RequestParam(value = "tenChienDich", defaultValue = "") String tenChienDich,
                                                       @RequestParam(value = "ngayBatDau", required = false) String ngayBatDauStr,
                                                       @RequestParam(value = "ngayKetThuc", required = false) String ngayKetThucStr,
-                                                      @RequestParam(value = "trangThai",defaultValue = "") Integer trangThai // Thay đổi ở đây
+                                                      @RequestParam(value = "trangThai", defaultValue = "") Integer trangThai // Thay đổi ở đây
     ) {
         Pageable pageable = PageRequest.of(Math.max(0, pageNumber), Math.max(1, pageSize));
         ApiResponse<Page<VoucherResponse>> apiResponse = new ApiResponse<>();
@@ -42,7 +41,7 @@ public class VoucherController {
         if (ngayKetThucStr != null && !ngayKetThucStr.isEmpty()) {
             ngayKetThuc = LocalDateTime.parse(ngayKetThucStr);
         }
-        apiResponse.setData(voucherService.getAllVoucherPageable(tenChienDich,ngayBatDau,ngayKetThuc, trangThai, pageable)); // Thay đổi ở đây
+        apiResponse.setData(voucherService.getAllVoucherPageable(tenChienDich, ngayBatDau, ngayKetThuc, trangThai, pageable)); // Thay đổi ở đây
         return apiResponse;
     }
 
@@ -75,5 +74,10 @@ public class VoucherController {
         apiResponse.setMessage("Cập nhật thành công voucher");
         apiResponse.setData(voucherService.updateVoucher(id, voucherRequest));
         return apiResponse;
+    }
+
+    @GetMapping("can-use")
+    public ApiResponse getAllVoucherCanUser(@RequestParam Double tongTien) {
+        return voucherService.getAllVoucherCanUser(tongTien);
     }
 }

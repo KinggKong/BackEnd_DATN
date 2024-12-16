@@ -2,6 +2,7 @@ package com.example.be_datn.service;
 
 import com.example.be_datn.dto.Request.NhanVienRequest;
 import com.example.be_datn.dto.Response.NhanVienResponse;
+import jakarta.mail.MessagingException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -11,7 +12,7 @@ public interface INhanVienService {
     Page<NhanVienResponse> getAllNhanVienPageable(String ten, Pageable pageable);
 
     // Tạo mới nhân viên
-    NhanVienResponse createNhanVien(NhanVienRequest nhanVienRequest);
+    NhanVienResponse createNhanVien(NhanVienRequest nhanVienRequest) throws MessagingException;
 
     // Lấy thông tin nhân viên theo ID
     NhanVienResponse getNhanVienById(Long id);

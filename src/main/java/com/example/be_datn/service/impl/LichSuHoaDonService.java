@@ -27,15 +27,12 @@ public class LichSuHoaDonService implements ILichSuHoaDonService {
     private final LichSuThanhToanRepository lichSuThanhToanRepository;
     private final HoaDonChiTietRepository hoaDonChiTietRepository;
     private final SanPhamChiTietRepository sanPhamChiTietRepository;
+    private final VoucherRepository voucherRepository;
 
     @Override
     public LichSuHoaDonResponse insertLichSuHoaDon(StatusBillRequest statusBillRequest) {
-        if(statusBillRequest.getStatus().equals(StatusPayment.CANCELLED.toString())){
-            updateAfterCancel(statusBillRequest.getIdHoaDon());
-        }
-
         NhanVien nhanVien = new NhanVien();
-        if(statusBillRequest.getStatus().equals(StatusPayment.CANCELLED.toString())){
+        if (statusBillRequest.getStatus().equals(StatusPayment.CANCELLED.toString())) {
             updateAfterCancel(statusBillRequest.getIdHoaDon());
         }
 
@@ -62,6 +59,7 @@ public class LichSuHoaDonService implements ILichSuHoaDonService {
                 .createdBy(nhanVien.getTen())
                 .trangThai(statusBillRequest.getStatus())
                 .ghiChu(statusBillRequest.getGhiChu())
+                .createdBy(nhanVien.getTen())
                 .build();
         LichSuHoaDon lichSuHD = lichSuHoaDonRepository.save(lichSuHoaDon);
         hoaDon.setTrangThai(lichSuHD.getTrangThai());
@@ -87,6 +85,16 @@ public class LichSuHoaDonService implements ILichSuHoaDonService {
     }
 
     public void updateAfterCancel(Long idHoaDon) {
+        HoaDon hoaDon = hoaDonRepository.findById(idHoaDon).orElseThrow(() -> new AppException(ErrorCode.HOA_DON_NOT_FOUND));
+
+        if (hoaDon.getVoucher() != null) {
+            Voucher voucher = voucherRepository.findById(hoaDon.getVoucher().getId()).orElseThrow(() -> new AppException(ErrorCode.VOUCHER_NOT_FOUND));
+            if (voucher != null) {
+                voucher.setSoLuong(voucher.getSoLuong() + 1);
+                voucherRepository.saveAndFlush(voucher);
+            }
+        }
+
         List<HoaDonCT> hoaDonCTList = hoaDonChiTietRepository.findByHoaDon_Id(idHoaDon);
         List<SanPhamChiTiet> newSanPhamChiTiets = new ArrayList<>();
 
