@@ -24,4 +24,5 @@ public interface ISanPhamChiTietService {
     Page<SanPhamChiTietResponse> getSanPhamChiTietBySoLuong(int soLuong, Pageable pageable);
     int countSanPhamHetHang();
     Page<SanPhamChiTietResponse> fillData(Long idDanhMuc, Long idThuongHieu, Long idChatLieuVai, Long idChatLieuDe, Long idSanPham, Pageable pageable);
+    public List<SanPhamChiTietResponse> getAllBanHang(Long idDanhMuc, Long idThuongHieu, Long idChatLieuVai, Long idChatLieuDe, Long idSanPham);
 }

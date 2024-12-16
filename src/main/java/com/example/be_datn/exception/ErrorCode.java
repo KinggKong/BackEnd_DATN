@@ -87,7 +87,7 @@ public enum ErrorCode {
     ACCOUNT_EMAIL_EXISTED(2000, "Email tài khoản đã tồn tại"),
     USER_CANT_CREATE_USER(2000, "Không thể tạo mới khách hàng"),
     ROLE_NOT_FOUND(2000,"Vai trò không tồn tại" ),
-
+    VOUCHER_OFF(2404, "VOUCHER_OFF"),
     EMAIL_INCORRECT_FORMAT(2000,"Email không đúng định dạng" );
     private int code;
     private String message;

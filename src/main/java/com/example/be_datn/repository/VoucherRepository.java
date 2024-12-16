@@ -9,6 +9,7 @@ import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 public interface VoucherRepository extends JpaRepository<Voucher, Long> {
 
@@ -36,6 +37,13 @@ public interface VoucherRepository extends JpaRepository<Voucher, Long> {
     List<Voucher> findAvailableVouchers(@Param("tongTien") double tongTien);
 
     Voucher findByMaVoucher(String ma);
+
+    Optional<Voucher> findByIdAndTrangThaiAndNgayKetThucAfterAndSoLuongGreaterThan(
+            Long id,
+            int trangThai, // Trạng thái của voucher (ví dụ: "ACTIVE")
+            LocalDateTime now,
+            int quantity);
+
 
 
 }

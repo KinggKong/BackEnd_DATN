@@ -235,4 +235,10 @@ public class SanPhamChiTietService implements ISanPhamChiTietService {
         return sanPhamChiTietRepository.fill(idDanhMuc, idThuongHieu, idChatLieuVai, idChatLieuDe, idSanPham, pageable)
                 .map(SanPhamChiTietResponse::fromSanPhamChiTiet);
     }
+
+    @Override
+    public List<SanPhamChiTietResponse> getAllBanHang(Long idDanhMuc, Long idThuongHieu, Long idChatLieuVai, Long idChatLieuDe, Long idSanPham) {
+        return sanPhamChiTietRepository.getAllByFilterBan(idDanhMuc, idThuongHieu, idChatLieuVai, idChatLieuDe, idSanPham)
+                .stream().map(SanPhamChiTietResponse::fromSanPhamChiTiet).toList();
+    }
 }

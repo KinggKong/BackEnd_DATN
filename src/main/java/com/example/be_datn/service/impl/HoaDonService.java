@@ -228,12 +228,12 @@ public class HoaDonService implements IHoaDonService {
         }
 
         if (hoaDon.getVoucher() != null) {
-            Voucher voucher = voucherRepository.findById(hoaDon.getVoucher().getId())
-                    .orElseThrow(() -> new AppException(ErrorCode.VOUCHER_NOT_FOUND));
-
-            if (voucher.getSoLuong() <= 0) {
-                throw new AppException(ErrorCode.VOUCHER_EXPIRED);
-            }
+            Voucher voucher = voucherRepository.findByIdAndTrangThaiAndNgayKetThucAfterAndSoLuongGreaterThan(
+                    hoaDon.getVoucher().getId(),
+                    1, // Kiểm tra trạng thái voucher phải là "ACTIVE"
+                    LocalDateTime.now(), // Kiểm tra voucher còn hiệu lực không
+                    0 // Kiểm tra voucher có số lượng lớn hơn 0 không
+            ).orElseThrow(() -> new AppException(ErrorCode.VOUCHER_OFF));
 
             voucher.setSoLuong(voucher.getSoLuong() - 1);
             voucherRepository.save(voucher);
@@ -281,6 +281,7 @@ public class HoaDonService implements IHoaDonService {
         invoicePdfGenerator.generateInvoice(HoaDonResponse.from(hoaDon), hoaDonChiTietMapper.toListResponse(hoaDonChiTietRepository.findByHoaDon_Id(hoaDon.getId())));
         return "ok";
     }
+
 
 
 
