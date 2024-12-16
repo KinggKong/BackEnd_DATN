@@ -80,10 +80,10 @@ public class KhachHangService implements IKhachHangService {
         String random = generateAccountCode().substring(0, 5);
         String password = UUID.randomUUID().toString();
         PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(10);
-        VaiTro vaiTro = vaiTroRepository.findByTenVaiTro("ROLE_CUSTOMER");
+        VaiTro vaiTro = vaiTroRepository.findByTenVaiTro("ROLE_USER");
         if (vaiTro == null) {
             VaiTro newVaiTro = VaiTro.builder()
-                    .tenVaiTro("ROLE_CUSTOMER")
+                    .tenVaiTro("ROLE_USER")
                     .trangThai(1)
                     .build();
             vaiTro = vaiTroRepository.save(newVaiTro);
