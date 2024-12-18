@@ -36,6 +36,21 @@ public interface VoucherRepository extends JpaRepository<Voucher, Long> {
     @Query("SELECT v FROM Voucher v WHERE v.trangThai = 1 AND :tongTien >= v.giaTriDonHangToiThieu")
     List<Voucher> findAvailableVouchers(@Param("tongTien") double tongTien);
 
+    Voucher findByMaVoucher(String ma);
+
+    @Query("SELECT v FROM Voucher v WHERE v.id = :id AND v.trangThai = :trangThai AND v.ngayKetThuc > :now AND v.soLuong > :quantity")
+    Optional<Voucher> findByIdAndTrangThaiAndNgayKetThucAfterAndSoLuongGreaterThan(
+            @Param("id") Long id,
+            @Param("trangThai") int trangThai,
+            @Param("now") LocalDateTime now,
+            @Param("quantity") int quantity);
+
+    @Query("select v from Voucher v where v.id=:id and v.trangThai=1")
+    Optional<Voucher>  check(@Param("id") Long id);
+
+
+
+
     @Query(value = "select v from Voucher v where v.trangThai = 1 and (:locadate between v.ngayBatDau and v.ngayKetThuc) and v.soLuong >  0 and :tongTien > v.giaTriDonHangToiThieu")
     List<Voucher> getAllVoucherCanUser(@Param("locadate") LocalDateTime localDate, @Param("tongTien") Double tongTien);
 
