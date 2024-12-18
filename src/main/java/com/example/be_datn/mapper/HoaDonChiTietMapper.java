@@ -19,7 +19,7 @@ public class HoaDonChiTietMapper {
                 .hoaDon(hoaDon)
                 .sanPhamChiTiet(gioHangChiTiet.getSanPhamChiTiet())
                 .soLuong(gioHangChiTiet.getSoLuong())
-                .giaTien(gioHangChiTiet.getGiaTien())
+                .giaTien(gioHangChiTiet.getSanPhamChiTiet().getGiaBanSauKhiGiam())
                 .trangThai(1)
                 .build();
     }
