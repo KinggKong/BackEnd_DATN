@@ -35,6 +35,11 @@ public class LichSuHoaDonService implements ILichSuHoaDonService {
         NhanVien nhanVien = new NhanVien();
         if (statusBillRequest.getStatus().equals(StatusPayment.CANCELLED.toString())) {
             HoaDon hoaDon = hoaDonRepository.findById(statusBillRequest.getIdHoaDon()).orElseThrow(() -> new AppException(ErrorCode.HOA_DON_NOT_FOUND));
+
+            if (hoaDon.getTrangThai().equalsIgnoreCase(StatusPayment.SHIPPING.toString()) || hoaDon.getTrangThai().equalsIgnoreCase(StatusPayment.DONE.toString())) {
+                throw new AppException(ErrorCode.CANT_BE_CANCEL_WHEN_SHIPPING);
+            }
+
             if (hoaDon.getTrangThai().equals(StatusPayment.ACCEPTED.toString())) {
                 updateAfterCancel(statusBillRequest.getIdHoaDon());
             }
