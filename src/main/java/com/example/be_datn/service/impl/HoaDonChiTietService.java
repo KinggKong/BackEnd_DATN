@@ -37,14 +37,18 @@ public class HoaDonChiTietService implements IHoaDonChiTietService {
 
     @Override
     public String create(HoaDonChiTietRequest request) {
-        SanPhamChiTiet sanPhamChiTiet = sanPhamChiTietRepository.findById(request.getIdSanPhamChiTiet()).get();
-        HoaDon hoaDon = hoaDonRepository.findById(request.getIdHoaDon()).get();
+        SanPhamChiTiet sanPhamChiTiet = sanPhamChiTietRepository.findById(request.getIdSanPhamChiTiet()).orElseThrow(() -> new RuntimeException("Product not found"));
+        HoaDon hoaDon = hoaDonRepository.findById(request.getIdHoaDon()).orElseThrow(() -> new RuntimeException("Invoice not found"));
+
         Optional<HoaDonCT> hoaDonChiTiet = hoaDonChiTietRepository.findByHoaDonAndSanPhamChiTiet(hoaDon, sanPhamChiTiet);
 
+        // Kiểm tra số lượng trong kho
+        if (request.getSoLuong() > sanPhamChiTiet.getSoLuong() || request.getSoLuong() < 0) {
+            throw new RuntimeException("Invalid quantity. Not enough stock.");
+        }
+
         if (hoaDonChiTiet.isEmpty()) {
-            if (request.getSoLuong() > sanPhamChiTiet.getSoLuong() || request.getSoLuong() < 0) {
-                throw new RuntimeException("Invalid quantity");
-            }
+            // Nếu không tồn tại chi tiết hóa đơn, thêm mới
             HoaDonCT hoaDonChiTiet1 = hoaDonChiTietRepository.save(
                     HoaDonCT.builder()
                             .hoaDon(hoaDon)
@@ -56,27 +60,42 @@ public class HoaDonChiTietService implements IHoaDonChiTietService {
             updateHoaDon(hoaDon.getId());
             sanPhamChiTietService.updateSoLuongSanPhamChiTiet(sanPhamChiTiet.getId(), hoaDonChiTiet1.getSoLuong(), "minus");
         } else {
+            // Nếu chi tiết hóa đơn đã tồn tại, kiểm tra và cập nhật số lượng
             HoaDonCT existingChiTiet = hoaDonChiTiet.get();
             Integer currentSoLuong = existingChiTiet.getSoLuong() != null ? existingChiTiet.getSoLuong() : 0;
-            Integer newSoLuong = currentSoLuong + request.getSoLuong();
-
-            if (newSoLuong > sanPhamChiTiet.getSoLuong()) {
-                throw new RuntimeException("Not enough stock");
+            Integer newSoLuong = request.getSoLuong();
+            SanPhamChiTiet sanPhamChiTiet1 = sanPhamChiTietRepository.findById(request.getIdSanPhamChiTiet())
+                    .orElseThrow(() -> new RuntimeException("Product not found"));
+            if(newSoLuong > sanPhamChiTiet1.getSoLuong()){
+                throw new RuntimeException("Not enough stock after update");
             }
+
+            // Cậpnhật chi tiết hóa đơn
             HoaDonCT hoaDonChiTiet1 = hoaDonChiTietRepository.save(
                     HoaDonCT.builder()
                             .id(existingChiTiet.getId())
                             .hoaDon(hoaDon)
                             .sanPhamChiTiet(sanPhamChiTiet)
-                            .soLuong(newSoLuong)
+                            .soLuong(currentSoLuong+newSoLuong)
                             .giaTien(sanPhamChiTiet.getGiaBanSauKhiGiam())
                             .build()
             );
             updateHoaDon(hoaDon.getId());
-            sanPhamChiTietService.updateSoLuongSanPhamChiTiet(sanPhamChiTiet.getId(), request.getSoLuong(), "minus");
+
+            // Cập nhật số lượng trong kho
+            int quantityToSubtract = request.getSoLuong();
+            if (currentSoLuong < newSoLuong+currentSoLuong) {
+                // Khi tăng số lượng, trừ bớt từ kho
+                sanPhamChiTietService.updateSoLuongSanPhamChiTiet(sanPhamChiTiet.getId(), quantityToSubtract, "minus");
+            } else {
+                // Khi giảm số lượng, cộng lại vào kho
+                sanPhamChiTietService.updateSoLuongSanPhamChiTiet(sanPhamChiTiet.getId(), quantityToSubtract, "plus");
+            }
         }
+
         return "Success";
     }
+
 
 
     @Override

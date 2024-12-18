@@ -243,4 +243,11 @@ public class SanPhamChiTietService implements ISanPhamChiTietService {
     public int countSanPhamHetHang() {
         return sanPhamChiTietRepository.countSanPhamHetHang();
     }
+
+
+//    @Override
+//    public List<SanPhamChiTietResponse> getAllBanHang(Long idDanhMuc, Long idThuongHieu, Long idChatLieuVai, Long idChatLieuDe, Long idSanPham) {
+//        return sanPhamChiTietRepository.getAllByFilterBan(idDanhMuc, idThuongHieu, idChatLieuVai, idChatLieuDe, idSanPham)
+//                .stream().map(SanPhamChiTietResponse::fromSanPhamChiTiet).toList();
+//    }
 }

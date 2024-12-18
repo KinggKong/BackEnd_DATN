@@ -5,6 +5,7 @@ import com.example.be_datn.dto.Request.KhachHangRequest;
 import com.example.be_datn.dto.Response.HoaDonCTResponse;
 import com.example.be_datn.dto.Response.HoaDonChiTietResponse;
 import com.example.be_datn.dto.Response.HoaDonResponse;
+import com.example.be_datn.dto.Response.InfoGiaoHang;
 import com.example.be_datn.entity.HoaDon;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -21,5 +22,4 @@ public interface IHoaDonService {
     String completeHoaDon(Long id, String method,String diaChi, Double tienShip,String tenNguoiNhan, String sdt, String ghiChu);
     HoaDonResponse findByMaHoaDon(String maHoaDon);
     void changeTypeBill(Long idHoaDon);
-
 }
