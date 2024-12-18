@@ -259,31 +259,14 @@ public class HoaDonService implements IHoaDonService {
         // Retrieve the HoaDon object
         HoaDon hoaDon = hoaDonRepository.findById(id)
                 .orElseThrow(() -> new AppException(ErrorCode.HOA_DON_NOT_FOUND));
-        if(diaChi != null ) {
-            hoaDon.setDiaChiNhan(diaChi);
-        }else {
-            hoaDon.setDiaChiNhan("");
-        }
-        if(tienShip != null) {
-            hoaDon.setTienShip(tienShip);
-        }else {
-            hoaDon.setTienShip(0.0);
-        }
-        if(tenNguoiNhan != null && !tenNguoiNhan.trim().isEmpty()) {
-            hoaDon.setTenNguoiNhan(tenNguoiNhan);
-        }else {
-            hoaDon.setTenNguoiNhan("Khách lẻ");
-        }
-        if(sdt != null) {
-            hoaDon.setSdt(sdt);
-        }else {
-            hoaDon.setSdt("");
-        }
-        if(ghiChu != null) {
-            hoaDon.setGhiChu(ghiChu);
-        }else {
-            hoaDon.setGhiChu("");
-        }
+
+        hoaDon.setDiaChiNhan(diaChi);
+        hoaDon.setTienShip(tienShip);
+        hoaDon.setTenNguoiNhan(tenNguoiNhan);
+        hoaDon.setSdt(sdt);
+        hoaDon.setGhiChu(ghiChu);
+        
+
 //        //Check voucher
 //        if(hoaDon.getVoucher() != null) {
 //            Voucher voucher = voucherRepository.findById(hoaDon.getVoucher().getId())
