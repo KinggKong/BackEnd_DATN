@@ -294,4 +294,15 @@ public interface HoaDonRepository extends JpaRepository<HoaDon, Long> {
 
     @Query("SELECT h FROM HoaDon h WHERE h.voucher = :voucher")
     List<HoaDon> findByVoucher(@Param("voucher") Voucher voucher);
+
+    List<HoaDon> findByTongTienBetweenAndVoucherIsNull(Double minTotalAmount, Double maxTotalAmount);
+
+    @Query("""
+    select hd from HoaDon hd 
+    where (hd.trangThai = 'PENDING' and hd.loaiHoaDon = 'OFFLINE') 
+    or (hd.loaiHoaDon = 'ONLINE' and hd.trangThai = 'PENDING')
+    and hd.tongTien >= :tongTien
+""")
+    List<HoaDon> findHoaDonAndAddVoucher(double tongTien);
+
 }

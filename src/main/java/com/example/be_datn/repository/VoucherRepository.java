@@ -38,11 +38,17 @@ public interface VoucherRepository extends JpaRepository<Voucher, Long> {
 
     Voucher findByMaVoucher(String ma);
 
+    @Query("SELECT v FROM Voucher v WHERE v.id = :id AND v.trangThai = :trangThai AND v.ngayKetThuc > :now AND v.soLuong > :quantity")
     Optional<Voucher> findByIdAndTrangThaiAndNgayKetThucAfterAndSoLuongGreaterThan(
-            Long id,
-            int trangThai, // Trạng thái của voucher (ví dụ: "ACTIVE")
-            LocalDateTime now,
-            int quantity);
+            @Param("id") Long id,
+            @Param("trangThai") int trangThai,
+            @Param("now") LocalDateTime now,
+            @Param("quantity") int quantity);
+
+    @Query("select v from Voucher v where v.id=:id and v.trangThai=1")
+    Optional<Voucher>  check(@Param("id") Long id);
+
+
 
 
 

@@ -1,10 +1,7 @@
 package com.example.be_datn.service.impl;
 
 import com.example.be_datn.dto.Request.HoaDonUpdateRequest;
-import com.example.be_datn.dto.Response.HoaDonCTResponse;
-import com.example.be_datn.dto.Response.HoaDonChiTietResponse;
 import com.example.be_datn.dto.Response.HoaDonResponse;
-import com.example.be_datn.dto.Response.InfoGiaoHang;
 import com.example.be_datn.entity.HoaDon;
 import com.example.be_datn.entity.HoaDonCT;
 import com.example.be_datn.entity.KhachHang;
@@ -87,7 +84,7 @@ public class HoaDonService implements IHoaDonService {
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy hóa đơn với ID: " + id));
         NhanVien nhanVien = hoaDon.getNhanVien();
         KhachHang khachHang = hoaDon.getKhachHang();
-        Voucher voucher = hoaDon.getVoucher();
+        Voucher voucher = hoaDon.getVoucher() == null ? null : hoaDon.getVoucher();
 
         return new HoaDonResponse(
                 hoaDon.getId(),
@@ -221,22 +218,25 @@ public class HoaDonService implements IHoaDonService {
         HoaDon hoaDon = hoaDonRepository.findById(id)
                 .orElseThrow(() -> new AppException(ErrorCode.HOA_DON_NOT_FOUND));
 
+        // Kiểm tra nhân viên
         if(hoaDon.getNhanVien() != null) {
             NhanVien nhanVien = nhanVienRepository.findById(hoaDon.getNhanVien().getId())
                     .orElseThrow(() -> new AppException(ErrorCode.NHANVIEN_NOT_FOUND));
             hoaDon.setNhanVien(nhanVien);
         }
-
         if (hoaDon.getVoucher() != null) {
-            Voucher voucher = voucherRepository.findByIdAndTrangThaiAndNgayKetThucAfterAndSoLuongGreaterThan(
-                    hoaDon.getVoucher().getId(),
-                    1, // Kiểm tra trạng thái voucher phải là "ACTIVE"
-                    LocalDateTime.now(), // Kiểm tra voucher còn hiệu lực không
-                    0 // Kiểm tra voucher có số lượng lớn hơn 0 không
-            ).orElseThrow(() -> new AppException(ErrorCode.VOUCHER_OFF));
-
+            Voucher voucher = voucherRepository.check(
+                hoaDon.getVoucher().getId()
+            ).orElseThrow(() -> new AppException(ErrorCode.VOUCHER_EXPIRED));
+            if (voucher.getSoLuong() <= 0 ) {
+                throw new AppException(ErrorCode.VOUCHER_EXPIRED);
+            }
+            if(voucher.getTrangThai()==0) {
+                throw new AppException(ErrorCode.VOUCHER_EXPIRED);
+            }
             voucher.setSoLuong(voucher.getSoLuong() - 1);
             voucherRepository.save(voucher);
+
             double discount = hoaDon.getSoTienGiam();
             hoaDon.setTienSauGiam(hoaDon.getTongTien() - discount);
         } else {
@@ -244,15 +244,13 @@ public class HoaDonService implements IHoaDonService {
             hoaDon.setTienSauGiam(hoaDon.getTongTien());
         }
         hoaDon.setHinhThucThanhToan(method);
-
         if(hoaDon.getLoaiHoaDon().equalsIgnoreCase(TypeBill.OFFLINE.toString())) {
             hoaDon.setTrangThai(StatusPayment.DONE.toString());
-        }else {
+        } else {
             hoaDon.setTienShip(hoaDon.getTienShip());
             hoaDon.setTrangThai(StatusPayment.WAITING.toString());
             hoaDon.setTienSauGiam(hoaDon.getTienSauGiam() + hoaDon.getTienShip());
         }
-
         HoaDon updatedHoaDon = hoaDonRepository.save(hoaDon);
 
         LichSuHoaDon lichSuHoaDon = lichSuHoaDonRepository.findLichSuHoaDonByHoaDonId(updatedHoaDon.getId());
@@ -263,13 +261,14 @@ public class HoaDonService implements IHoaDonService {
             if(updatedHoaDon.getLoaiHoaDon().equalsIgnoreCase(TypeBill.OFFLINE.toString())) {
                 lichSuHoaDon.setGhiChu("WAITING");
                 lichSuHoaDon.setTrangThai(StatusPayment.WAITING.toString());
-            }else {
+            } else {
                 lichSuHoaDon.setGhiChu("DONE");
                 lichSuHoaDon.setTrangThai(StatusPayment.DONE.toString());
             }
             lichSuHoaDonRepository.save(lichSuHoaDon);
         }
 
+        // Lưu lịch sử thanh toán
         LichSuThanhToan lichSuThanhToan = LichSuThanhToan.builder()
                 .soTien(updatedHoaDon.getTongTien())
                 .paymentMethod(updatedHoaDon.getHinhThucThanhToan())
@@ -278,12 +277,11 @@ public class HoaDonService implements IHoaDonService {
                 .status(StatusPayment.DONE.toString())
                 .build();
         lichSuThanhToanRepository.save(lichSuThanhToan);
+
         invoicePdfGenerator.generateInvoice(HoaDonResponse.from(hoaDon), hoaDonChiTietMapper.toListResponse(hoaDonChiTietRepository.findByHoaDon_Id(hoaDon.getId())));
+
         return "ok";
     }
-
-
-
 
     @Transactional
     @Scheduled(fixedRate = 600000)
