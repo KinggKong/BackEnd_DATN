@@ -1,8 +1,6 @@
 package com.example.be_datn.service.impl;
 
 import com.example.be_datn.dto.Request.HoaDonUpdateRequest;
-import com.example.be_datn.dto.Response.HoaDonCTResponse;
-import com.example.be_datn.dto.Response.HoaDonChiTietResponse;
 import com.example.be_datn.dto.Response.HoaDonResponse;
 import com.example.be_datn.dto.Response.VoucherResponse;
 import com.example.be_datn.entity.HoaDon;
@@ -15,6 +13,7 @@ import com.example.be_datn.entity.SanPhamChiTiet;
 import com.example.be_datn.entity.StatusPayment;
 import com.example.be_datn.entity.TypeBill;
 import com.example.be_datn.entity.Voucher;
+import com.example.be_datn.entity.*;
 import com.example.be_datn.exception.AppException;
 import com.example.be_datn.exception.ErrorCode;
 import com.example.be_datn.mapper.HoaDonChiTietMapper;
@@ -265,7 +264,7 @@ public class HoaDonService implements IHoaDonService {
         hoaDon.setTenNguoiNhan(tenNguoiNhan);
         hoaDon.setSdt(sdt);
         hoaDon.setGhiChu(ghiChu);
-        
+
 
 //        //Check voucher
 //        if(hoaDon.getVoucher() != null) {

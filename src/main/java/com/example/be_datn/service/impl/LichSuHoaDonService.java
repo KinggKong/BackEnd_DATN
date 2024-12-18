@@ -83,7 +83,7 @@ public class LichSuHoaDonService implements ILichSuHoaDonService {
             LichSuThanhToan lichSuThanhToan = LichSuThanhToan.builder()
                     .hoaDon(hoaDon)
                     .type(hoaDon.getLoaiHoaDon())
-                    .soTien(hoaDon.getTongTien())
+                    .soTien(hoaDon.getTongTien() - hoaDon.getSoTienGiam())
                     .paymentMethod(hoaDon.getHinhThucThanhToan())
                     .status("DONE")
                     .build();
@@ -101,13 +101,13 @@ public class LichSuHoaDonService implements ILichSuHoaDonService {
     public void updateAfterCancel(Long idHoaDon) {
         HoaDon hoaDon = hoaDonRepository.findById(idHoaDon).orElseThrow(() -> new AppException(ErrorCode.HOA_DON_NOT_FOUND));
 
-        if (hoaDon.getVoucher() != null) {
-            Voucher voucher = voucherRepository.findById(hoaDon.getVoucher().getId()).orElseThrow(() -> new AppException(ErrorCode.VOUCHER_NOT_FOUND));
-            if (voucher != null) {
-                voucher.setSoLuong(voucher.getSoLuong() + 1);
-                voucherRepository.saveAndFlush(voucher);
-            }
-        }
+//        if (hoaDon.getVoucher() != null) {
+//            Voucher voucher = voucherRepository.findById(hoaDon.getVoucher().getId()).orElseThrow(() -> new AppException(ErrorCode.VOUCHER_NOT_FOUND));
+//            if (voucher != null) {
+//                voucher.setSoLuong(voucher.getSoLuong() + 1);
+//                voucherRepository.saveAndFlush(voucher);
+//            }
+//        }
 
         List<HoaDonCT> hoaDonCTList = hoaDonChiTietRepository.findByHoaDon_Id(idHoaDon);
         List<SanPhamChiTiet> newSanPhamChiTiets = new ArrayList<>();
