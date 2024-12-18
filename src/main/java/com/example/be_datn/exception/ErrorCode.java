@@ -91,7 +91,8 @@ public enum ErrorCode {
 
     EMAIL_INCORRECT_FORMAT(2000, "Email không đúng định dạng"),
     EMAIL_SEND_FAILED(2000, "Gửi email không thành công"),
-    VOUCHER_INVALID(2000, "Voucher đã không còn hoạt động");
+    VOUCHER_INVALID(2000, "Voucher đã không còn hoạt động"),
+    SO_LUONG_SAN_PHAM_KHONG_DU(2000, "Số lượng sản phẩm mua nhiều hơn số lượng có sẵn");
     private int code;
     private String message;
 }

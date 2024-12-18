@@ -65,4 +65,11 @@ public class TaiKhoanController {
         return apiResponse;
     }
 
+    @GetMapping("/getIDOwner")
+    public ApiResponse<TaiKhoanResponse> getIDOwner(@RequestParam String email) {
+        ApiResponse<TaiKhoanResponse> apiResponse = new ApiResponse<>();
+        apiResponse.setMessage("Get ID Owner successfully");
+        apiResponse.setData(taiKhoanService.getTaiKhoanByIDOwner(email));
+        return apiResponse;
+    }
 }

@@ -4,6 +4,7 @@ import com.example.be_datn.dto.Request.HoaDonUpdateRequest;
 import com.example.be_datn.dto.Response.HoaDonCTResponse;
 import com.example.be_datn.dto.Response.HoaDonChiTietResponse;
 import com.example.be_datn.dto.Response.HoaDonResponse;
+import com.example.be_datn.dto.Response.VoucherResponse;
 import com.example.be_datn.entity.HoaDon;
 import com.example.be_datn.entity.HoaDonCT;
 import com.example.be_datn.entity.KhachHang;
@@ -119,7 +120,9 @@ public class HoaDonService implements IHoaDonService {
                 voucher != null ? voucher.getMaVoucher() : null,
                 hoaDon.getSoTienGiam(),
                 hoaDon.getCreated_at(),
-                hoaDon.getUpdated_at()
+                hoaDon.getUpdated_at(),
+                voucher != null ? voucher.getId() : null
+
         );
     }
 
@@ -163,6 +166,7 @@ public class HoaDonService implements IHoaDonService {
         hoaDon.setTienSauGiam(0.0);
         hoaDon.setTienShip(0.0);
         hoaDon.setTongTien(0.0);
+        hoaDon.setSoTienGiam(0.0);
 
         HoaDon hd = hoaDonRepository.save(hoaDon);
         LichSuHoaDon lichSuHoaDon = LichSuHoaDon.builder()
@@ -251,16 +255,55 @@ public class HoaDonService implements IHoaDonService {
 
     @Override
     @Transactional
-    public String completeHoaDon(Long id, String method,String diaChi, Double tienShip) {
+    public String completeHoaDon(Long id, String method,String diaChi, Double tienShip,String tenNguoiNhan, String sdt, String ghiChu) {
         // Retrieve the HoaDon object
         HoaDon hoaDon = hoaDonRepository.findById(id)
                 .orElseThrow(() -> new AppException(ErrorCode.HOA_DON_NOT_FOUND));
-        if(diaChi != null) {
+        if(diaChi != null ) {
             hoaDon.setDiaChiNhan(diaChi);
+        }else {
+            hoaDon.setDiaChiNhan("");
         }
         if(tienShip != null) {
             hoaDon.setTienShip(tienShip);
+        }else {
+            hoaDon.setTienShip(0.0);
         }
+        if(tenNguoiNhan != null && !tenNguoiNhan.trim().isEmpty()) {
+            hoaDon.setTenNguoiNhan(tenNguoiNhan);
+        }else {
+            hoaDon.setTenNguoiNhan("Khách lẻ");
+        }
+        if(sdt != null) {
+            hoaDon.setSdt(sdt);
+        }else {
+            hoaDon.setSdt("");
+        }
+        if(ghiChu != null) {
+            hoaDon.setGhiChu(ghiChu);
+        }else {
+            hoaDon.setGhiChu("");
+        }
+//        //Check voucher
+//        if(hoaDon.getVoucher() != null) {
+//            Voucher voucher = voucherRepository.findById(hoaDon.getVoucher().getId())
+//                    .orElseThrow(() -> new AppException(ErrorCode.VOUCHER_NOT_FOUND));
+//            if(voucher.getSoLuong() <= 0) {
+//                throw new AppException(ErrorCode.VOUCHER_EXPIRED);
+//            }
+//            if(voucher.getTrangThai()==0){
+//                throw new AppException(ErrorCode.VOUCHER_EXPIRED);
+//            }
+//
+//            voucher.setSoLuong(voucher.getSoLuong() - 1);
+//            voucherRepository.save(voucher);
+//            double discount = hoaDon.getSoTienGiam();
+//            hoaDon.setTienSauGiam(hoaDon.getTongTien() - discount);
+//        } else {
+//            throw new AppException(ErrorCode.VOUCHER_NOT_FOUND);
+//        }
+
+
 
         if(hoaDon.getNhanVien() != null) {
             NhanVien nhanVien = nhanVienRepository.findById(hoaDon.getNhanVien().getId())

@@ -20,4 +20,6 @@ public interface TaiKhoanRepository extends JpaRepository<TaiKhoan, Long> {
     Optional<TaiKhoan> findByEmailAndUsername(@Param("keyword") String keyword);
 
     Optional<TaiKhoan> findByTenDangNhap(String tenDangNhap);
+    @Query("select tk from TaiKhoan tk where tk.email = :email")
+    Optional<TaiKhoan> findByOwnerID(String email);
 }
