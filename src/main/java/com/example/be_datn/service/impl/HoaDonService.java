@@ -1,8 +1,6 @@
 package com.example.be_datn.service.impl;
 
 import com.example.be_datn.dto.Request.HoaDonUpdateRequest;
-import com.example.be_datn.dto.Response.HoaDonCTResponse;
-import com.example.be_datn.dto.Response.HoaDonChiTietResponse;
 import com.example.be_datn.dto.Response.HoaDonResponse;
 import com.example.be_datn.entity.HoaDon;
 import com.example.be_datn.entity.HoaDonCT;
@@ -27,6 +25,7 @@ import com.example.be_datn.repository.NhanVienRepository;
 import com.example.be_datn.repository.SanPhamChiTietRepository;
 import com.example.be_datn.repository.VoucherRepository;
 import com.example.be_datn.service.IHoaDonService;
+import com.example.be_datn.utils.SecurityUtils;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -151,13 +150,14 @@ public class HoaDonService implements IHoaDonService {
         hoaDon.setTienSauGiam(0.0);
         hoaDon.setTienShip(0.0);
         hoaDon.setTongTien(0.0);
-
         HoaDon hd = hoaDonRepository.save(hoaDon);
+        NhanVien nhanVien = nhanVienRepository.findById(SecurityUtils.getCurrentUserId())
+                .orElseThrow(() -> new AppException(ErrorCode.NHANVIEN_NOT_FOUND));
         LichSuHoaDon lichSuHoaDon = LichSuHoaDon.builder()
-                .nhanVien(null)
+                .nhanVien(nhanVien)
                 .hoaDon(hd)
                 .ghiChu("PENDING")
-                .createdBy(null)
+                .createdBy(nhanVien.getTen())
                 .trangThai(StatusPayment.PENDING.toString())
                 .build();
         lichSuHoaDonRepository.save(lichSuHoaDon);
