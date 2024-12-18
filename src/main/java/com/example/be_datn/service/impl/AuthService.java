@@ -70,18 +70,20 @@ public class AuthService implements IAuthService {
 
     @Override
     public ResponseEntity<ApiResponse<SignInResponse>> login(SignInRequest signinRequest, HttpServletRequest request) {
-        if (taiKhoanRepository.checkIsActive(signinRequest.getUsername()).isEmpty()) {
-            throw new AppException(ErrorCode.ACCOUNT_NOT_ACTIVE);
-        }
-        if (khachHangRepository.checkIsActive(signinRequest.getUsername()).isEmpty()) {
-            throw new AppException(ErrorCode.ACCOUNT_NOT_ACTIVE);
-        }
         try {
             Authentication authentication = authenticateUser(signinRequest);
             AccountDetailsImpl accountDetails = (AccountDetailsImpl) authentication.getPrincipal();
             if (!accountDetails.getRoleName().equals("ROLE_USER")) {
                 throw new AppException(ErrorCode.LOGIN_FAILED);
             }
+
+            if (taiKhoanRepository.checkIsActive(signinRequest.getUsername()).isEmpty()) {
+                throw new AppException(ErrorCode.ACCOUNT_NOT_ACTIVE);
+            }
+            if (khachHangRepository.checkIsActive(signinRequest.getUsername()).isEmpty()) {
+                throw new AppException(ErrorCode.ACCOUNT_NOT_ACTIVE);
+            }
+
             Long accountId = accountDetails.getAccount().getId();
 
             LocalDateTime now = LocalDateTime.now();
@@ -114,9 +116,7 @@ public class AuthService implements IAuthService {
 
     @Override
     public ResponseEntity<ApiResponse<SignInResponse>> loginAdmin(SignInRequest signinRequest, HttpServletRequest request) {
-        if (nhanVienRepository.checkIsActive(signinRequest.getUsername()).isEmpty()) {
-            throw new AppException(ErrorCode.ACCOUNT_NOT_ACTIVE);
-        }
+
 
         try {
             Authentication authentication = authenticateUser(signinRequest);
@@ -124,6 +124,11 @@ public class AuthService implements IAuthService {
             if (accountDetails.getRoleName().equals("ROLE_USER")) {
                 throw new AppException(ErrorCode.LOGIN_FAILED);
             }
+
+            if (nhanVienRepository.checkIsActive(signinRequest.getUsername()).isEmpty()) {
+                throw new AppException(ErrorCode.ACCOUNT_NOT_ACTIVE);
+            }
+
             Long accountId = accountDetails.getAccount().getId();
 
             LocalDateTime now = LocalDateTime.now();
