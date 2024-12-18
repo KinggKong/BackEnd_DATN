@@ -70,6 +70,12 @@ public class AuthService implements IAuthService {
 
     @Override
     public ResponseEntity<ApiResponse<SignInResponse>> login(SignInRequest signinRequest, HttpServletRequest request) {
+        if (taiKhoanRepository.checkIsActive(signinRequest.getUsername()).isEmpty()) {
+            throw new AppException(ErrorCode.ACCOUNT_NOT_ACTIVE);
+        }
+        if (khachHangRepository.checkIsActive(signinRequest.getUsername()).isEmpty()) {
+            throw new AppException(ErrorCode.ACCOUNT_NOT_ACTIVE);
+        }
         try {
             Authentication authentication = authenticateUser(signinRequest);
             AccountDetailsImpl accountDetails = (AccountDetailsImpl) authentication.getPrincipal();
@@ -108,6 +114,10 @@ public class AuthService implements IAuthService {
 
     @Override
     public ResponseEntity<ApiResponse<SignInResponse>> loginAdmin(SignInRequest signinRequest, HttpServletRequest request) {
+        if (nhanVienRepository.checkIsActive(signinRequest.getUsername()).isEmpty()) {
+            throw new AppException(ErrorCode.ACCOUNT_NOT_ACTIVE);
+        }
+
         try {
             Authentication authentication = authenticateUser(signinRequest);
             AccountDetailsImpl accountDetails = (AccountDetailsImpl) authentication.getPrincipal();
@@ -269,7 +279,7 @@ public class AuthService implements IAuthService {
         String role = SecurityUtils.getCurrentRole();
         GioHang gioHang = gioHangRepository.findByKhachHang_Id(khachHang.get().getId());
         return ApiResponse.<Profile>builder()
-                .data(profileMapper.toProfile(khachHang.get(), gioHang.getId(),role))
+                .data(profileMapper.toProfile(khachHang.get(), gioHang.getId(), role))
                 .build();
     }
 

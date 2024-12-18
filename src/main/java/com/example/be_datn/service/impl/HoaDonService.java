@@ -1,31 +1,13 @@
 package com.example.be_datn.service.impl;
 
 import com.example.be_datn.dto.Request.HoaDonUpdateRequest;
-import com.example.be_datn.dto.Response.HoaDonCTResponse;
-import com.example.be_datn.dto.Response.HoaDonChiTietResponse;
 import com.example.be_datn.dto.Response.HoaDonResponse;
-import com.example.be_datn.entity.HoaDon;
-import com.example.be_datn.entity.HoaDonCT;
-import com.example.be_datn.entity.KhachHang;
-import com.example.be_datn.entity.LichSuHoaDon;
-import com.example.be_datn.entity.LichSuThanhToan;
-import com.example.be_datn.entity.NhanVien;
-import com.example.be_datn.entity.SanPhamChiTiet;
-import com.example.be_datn.entity.StatusPayment;
-import com.example.be_datn.entity.TypeBill;
-import com.example.be_datn.entity.Voucher;
+import com.example.be_datn.entity.*;
 import com.example.be_datn.exception.AppException;
 import com.example.be_datn.exception.ErrorCode;
 import com.example.be_datn.mapper.HoaDonChiTietMapper;
 import com.example.be_datn.mapper.HoaDonMapper;
-import com.example.be_datn.repository.HoaDonChiTietRepository;
-import com.example.be_datn.repository.HoaDonRepository;
-import com.example.be_datn.repository.KhachHangRepository;
-import com.example.be_datn.repository.LichSuHoaDonRepository;
-import com.example.be_datn.repository.LichSuThanhToanRepository;
-import com.example.be_datn.repository.NhanVienRepository;
-import com.example.be_datn.repository.SanPhamChiTietRepository;
-import com.example.be_datn.repository.VoucherRepository;
+import com.example.be_datn.repository.*;
 import com.example.be_datn.service.IHoaDonService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -62,7 +44,7 @@ public class HoaDonService implements IHoaDonService {
 
     private final SanPhamChiTietRepository sanPhamChiTietRepository;
 
-    private final HoaDonChiTietMapper  hoaDonChiTietMapper;
+    private final HoaDonChiTietMapper hoaDonChiTietMapper;
     private final InvoicePdfGenerator invoicePdfGenerator;
     private final NhanVienRepository nhanVienRepository;
 
@@ -210,7 +192,7 @@ public class HoaDonService implements IHoaDonService {
                 hoaDon.setDiaChiNhan("");
                 hoaDon.setSdt("");
                 hoaDon.setTienShip(0.0);
-            }else {
+            } else {
                 hoaDon.setTienShip(request.getTienShip());
                 hoaDon.setDiaChiNhan(request.getDiaChiNhan());
             }
@@ -239,18 +221,18 @@ public class HoaDonService implements IHoaDonService {
 
     @Override
     @Transactional
-    public String completeHoaDon(Long id, String method,String diaChi, Double tienShip) {
+    public String completeHoaDon(Long id, String method, String diaChi, Double tienShip) {
         // Retrieve the HoaDon object
         HoaDon hoaDon = hoaDonRepository.findById(id)
                 .orElseThrow(() -> new AppException(ErrorCode.HOA_DON_NOT_FOUND));
-        if(diaChi != null) {
+        if (diaChi != null) {
             hoaDon.setDiaChiNhan(diaChi);
         }
-        if(tienShip != null) {
+        if (tienShip != null) {
             hoaDon.setTienShip(tienShip);
         }
 
-        if(hoaDon.getNhanVien() != null) {
+        if (hoaDon.getNhanVien() != null) {
             NhanVien nhanVien = nhanVienRepository.findById(hoaDon.getNhanVien().getId())
                     .orElseThrow(() -> new AppException(ErrorCode.NHANVIEN_NOT_FOUND));
             hoaDon.setNhanVien(nhanVien);
@@ -295,7 +277,7 @@ public class HoaDonService implements IHoaDonService {
 
         // Log payment transaction (LichSuThanhToan)
         LichSuThanhToan lichSuThanhToan = LichSuThanhToan.builder()
-                .soTien(updatedHoaDon.getTongTien())
+                .soTien(updatedHoaDon.getTienSauGiam())
                 .paymentMethod(updatedHoaDon.getHinhThucThanhToan())
                 .type(hoaDon.getLoaiHoaDon())
                 .hoaDon(updatedHoaDon)
@@ -305,7 +287,6 @@ public class HoaDonService implements IHoaDonService {
         invoicePdfGenerator.generateInvoice(HoaDonResponse.from(hoaDon), hoaDonChiTietMapper.toListResponse(hoaDonChiTietRepository.findByHoaDon_Id(hoaDon.getId())));
         return "ok";
     }
-
 
 
     @Transactional
@@ -329,7 +310,6 @@ public class HoaDonService implements IHoaDonService {
     }
 
 
-
     @Override
     public HoaDonResponse findByMaHoaDon(String maHoaDon) {
         return hoaDonMapper.toHoaDonResponse(hoaDonRepository.findByMaHoaDon(maHoaDon));
@@ -350,7 +330,6 @@ public class HoaDonService implements IHoaDonService {
                 ? TypeBill.ONLINE.toString()
                 : TypeBill.OFFLINE.toString();
     }
-
 
 
 }
