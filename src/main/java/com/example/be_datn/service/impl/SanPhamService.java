@@ -16,9 +16,7 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.domain.JpaSort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
@@ -197,7 +195,7 @@ public class SanPhamService implements ISanPhamService {
 
     @Override
     public SanPhamResponse create(SanPhamRequest sanPhamRequest) {
-        if (sanPhamRepository.existsByTenSanPham(sanPhamRequest.getTenSanPham())) {
+        if (sanPhamRepository.existsByTenSanPham(sanPhamRequest.getTenSanPham().trim())) {
             throw new AppException(ErrorCode.TEN_SANPHAM_EXIST);
         }
         validateForeignKeys(sanPhamRequest);

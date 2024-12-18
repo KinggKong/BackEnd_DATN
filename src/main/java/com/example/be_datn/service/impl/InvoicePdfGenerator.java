@@ -2,14 +2,9 @@ package com.example.be_datn.service.impl;
 
 import com.example.be_datn.dto.Response.HoaDonChiTietResponse;
 import com.example.be_datn.dto.Response.HoaDonResponse;
-import com.lowagie.text.Document;
-import com.lowagie.text.DocumentException;
-import com.lowagie.text.Element;
 import com.lowagie.text.Font;
-import com.lowagie.text.PageSize;
-import com.lowagie.text.Paragraph;
-import com.lowagie.text.Phrase;
 import com.lowagie.text.Rectangle;
+import com.lowagie.text.*;
 import com.lowagie.text.pdf.BaseFont;
 import com.lowagie.text.pdf.PdfPCell;
 import com.lowagie.text.pdf.PdfPTable;
@@ -80,14 +75,14 @@ public class InvoicePdfGenerator {
 
             // Invoice information
 
-            if(hoaDon.getTenNguoiNhan().equalsIgnoreCase("Khách lẻ")) {
+            if (hoaDon.getTenNguoiNhan().equalsIgnoreCase("Khách lẻ")) {
                 document.add(new Paragraph("Mã hóa đơn: " + hoaDon.getMaHoaDon(), NORMAL_FONT));
                 document.add(new Paragraph("Ngày tạo: " + formatDateTime(hoaDon.getCreatedAt().toString()), NORMAL_FONT));
                 document.add(new Paragraph("Khách hàng: " + hoaDon.getTenKhachHang(), NORMAL_FONT));
             } else {
                 document.add(new Paragraph("Mã hóa đơn: " + hoaDon.getMaHoaDon(), NORMAL_FONT));
                 document.add(new Paragraph("Ngày tạo: " + formatDateTime(hoaDon.getCreatedAt().toString()), NORMAL_FONT));
-                document.add(new Paragraph("Khách hàng: " + hoaDon.getTenKhachHang(), NORMAL_FONT));
+                document.add(new Paragraph("Khách hàng: " + hoaDon.getTenNguoiNhan(), NORMAL_FONT));
                 document.add(new Paragraph("Số điện thoại: " + hoaDon.getSdt(), NORMAL_FONT));
                 document.add(new Paragraph("Địa chỉ: " + hoaDon.getDiaChiNhan(), NORMAL_FONT));
                 document.add(new Paragraph("Email: " + hoaDon.getEmail(), NORMAL_FONT));
@@ -119,7 +114,7 @@ public class InvoicePdfGenerator {
             // Payment information
             Paragraph paymentInfo = new Paragraph(
                     "\nHình thức thanh toán: " + hoaDon.getHinhThucThanhToan() +
-                            "\nTrạng thái: " + hoaDon.getTrangThai(),
+                            "\nTrạng thái: " + (hoaDon.getTrangThai().equals("DONE") ? "Hoàn thành" : ""),
                     NORMAL_FONT
             );
             document.add(paymentInfo);

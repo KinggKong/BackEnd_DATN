@@ -13,7 +13,7 @@ public interface IShopOnlineService {
 
     InfoOrder getInfoOrder(String maHoaDon);
 
-    List<HoaDonResponse> getAllOrderByStatus(String trangThai, String keySearch);
+    List<HoaDonResponse> getAllOrderByStatus(String trangThai, String keySearch,String startDate, String endDate);
 
     DetailHistoryBillResponse getDetailHistoryBill(Long idHoaDon);
 

@@ -21,6 +21,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -85,19 +86,28 @@ public class ShopOnlineService implements IShopOnlineService {
 
     @Override
     public ApiResponse<?> checkout(HoaDonRequest hoaDonRequest) {
+        double tongTien = tinhTongTien(hoaDonRequest.getIdGioHang()) + hoaDonRequest.getTienShip();
+
+        if (tongTien > 10000000) {
+            throw new AppException(ErrorCode.TOTAL_BILL_CANT_BE_THAN_LIMIT);
+        }
+        checkSoLuongMuaHopLe(hoaDonRequest.getIdGioHang());
+
+        checkSoLuongHopLe(hoaDonRequest.getIdGioHang());
+        double tienGiamVoucher = 0;
         if (hoaDonRequest.getIdVoucher() != null) {
-            if (checkVourcherCanUse(hoaDonRequest.getIdVoucher()) == null) {
+            Voucher voucher = checkVourcherCanUse(hoaDonRequest.getIdVoucher(), tongTien, LocalDateTime.now());
+            if (voucher == null) {
                 return ApiResponse.builder()
                         .code(2000)
                         .data("Voucher đã không còn hoạt động")
                         .message("Voucher đã không còn hoạt động")
                         .build();
             }
+            tienGiamVoucher = tinhTienGiamVoucher(voucher, tongTien);
         }
 
-        checkSoLuongHopLe(hoaDonRequest.getIdGioHang());
-        handleUpdateAfterBuy(hoaDonRequest.getIdGioHang());
-        HoaDon hd = createHoaDon(hoaDonRequest);
+        HoaDon hd = createHoaDon(hoaDonRequest, tongTien, tienGiamVoucher);
         HoaDon hoaDon = hoaDonRepository.saveAndFlush(hd);
 
         LichSuHoaDon lichSuHoaDon = LichSuHoaDon.builder()
@@ -129,32 +139,42 @@ public class ShopOnlineService implements IShopOnlineService {
                 .build();
     }
 
-    public HoaDonResponse checkoutOnline(HoaDonRequest hoaDonRequest) {
-        HoaDon hd = createHoaDon(hoaDonRequest);
-        HoaDon hoaDon = hoaDonRepository.saveAndFlush(hd);
-
-        LichSuHoaDon lichSuHoaDon = LichSuHoaDon.builder()
-                .nhanVien(null)
-                .hoaDon(hoaDon)
-                .createdBy(null)
-                .ghiChu("Chờ xác nhận")
-                .trangThai(StatusPayment.WAITING.toString())
-                .build();
-
-        lichSuHoaDonRepository.saveAndFlush(lichSuHoaDon);
-
-        if (hoaDon == null) {
-            throw new AppException(ErrorCode.HOA_DON_INVALID);
+    double tinhTienGiamVoucher(Voucher voucher, double tongTien) {
+        double tienGiam = 0;
+        if (voucher.getHinhThucGiam().equalsIgnoreCase("%")) {
+            double tienGiamTheoPhanTram = (tongTien * voucher.getGiaTriGiam()) / 100;
+            if (tienGiamTheoPhanTram > voucher.getGiaTriGiamToiDa()) {
+                tienGiam = voucher.getGiaTriGiamToiDa();
+            }
+            if (tienGiamTheoPhanTram < voucher.getGiaTriGiamToiDa()) {
+                tienGiam = tienGiamTheoPhanTram;
+            }
+        } else if (voucher.getHinhThucGiam().equalsIgnoreCase("VNĐ")) {
+            tienGiam = voucher.getGiaTriGiam();
         }
-
-        List<GioHangChiTiet> gioHangChiTietList = gioHangChiTietRepository.findByGioHang_IdAndTrangThai(hoaDonRequest.getIdGioHang(), 1);
-        gioHangChiTietList.stream()
-                .map(gioHangChiTiet -> hoaDonChiTietMapper.toHoaDonCT(gioHangChiTiet, hoaDon.getId()))
-                .forEach(hoaDonChiTietRepository::saveAndFlush);
-        emailService.sendMailToUser(hoaDonRequest.getEmail(), "3HST Shoes - Cảm ơn bạn đã đặt hàng tại 3HST Shoes", hoaDon.getMaHoaDon(), this.getInfoOrder(hoaDon.getMaHoaDon()));
-        return hoaDonMapper.toHoaDonResponse(hoaDon);
+        return tienGiam;
     }
 
+    private double tinhTongTien(Long idGioHang) {
+        double tongTien = 0;
+        List<GioHangChiTiet> gioHangChiTietList = gioHangChiTietRepository.findByGioHang_Id(idGioHang);
+        for (GioHangChiTiet gioHangChiTiet : gioHangChiTietList) {
+            tongTien += gioHangChiTiet.getSanPhamChiTiet().getGiaBanSauKhiGiam() * gioHangChiTiet.getSoLuong();
+        }
+        return tongTien;
+    }
+
+    private void checkSoLuongMuaHopLe(Long idGioHang) {
+        List<GioHangChiTiet> gioHangChiTietList = gioHangChiTietRepository.findByGioHang_Id(idGioHang);
+        if (gioHangChiTietList.size() > 20) {
+            throw new AppException(ErrorCode.TOTAL_ITEM_CAN_BE_THAN_LIMIT);
+        }
+        gioHangChiTietList.stream().forEach(gh -> {
+            if (gh.getSoLuong() > 5) {
+                throw new AppException(ErrorCode.TOTAL_IN_A_ITEM);
+            }
+        });
+    }
 
     @Override
     public InfoOrder getInfoOrder(String maHoaDon) {
@@ -166,7 +186,7 @@ public class ShopOnlineService implements IShopOnlineService {
             throw new AppException(ErrorCode.HOA_DON_NOT_FOUND);
         }
         List<HoaDonCT> hoaDonCTList = hoaDonChiTietRepository.findByHoaDon_Id(hoaDon.getId());
-        double tongTienHang = hoaDonCTList.stream().mapToDouble(item -> item.getGiaTien() * item.getSoLuong()).sum();
+        double tongTienHang = hoaDonCTList.stream().mapToDouble(item -> item.getSanPhamChiTiet().getGiaBanSauKhiGiam() * item.getSoLuong()).sum();
         if (hoaDonCTList.isEmpty()) {
             throw new AppException(ErrorCode.HOA_DON_CHI_TIET_NOT_FOUND_LIST);
         }
@@ -178,8 +198,19 @@ public class ShopOnlineService implements IShopOnlineService {
     }
 
     @Override
-    public List<HoaDonResponse> getAllOrderByStatus(String trangThai, String keySearch) {
-        List<HoaDon> hoaDons = hoaDonRepository.findByTrangThai(trangThai, keySearch);
+    public List<HoaDonResponse> getAllOrderByStatus(String trangThai, String keySearch, String startDate, String endDate) {
+        LocalDateTime ngayBatDau = null;
+        LocalDateTime ngayKetThuc = null;
+
+
+        if (startDate != null && !startDate.isEmpty()) {
+            ngayBatDau = LocalDate.parse(startDate).atStartOfDay();
+        }
+        if (endDate != null && !endDate.isEmpty()) {
+            ngayKetThuc = LocalDate.parse(endDate).atStartOfDay();
+        }
+
+        List<HoaDon> hoaDons = hoaDonRepository.findByTrangThai(trangThai, keySearch, ngayBatDau, ngayKetThuc);
         if (trangThai.contains("WAITING")) {
 //            hoaDons = hoaDons.stream()
 //                    .sorted(Comparator.comparing(HoaDon::getCreated_at))
@@ -225,7 +256,7 @@ public class ShopOnlineService implements IShopOnlineService {
     }
 
 
-    public HoaDon createHoaDon(HoaDonRequest hoaDonRequest) {
+    public HoaDon createHoaDon(HoaDonRequest hoaDonRequest, double tongTien, double tienGiamVoucher) {
 
         KhachHang khachHang = KhachHang.builder()
                 .id(1L)
@@ -235,13 +266,14 @@ public class ShopOnlineService implements IShopOnlineService {
             voucher = voucherRepository.findById(hoaDonRequest.getIdVoucher()).orElseThrow(() -> new AppException(ErrorCode.VOUCHER_NOT_FOUND));
         }
 
+
         return HoaDon.builder()
                 .maHoaDon(generateBillCode())
                 .tenNguoiNhan(hoaDonRequest.getTenNguoiNhan())
                 .sdt(hoaDonRequest.getSdt())
-                .tongTien(hoaDonRequest.getTongTien())
+                .tongTien(tongTien)
                 .diaChiNhan(hoaDonRequest.getDiaChiNhan())
-                .tienSauGiam(hoaDonRequest.getTienSauGiam())
+                .tienSauGiam(tongTien - tienGiamVoucher)
                 .tienShip(hoaDonRequest.getTienShip())
                 .ghiChu(hoaDonRequest.getGhiChu())
                 .loaiHoaDon(TypeBill.ONLINE.toString())
@@ -251,13 +283,14 @@ public class ShopOnlineService implements IShopOnlineService {
                 .hinhThucThanhToan(hoaDonRequest.getHinhThucThanhToan())
                 .trangThai(StatusPayment.WAITING.toString())
                 .voucher(voucher)
-                .soTienGiam(hoaDonRequest.getSoTienGiam())
+                .soTienGiam(tienGiamVoucher)
                 .build();
     }
 
     public void clearGioHangChiTiet(Long idGioHang) {
         gioHangChiTietRepository.deleteByGioHang_Id(idGioHang);
     }
+
 
     void checkSoLuongHopLe(Long idGioHang) {
         List<GioHangChiTiet> gioHangChiTietList = gioHangChiTietRepository.findByGioHang_IdAndTrangThai(idGioHang, 1);
@@ -296,8 +329,8 @@ public class ShopOnlineService implements IShopOnlineService {
     }
 
 
-    private Voucher checkVourcherCanUse(Long idVoucher) {
-        Voucher voucher = voucherRepository.findByIdAndTrangThai(idVoucher).orElse(null);
+    private Voucher checkVourcherCanUse(Long idVoucher, double tongTien, LocalDateTime localDateTime) {
+        Voucher voucher = voucherRepository.findByIdAndTrangThai(idVoucher, tongTien, localDateTime).orElse(null);
         if (voucher != null) {
             voucher.setSoLuong(voucher.getSoLuong() - 1);
             voucherRepository.saveAndFlush(voucher);

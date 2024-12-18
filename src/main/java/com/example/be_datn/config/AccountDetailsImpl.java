@@ -43,7 +43,7 @@ public class AccountDetailsImpl implements UserDetails {
         if (account == null)
             return null;
         if (account.getEmail() == null)
-            return null;
+            return account.getTenDangNhap();
         return account.getEmail();
     }
 

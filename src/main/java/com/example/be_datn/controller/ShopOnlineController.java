@@ -41,9 +41,13 @@ public class ShopOnlineController {
     }
 
     @GetMapping("/order-management")
-    public ApiResponse<?> orderManagement(@RequestParam String trangThai, @RequestParam(name = "keySearch", defaultValue = "") String keySearch) {
+    public ApiResponse<?> orderManagement(@RequestParam String trangThai,
+                                          @RequestParam(name = "keySearch", defaultValue = "") String keySearch,
+                                          @RequestParam(value = "startDate", required = false) String startDate,
+                                          @RequestParam(value = "endDate", required = false) String endDate
+    ) {
         return ApiResponse.builder()
-                .data(shopOnlineService.getAllOrderByStatus(trangThai, keySearch))
+                .data(shopOnlineService.getAllOrderByStatus(trangThai, keySearch, startDate, endDate))
                 .message("get order management successfull")
                 .build();
     }
