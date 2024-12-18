@@ -125,6 +125,15 @@ public class HoaDonController {
         hoaDonService.changeTypeBill(id);
         return apiResponse;
     }
+    @PutMapping("/addKhachHang")
+    public ApiResponse<?> addCustomer(
+            @RequestParam Long idHoaDon,
+            @RequestParam Long idKhachHang
+    ) {
+        ApiResponse<String> apiResponse = new ApiResponse<>();
+        apiResponse.setData(hoaDonService.updateCustomer(idHoaDon, idKhachHang));
+        return apiResponse;
+    }
 
 
 }
