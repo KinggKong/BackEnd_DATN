@@ -23,7 +23,7 @@ public class UpdateScheduledService {
     SanPhamChiTietRepository sanPhamChiTietRepository;
     VoucherRepository voucherRepository;
 
-    @Scheduled(fixedRate = 60000)
+    @Scheduled(fixedRate = 10000)
     public void updateGiaGioHang() {
 
         List<GioHangChiTiet> getAll = gioHangChiTietRepository.findAll();
