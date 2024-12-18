@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class ProfileMapper {
-    public Profile toProfile(KhachHang khachHang, Long idGiohang) {
+    public Profile toProfile(KhachHang khachHang, Long idGiohang,String vaiTro) {
         return Profile.builder()
                 .id(khachHang.getId())
                 .ten(khachHang.getTen())
@@ -18,10 +18,11 @@ public class ProfileMapper {
                 .ngaySinh(khachHang.getNgaySinh())
                 .gioiTinh(khachHang.getGioiTinh())
                 .idGioHang(idGiohang)
+                .vaiTro(vaiTro)
                 .build();
     }
 
-    public Profile toProfileAdmin(NhanVien nhanVien) {
+    public Profile toProfileAdmin(NhanVien nhanVien, String vaiTro) {
         return Profile.builder()
                 .id(nhanVien.getId())
                 .ten(nhanVien.getTen())
@@ -30,6 +31,7 @@ public class ProfileMapper {
                 .avatar(nhanVien.getAvatar())
                 .ngaySinh(nhanVien.getNgaySinh())
                 .gioiTinh(nhanVien.getGioiTinh())
+                .vaiTro(vaiTro)
                 .build();
     }
 }

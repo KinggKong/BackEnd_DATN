@@ -29,7 +29,7 @@ public interface HoaDonRepository extends JpaRepository<HoaDon, Long> {
                left join hd.khachHang kh 
                left join hd.voucher v  
                where  hd.trangThai = 'PENDING' and hd.loaiHoaDon = 'OFFLINE' or (hd.loaiHoaDon = 'ONLINE' AND hd.trangThai = 'PENDING')
-
+            
             """)
     Page<HoaDonResponse> findAllHoaDon(Pageable pageable);
 
@@ -47,10 +47,9 @@ public interface HoaDonRepository extends JpaRepository<HoaDon, Long> {
 
     @Query("SELECT hd FROM HoaDon hd WHERE (hd.tenNguoiNhan like CONCAT('%', :keySearch, '%')  or hd.sdt like CONCAT('%', :keySearch, '%') or hd.maHoaDon like CONCAT('%', :keySearch, '%') or hd.email like  CONCAT('%', :keySearch, '%') ) " +
             "AND hd.trangThai LIKE CONCAT('%', :trangThai, '%')  " +
-            "AND hd.trangThai <> 'PENDING'  " +
+            "AND hd.trangThai <> 'PENDING'  AND (:startDate IS NULL OR hd.created_at >= :startDate)  AND (:endDate IS NULL OR hd.created_at <= :endDate) " +
             "order by hd.created_at desc ")
-    List<HoaDon> findByTrangThai(@Param("trangThai") String trangThai, @Param("keySearch") String keySearch);
-
+    List<HoaDon> findByTrangThai(@Param("trangThai") String trangThai, @Param("keySearch") String keySearch,@Param("startDate") LocalDateTime startDate,@Param("endDate") LocalDateTime endDate);
 
 
     @Query("""
@@ -67,7 +66,6 @@ public interface HoaDonRepository extends JpaRepository<HoaDon, Long> {
                where hd.khachHang.id =:idKhachHang
             """)
     List<HistoryBillResponse> getAllHistoryBillByIdKhachHang(@Param("idKhachHang") Long idKhachHang);
-
 
 
     @Query("""
@@ -106,7 +104,6 @@ public interface HoaDonRepository extends JpaRepository<HoaDon, Long> {
 
     @Query("select sum(hdct.soLuong) from HoaDonCT hdct join HoaDon hd on hdct.hoaDon.id = hd.id where hd.trangThai ='DONE' and  hd.created_at >= ?1 and hd.created_at <= ?2")
     Integer tongSanPhamBan(LocalDateTime ngayBatDau, LocalDateTime ngayKetThuc);
-
 
 
     @Query(value = """

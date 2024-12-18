@@ -266,20 +266,22 @@ public class AuthService implements IAuthService {
         if (khachHang.isEmpty()) {
             throw new AppException(ErrorCode.KHACH_HANG_NOT_FOUND);
         }
+        String role = SecurityUtils.getCurrentRole();
         GioHang gioHang = gioHangRepository.findByKhachHang_Id(khachHang.get().getId());
         return ApiResponse.<Profile>builder()
-                .data(profileMapper.toProfile(khachHang.get(), gioHang.getId()))
+                .data(profileMapper.toProfile(khachHang.get(), gioHang.getId(),role))
                 .build();
     }
 
     @Override
     public ApiResponse<?> getProfileAdmin() {
         Optional<NhanVien> nhanVien = nhanVienRepository.findById(SecurityUtils.getCurrentUserId());
+        String role = SecurityUtils.getCurrentRole();
         if (nhanVien.isEmpty()) {
             throw new AppException(ErrorCode.NHANVIEN_NOT_FOUND);
         }
         return ApiResponse.<Profile>builder()
-                .data(profileMapper.toProfileAdmin(nhanVien.get()))
+                .data(profileMapper.toProfileAdmin(nhanVien.get(), role))
                 .build();
     }
 

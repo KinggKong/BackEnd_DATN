@@ -40,7 +40,7 @@ public class SanPhamChiTiet extends BaseEntity {
     Double giaBanSauKhiGiam;
     @Column(name = "trang_thai")
     int trangThai;
-    @OneToMany(mappedBy = "sanPhamChiTiet", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "sanPhamChiTiet", fetch = FetchType.EAGER)
     List<HinhAnh> hinhAnhList;
 
 
