@@ -132,8 +132,15 @@ public class SaleService implements ISaleService {
                 if(sanPhamChiTiet == null){
                     throw new AppException(ErrorCode.SANPHAMCHITIET_NOT_FOUND);
                 }
-                sanPhamChiTiet.setGiaBanSauKhiGiam(sanPhamChiTiet.getGiaBan());
-                sanPhamChiTietRepository.save(sanPhamChiTiet);
+                SaleCt saleCt1 = sale_ChiTietRepository.findMostRecentByIdSanPhamCtAndIdSale(sanPhamChiTiet.getId());
+                if (saleCt1 == null){
+                    sanPhamChiTiet.setGiaBanSauKhiGiam(sanPhamChiTiet.getGiaBan());
+                    sanPhamChiTietRepository.save(sanPhamChiTiet);
+                }else {
+                    sanPhamChiTiet.setGiaBanSauKhiGiam((Double) (sanPhamChiTiet.getGiaBan()*(100-saleCt1.getGiaTriGiam())/100));
+                    sanPhamChiTietRepository.save(sanPhamChiTiet);
+                }
+
             }
             sale_ChiTietRepository.save(saleCt);
         }

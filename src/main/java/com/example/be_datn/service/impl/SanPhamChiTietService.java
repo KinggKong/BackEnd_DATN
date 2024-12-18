@@ -2,17 +2,10 @@ package com.example.be_datn.service.impl;
 
 import com.example.be_datn.dto.Request.SanPhamChiTietRequest;
 import com.example.be_datn.dto.Response.SanPhamChiTietResponse;
-import com.example.be_datn.entity.HinhAnh;
-import com.example.be_datn.entity.KichThuoc;
-import com.example.be_datn.entity.MauSac;
-import com.example.be_datn.entity.SanPham;
-import com.example.be_datn.entity.SanPhamChiTiet;
+import com.example.be_datn.entity.*;
 import com.example.be_datn.exception.AppException;
 import com.example.be_datn.exception.ErrorCode;
-import com.example.be_datn.repository.KichThuocRepository;
-import com.example.be_datn.repository.MauSacRepository;
-import com.example.be_datn.repository.SanPhamChiTietRepository;
-import com.example.be_datn.repository.SanPhamRepository;
+import com.example.be_datn.repository.*;
 import com.example.be_datn.service.ISanPhamChiTietService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -35,6 +28,7 @@ public class SanPhamChiTietService implements ISanPhamChiTietService {
     KichThuocRepository kichThuocRepository;
     HinhAnhService hinhAnhService;
     SanPhamRepository sanPhamRepository;
+    Sale_ChiTietRepository sale_ChiTietRepository;
 
     @Override
     public List<SanPhamChiTietResponse> getAllBySanPhamId(Long id) {
@@ -85,7 +79,13 @@ public class SanPhamChiTietService implements ISanPhamChiTietService {
             if (sanPhamChiTietCheck != null) {
                 sanPhamChiTietCheck.setSoLuong(sanPhamChiTietCheck.getSoLuong() + sanPhamChiTietRequest1.getSoLuong());
                 sanPhamChiTietCheck.setGiaBan(sanPhamChiTietRequest1.getGiaBan());
-                sanPhamChiTietCheck.setGiaBanSauKhiGiam(sanPhamChiTietRequest1.getGiaBan());
+                SaleCt saleCt = sale_ChiTietRepository.findMostRecentByIdSanPhamCtAndIdSale(sanPhamChiTietCheck.getId());
+                if(saleCt != null){
+                    sanPhamChiTietCheck.setGiaBanSauKhiGiam(sanPhamChiTietRequest1.getGiaBan() - (sanPhamChiTietRequest1.getGiaBan() * saleCt.getSale().getGiaTriGiam() / 100));
+                }else {
+                    sanPhamChiTietCheck.setGiaBanSauKhiGiam(sanPhamChiTietRequest1.getGiaBan());
+                }
+
                 sanPhamChiTietCheck.setTrangThai(sanPhamChiTietRequest1.getTrangThai());
                 sanPhamChiTietCheck = sanPhamChiTietRepository.save(sanPhamChiTietCheck);
                 List<String> existingImages = hinhAnhService.getAllByIdSanPhamCt(sanPhamChiTietCheck.getId())
@@ -147,11 +147,19 @@ public class SanPhamChiTietService implements ISanPhamChiTietService {
         SanPham sanPham = sanPhamRepository.findById(sanPhamChiTietRequest.getId_sanPham()).orElseThrow(()-> new AppException(ErrorCode.SANPHAM_NOT_FOUND));
         sanPhamChiTiet.setSoLuong(sanPhamChiTietRequest.getSoLuong());
         sanPhamChiTiet.setGiaBan(sanPhamChiTietRequest.getGiaBan());
-        sanPhamChiTiet.setGiaBanSauKhiGiam(sanPhamChiTietRequest.getGiaBan());
+
         sanPhamChiTiet.setSanPham(sanPham);
         sanPhamChiTiet.setKichThuoc(kichThuoc);
         sanPhamChiTiet.setMauSac(mauSac);
         sanPhamChiTiet.setTrangThai(sanPhamChiTietRequest.getTrangThai());
+
+        //check có đợt giảm giá khong
+        SaleCt saleCt = sale_ChiTietRepository.findMostRecentByIdSanPhamCtAndIdSale(sanPhamChiTiet.getId());
+        if(saleCt != null){
+            sanPhamChiTiet.setGiaBanSauKhiGiam(sanPhamChiTiet.getGiaBan() - (sanPhamChiTiet.getGiaBan() * saleCt.getSale().getGiaTriGiam() / 100));
+        }else {
+            sanPhamChiTiet.setGiaBanSauKhiGiam(sanPhamChiTiet.getGiaBan());
+        }
         SanPhamChiTiet savedSanPhamChiTiet = sanPhamChiTietRepository.save(sanPhamChiTiet);
 
         List<String> existingImages = hinhAnhService.getAllByIdSanPhamCt(sanPhamChiTiet.getId())

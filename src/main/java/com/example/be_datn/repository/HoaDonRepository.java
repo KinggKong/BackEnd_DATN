@@ -23,7 +23,7 @@ public interface HoaDonRepository extends JpaRepository<HoaDon, Long> {
                 hd.maHoaDon, hd.tenNguoiNhan, hd.diaChiNhan, hd.sdt, hd.tienSauGiam,
                 hd.tienSauGiam, hd.tienShip, hd.ghiChu, hd.loaiHoaDon, hd.email,
                 nv.ten, kh.ten, hd.hinhThucThanhToan, hd.trangThai, v.maVoucher, hd.soTienGiam,
-               hd.created_at, hd.updated_at
+               hd.created_at, hd.updated_at, v.id
                ) from HoaDon hd 
                left join hd.nhanVien nv 
                left join hd.khachHang kh 

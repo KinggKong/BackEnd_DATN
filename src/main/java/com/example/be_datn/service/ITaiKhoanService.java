@@ -19,4 +19,5 @@ public interface ITaiKhoanService {
     boolean existTaiKhoan(String maTaiKhoan);
 
     boolean existTenTaiKhoan(String tenTaiKhoan);
+    TaiKhoanResponse getTaiKhoanByIDOwner(String email);
 }

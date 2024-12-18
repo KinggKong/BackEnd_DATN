@@ -45,6 +45,7 @@ public class ShopOnlineService implements IShopOnlineService {
     LichSuHoaDonMapper lichSuHoaDonMapper;
     EmailService emailService;
     LichSuThanhToanMapper lichSuThanhToanMapper;
+    Sale_ChiTietRepository sale_ChiTietRepository;
 
     private static final String CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
     private static final int CODE_LENGTH = 10;
@@ -75,6 +76,21 @@ public class ShopOnlineService implements IShopOnlineService {
         }
         double totalPrice = 0;
         for (GioHangChiTietResponse gioHangChiTietResponse : gioHangChiTietResponses) {
+            SaleCt saleCt = sale_ChiTietRepository.findMostRecentByIdSanPhamCtAndIdSale(gioHangChiTietResponse.getSanPhamChiTietResponse().getId());
+            if (saleCt == null) {
+                gioHangChiTietResponse.setGiaTien(gioHangChiTietResponse.getSanPhamChiTietResponse().getGiaBan());
+                GioHangChiTiet gioHangChiTiet = gioHangChiTietRepository.findById(gioHangChiTietResponse.getId()).orElseThrow(() -> new AppException(ErrorCode.GIO_HANG_CHI_TIET_NOT_FOUND));
+                gioHangChiTiet.setThoiGianGiamGia(null);
+                gioHangChiTiet.setGiaTien(gioHangChiTietResponse.getGiaTien());
+                gioHangChiTietRepository.save(gioHangChiTiet);
+
+            }else {
+                gioHangChiTietResponse.setGiaTien(gioHangChiTietResponse.getSanPhamChiTietResponse().getGiaBan()- (gioHangChiTietResponse.getSanPhamChiTietResponse().getGiaBan() * saleCt.getSale().getGiaTriGiam() / 100));
+                GioHangChiTiet gioHangChiTiet = gioHangChiTietRepository.findById(gioHangChiTietResponse.getId()).orElseThrow(() -> new AppException(ErrorCode.GIO_HANG_CHI_TIET_NOT_FOUND));
+                gioHangChiTiet.setThoiGianGiamGia(saleCt.getSale().getThoiGianKetThuc());
+                gioHangChiTiet.setGiaTien(gioHangChiTietResponse.getGiaTien());
+                gioHangChiTietRepository.save(gioHangChiTiet);
+            }
             totalPrice += gioHangChiTietResponse.getGiaTien() * gioHangChiTietResponse.getSoLuong();
         }
         return AboutProductShopOn.builder()

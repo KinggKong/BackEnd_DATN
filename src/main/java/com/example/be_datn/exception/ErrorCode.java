@@ -90,10 +90,9 @@ public enum ErrorCode {
     VOUCHER_OFF(2404, "VOUCHER_OFF"),
     EMAIL_INCORRECT_FORMAT(2000, "Email không đúng định dạng"),
     TOKEN_RESET_PASSWORD_INVALID(2005, "TOKEN RESET PASSWORD INVALID"),
-
-
     EMAIL_SEND_FAILED(2000, "Gửi email không thành công"),
     VOUCHER_INVALID(2000, "Voucher đã không còn hoạt động"),
+    SO_LUONG_SAN_PHAM_KHONG_DU(2000, "Số lượng sản phẩm mua nhiều hơn số lượng có sẵn"),
     TOTAL_BILL_CANT_BE_THAN_LIMIT(2000, "Giá trị đơn hàng không được lớn hơn 10 triệu"),
     TOTAL_ITEM_CAN_BE_THAN_LIMIT(2000, "Tổng số lượng sản phẩm không được lơn hơn 20"),
     TOTAL_IN_A_ITEM(2000, "Mỗi sản phẩm không được mua quá số lượng 5"),
