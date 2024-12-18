@@ -2,6 +2,7 @@ package com.example.be_datn.service;
 
 import com.example.be_datn.dto.Request.KhachHangRequest1;
 import com.example.be_datn.dto.Response.KhachHangResponse1;
+import jakarta.mail.MessagingException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -11,7 +12,7 @@ public interface IKhachHangService {
     Page<KhachHangResponse1> getAllKhachHangPageable(String ten, Pageable pageable);
 
     // Tạo mới khách hàng
-    KhachHangResponse1 createKhachHang(KhachHangRequest1 khachHangRequest);
+    KhachHangResponse1 createKhachHang(KhachHangRequest1 khachHangRequest) throws MessagingException;
 
     // Lấy thông tin khách hàng theo ID
     KhachHangResponse1 getKhachHangById(Long id);
