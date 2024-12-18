@@ -147,9 +147,32 @@ public class SaleService implements ISaleService {
         for (Long idSanPhamChiTiet : idSanPhamChiTietOld) {
             if(!idSanPhamChiTietNew.contains(idSanPhamChiTiet)){
                 SaleCt saleCt = sale_ChiTietRepository.findByIdSanPhamCtAndIdSale(idSanPhamChiTiet, id);
-                if(saleCt != null){
-
+//                if(saleCt != null){
+//
+//                    sale_ChiTietRepository.delete(saleCt);
+//                }
+                if (saleCt != null) {
+                    // Xóa SaleCt
                     sale_ChiTietRepository.delete(saleCt);
+
+                    // Lấy sản phẩm chi tiết
+                    SanPhamChiTiet sanPhamChiTiet = sanPhamChiTietRepository.findById(idSanPhamChiTiet).orElse(null);
+                    if (sanPhamChiTiet == null) {
+                        throw new AppException(ErrorCode.SANPHAMCHITIET_NOT_FOUND);
+                    }
+
+                    // Kiểm tra xem có chiến dịch giảm giá nào khác cho sản phẩm không
+                    SaleCt mostRecentSaleCt = sale_ChiTietRepository.findMostRecentByIdSanPhamCtAndIdSale(idSanPhamChiTiet);
+                    if (mostRecentSaleCt == null) {
+                        // Không còn chiến dịch giảm giá, khôi phục giá gốc
+                        sanPhamChiTiet.setGiaBanSauKhiGiam(sanPhamChiTiet.getGiaBan());
+                    } else {
+                        // Còn chiến dịch khác, tính lại giá sau khi giảm
+                        sanPhamChiTiet.setGiaBanSauKhiGiam(
+                                (Double) (sanPhamChiTiet.getGiaBan() * (100 - mostRecentSaleCt.getGiaTriGiam()) / 100)
+                        );
+                    }
+                    sanPhamChiTietRepository.save(sanPhamChiTiet);
                 }
             }
         }
