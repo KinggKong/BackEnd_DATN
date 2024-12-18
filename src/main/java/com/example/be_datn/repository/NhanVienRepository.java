@@ -6,6 +6,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
+import java.util.Optional;
+
 public interface NhanVienRepository extends JpaRepository<NhanVien, Long> {
 
     // Kiểm tra xem có tồn tại nhân viên với số điện thoại cụ thể không
@@ -26,5 +28,6 @@ public interface NhanVienRepository extends JpaRepository<NhanVien, Long> {
     // Tìm kiếm nhân viên theo giới tính (true = Nam, false = Nữ)
     Page<NhanVien> findByGioiTinh(Boolean gioiTinh, Pageable pageable);
 
-
+    @Query(value = "select nv from NhanVien nv inner join TaiKhoan tk on tk.ownerID = nv.id where (nv.email = :username or tk.tenDangNhap = :username) and nv.trangThai = 1")
+    Optional<NhanVien> checkIsActive(String username);
 }

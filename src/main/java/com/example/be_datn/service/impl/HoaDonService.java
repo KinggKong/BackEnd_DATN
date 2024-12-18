@@ -1,10 +1,7 @@
 package com.example.be_datn.service.impl;
 
 import com.example.be_datn.dto.Request.HoaDonUpdateRequest;
-import com.example.be_datn.dto.Response.HoaDonCTResponse;
-import com.example.be_datn.dto.Response.HoaDonChiTietResponse;
 import com.example.be_datn.dto.Response.HoaDonResponse;
-import com.example.be_datn.dto.Response.VoucherResponse;
 import com.example.be_datn.entity.HoaDon;
 import com.example.be_datn.entity.HoaDonCT;
 import com.example.be_datn.entity.KhachHang;
@@ -15,6 +12,7 @@ import com.example.be_datn.entity.SanPhamChiTiet;
 import com.example.be_datn.entity.StatusPayment;
 import com.example.be_datn.entity.TypeBill;
 import com.example.be_datn.entity.Voucher;
+import com.example.be_datn.entity.*;
 import com.example.be_datn.exception.AppException;
 import com.example.be_datn.exception.ErrorCode;
 import com.example.be_datn.mapper.HoaDonChiTietMapper;
@@ -28,6 +26,7 @@ import com.example.be_datn.repository.NhanVienRepository;
 import com.example.be_datn.repository.SanPhamChiTietRepository;
 import com.example.be_datn.repository.VoucherRepository;
 import com.example.be_datn.service.IHoaDonService;
+import com.example.be_datn.utils.SecurityUtils;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -169,11 +168,13 @@ public class HoaDonService implements IHoaDonService {
         hoaDon.setSoTienGiam(0.0);
 
         HoaDon hd = hoaDonRepository.save(hoaDon);
+        NhanVien nhanVien = nhanVienRepository.findById(SecurityUtils.getCurrentUserId())
+                .orElseThrow(() -> new AppException(ErrorCode.NHANVIEN_NOT_FOUND));
         LichSuHoaDon lichSuHoaDon = LichSuHoaDon.builder()
-                .nhanVien(null)
+                .nhanVien(nhanVien)
                 .hoaDon(hd)
                 .ghiChu("PENDING")
-                .createdBy(null)
+                .createdBy(nhanVien.getTen())
                 .trangThai(StatusPayment.PENDING.toString())
                 .build();
         lichSuHoaDonRepository.save(lichSuHoaDon);
@@ -242,12 +243,14 @@ public class HoaDonService implements IHoaDonService {
     }
 
     @Override
-    public String updateCustomer(HoaDon hoaDon, Long idKhachHang) {
+    public String updateCustomer(Long idHoaDon, Long idKhachHang) {
         KhachHang khachHang = khachHangRepository.findById(idKhachHang)
                 .orElseThrow(() -> new AppException(ErrorCode.KHACH_HANG_NOT_FOUND));
+        HoaDon hoaDon = hoaDonRepository.findById(idHoaDon)
+                        .orElseThrow(() -> new AppException(ErrorCode.HOA_DON_NOT_FOUND));
         hoaDon.setKhachHang(khachHang);
         hoaDon.setTenNguoiNhan(khachHang.getTen());
-        hoaDon.setSdt(khachHang.getSdt());
+        hoaDon.setSdt(khachHang.getSdt() ==null ? "" : khachHang.getSdt().toString());
         hoaDon.setEmail(khachHang.getEmail());
         hoaDonRepository.save(hoaDon);
         return "Update customer success";
@@ -265,7 +268,7 @@ public class HoaDonService implements IHoaDonService {
         hoaDon.setTenNguoiNhan(tenNguoiNhan);
         hoaDon.setSdt(sdt);
         hoaDon.setGhiChu(ghiChu);
-        
+
 
 //        //Check voucher
 //        if(hoaDon.getVoucher() != null) {
@@ -309,11 +312,13 @@ public class HoaDonService implements IHoaDonService {
             voucher.setSoLuong(voucher.getSoLuong() - 1);
             voucherRepository.save(voucher);
             double discount = hoaDon.getSoTienGiam();
-            hoaDon.setTienSauGiam(hoaDon.getTongTien() - discount);
+            hoaDon.setTienSauGiam(hoaDon.getTongTien() - discount + tienShip);
         } else {
             hoaDon.setSoTienGiam(0.0);
-            hoaDon.setTienSauGiam(hoaDon.getTongTien());
+            hoaDon.setTienSauGiam(hoaDon.getTongTien()+tienShip);
         }
+        hoaDon.setTienShip(tienShip);
+        hoaDon.setGhiChu(ghiChu);
         hoaDon.setHinhThucThanhToan(method);
         hoaDon.setTrangThai(StatusPayment.DONE.toString());
 
@@ -333,7 +338,7 @@ public class HoaDonService implements IHoaDonService {
 
         // Log payment transaction (LichSuThanhToan)
         LichSuThanhToan lichSuThanhToan = LichSuThanhToan.builder()
-                .soTien(updatedHoaDon.getTongTien())
+                .soTien(updatedHoaDon.getTongTien() -updatedHoaDon.getSoTienGiam()+tienShip)
                 .paymentMethod(updatedHoaDon.getHinhThucThanhToan())
                 .type(hoaDon.getLoaiHoaDon())
                 .hoaDon(updatedHoaDon)

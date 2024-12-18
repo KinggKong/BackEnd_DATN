@@ -5,6 +5,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+
+import java.util.Optional;
 
 public interface KhachHangRepository extends JpaRepository<KhachHang, Long> {
 
@@ -32,4 +35,7 @@ public interface KhachHangRepository extends JpaRepository<KhachHang, Long> {
 
     // Tìm kiếm khách hàng theo giới tính (true = Nam, false = Nữ)
     Page<KhachHang> findByGioiTinh(Boolean gioiTinh, Pageable pageable);
+
+    @Query(value = "select kh from KhachHang  kh inner  join TaiKhoan  tk on tk.ownerID = kh.id where (kh.email = :username or tk.tenDangNhap = :username) and kh.trangThai = 1")
+    Optional<KhachHang> checkIsActive(@Param("username") String username);
 }
