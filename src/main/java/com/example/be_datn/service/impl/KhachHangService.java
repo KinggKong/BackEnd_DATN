@@ -219,7 +219,7 @@ public class KhachHangService implements IKhachHangService {
         khachHang.setNgaySinh(khachHangRequest.getNgaySinh());
         khachHang.setDiaChi(khachHangRequest.getDiaChiStr());
         khachHang.setGioiTinh(khachHangRequest.getGioiTinh());
-        khachHang.setTrangThai(khachHangRequest.getTrangThai());
+        khachHang.setTrangThai(khachHangRequest.getTrangThai() == null ? 1 : 1);
 
         return KhachHangResponse1.fromKhachHang(khachHangRepository.save(khachHang));
     }
