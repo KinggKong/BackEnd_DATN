@@ -85,9 +85,9 @@ public class HoaDonController {
     }
 
     @PatchMapping("/complete/{id}")
-    public ApiResponse<?> completeOrder(@PathVariable Long id, @RequestParam String method){
+    public ApiResponse<?> completeOrder(@PathVariable Long id, @RequestParam String method, @RequestParam String diaChi, @RequestParam Double tienShip){
         ApiResponse<String> apiResponse = new ApiResponse<>();
-        apiResponse.setData(hoaDonService.completeHoaDon(id, method));
+        apiResponse.setData(hoaDonService.completeHoaDon(id, method, diaChi, tienShip));
         apiResponse.setCode(200);
         apiResponse.setMessage("Thanh toán thành công !");
         return apiResponse;

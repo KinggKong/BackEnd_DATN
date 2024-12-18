@@ -1,6 +1,7 @@
 package com.example.be_datn.service.impl;
 
 import com.example.be_datn.dto.Request.VoucherRequest;
+import com.example.be_datn.dto.Response.ApiResponse;
 import com.example.be_datn.dto.Response.VoucherResponse;
 import com.example.be_datn.entity.HoaDon;
 import com.example.be_datn.entity.Voucher;
@@ -95,7 +96,6 @@ public class VoucherService implements IVoucherService {
             enableVoucherForInvoices(voucher.getId());
         }
 
-        // Lưu voucher đã cập nhật vào cơ sở dữ liệu
         return VoucherResponse.fromVoucher(voucherRepository.save(voucher));
     }
 
@@ -180,7 +180,6 @@ public class VoucherService implements IVoucherService {
         return "deleted successfully";
     }
 
-
     private double calculateDiscount(double totalAmount, Voucher voucher) {
         double discount;
 
@@ -189,11 +188,19 @@ public class VoucherService implements IVoucherService {
         } else {
             discount = voucher.getGiaTriGiam();
         }
+
+        // Check if the discount exceeds the maximum allowable discount (giaTriGiamToiDa)
         if (voucher.getGiaTriGiamToiDa() != null && discount > voucher.getGiaTriGiamToiDa()) {
             return voucher.getGiaTriGiamToiDa();
         }
 
         return discount;
+    }
+
+    public ApiResponse<?> getAllVoucherCanUser(Double tongTien) {
+        return ApiResponse.builder()
+                .data(voucherRepository.getAllVoucherCanUser(LocalDateTime.now(), tongTien))
+                .build();
     }
 
 }

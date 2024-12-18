@@ -88,7 +88,12 @@ public enum ErrorCode {
     USER_CANT_CREATE_USER(2000, "Không thể tạo mới khách hàng"),
     ROLE_NOT_FOUND(2000,"Vai trò không tồn tại" ),
     VOUCHER_OFF(2404, "VOUCHER_OFF"),
-    EMAIL_INCORRECT_FORMAT(2000,"Email không đúng định dạng" );
+    EMAIL_INCORRECT_FORMAT(2000,"Email không đúng định dạng" ),
+    TOKEN_RESET_PASSWORD_INVALID(2005, "TOKEN RESET PASSWORD INVALID"),
+
+
+    EMAIL_SEND_FAILED(2000, "Gửi email không thành công"),
+    VOUCHER_INVALID(2000, "Voucher đã không còn hoạt động");
     private int code;
     private String message;
 }

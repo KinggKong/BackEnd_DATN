@@ -47,6 +47,12 @@ public class SanPhamChiTietService implements ISanPhamChiTietService {
     }
 
     @Override
+    public List<SanPhamChiTietResponse> getAllBanHang(Long idDanhMuc, Long idThuongHieu, Long idChatLieuVai, Long idChatLieuDe, Long idSanPham) {
+        return sanPhamChiTietRepository.getAllByFilterBan(idDanhMuc, idThuongHieu, idChatLieuVai, idChatLieuDe, idSanPham)
+                .stream().map(SanPhamChiTietResponse::fromSanPhamChiTiet).toList();
+    }
+
+    @Override
     public Page<SanPhamChiTietResponse> getAllPageBySanPhamId(Long id, Pageable pageable) {
         return sanPhamChiTietRepository.findSPCTBySanPhamId(id,pageable).map(SanPhamChiTietResponse::fromSanPhamChiTiet);
     }
@@ -230,15 +236,10 @@ public class SanPhamChiTietService implements ISanPhamChiTietService {
         return sanPhamChiTietRepository.countSanPhamHetHang();
     }
 
-    @Override
-    public Page<SanPhamChiTietResponse> fillData(Long idDanhMuc, Long idThuongHieu, Long idChatLieuVai, Long idChatLieuDe, Long idSanPham, Pageable pageable) {
-        return sanPhamChiTietRepository.fill(idDanhMuc, idThuongHieu, idChatLieuVai, idChatLieuDe, idSanPham, pageable)
-                .map(SanPhamChiTietResponse::fromSanPhamChiTiet);
-    }
 
-    @Override
-    public List<SanPhamChiTietResponse> getAllBanHang(Long idDanhMuc, Long idThuongHieu, Long idChatLieuVai, Long idChatLieuDe, Long idSanPham) {
-        return sanPhamChiTietRepository.getAllByFilterBan(idDanhMuc, idThuongHieu, idChatLieuVai, idChatLieuDe, idSanPham)
-                .stream().map(SanPhamChiTietResponse::fromSanPhamChiTiet).toList();
-    }
+//    @Override
+//    public List<SanPhamChiTietResponse> getAllBanHang(Long idDanhMuc, Long idThuongHieu, Long idChatLieuVai, Long idChatLieuDe, Long idSanPham) {
+//        return sanPhamChiTietRepository.getAllByFilterBan(idDanhMuc, idThuongHieu, idChatLieuVai, idChatLieuDe, idSanPham)
+//                .stream().map(SanPhamChiTietResponse::fromSanPhamChiTiet).toList();
+//    }
 }

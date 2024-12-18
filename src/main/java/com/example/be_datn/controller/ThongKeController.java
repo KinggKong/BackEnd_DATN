@@ -2,7 +2,6 @@ package com.example.be_datn.controller;
 
 import com.example.be_datn.dto.Response.ApiResponse;
 import com.example.be_datn.dto.Response.ThongKeResponse;
-
 import com.example.be_datn.dto.Response.ThongKeSanPhamBanChayResponse;
 import com.example.be_datn.dto.Response.ViecCanLamResponse;
 import com.example.be_datn.service.impl.ThongKeService;
@@ -14,7 +13,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;

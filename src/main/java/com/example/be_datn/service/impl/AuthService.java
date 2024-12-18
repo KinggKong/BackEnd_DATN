@@ -6,7 +6,10 @@ import com.example.be_datn.dto.Request.ChangePasswordRequest;
 import com.example.be_datn.dto.Request.LogoutRequest;
 import com.example.be_datn.dto.Request.SignInRequest;
 import com.example.be_datn.dto.Request.SignupRequest;
-import com.example.be_datn.dto.Response.*;
+import com.example.be_datn.dto.Response.ApiResponse;
+import com.example.be_datn.dto.Response.Profile;
+import com.example.be_datn.dto.Response.SignInResponse;
+import com.example.be_datn.dto.Response.TaiKhoanResponse;
 import com.example.be_datn.entity.*;
 import com.example.be_datn.exception.AppException;
 import com.example.be_datn.exception.ErrorCode;
@@ -15,6 +18,8 @@ import com.example.be_datn.mapper.TaiKhoanMapper;
 import com.example.be_datn.repository.*;
 import com.example.be_datn.service.IAuthService;
 import com.example.be_datn.utils.SecurityUtils;
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.Jwts;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import jakarta.servlet.http.HttpServletRequest;
@@ -32,6 +37,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.Date;
@@ -59,12 +65,17 @@ public class AuthService implements IAuthService {
     private final ViaCodeRepository viaCodeRepository;
     private final GioHangRepository gioHangRepository;
     private final ProfileMapper profileMapper;
+    private final JwtProvider jwtProvider;
+    private final NhanVienRepository nhanVienRepository;
 
     @Override
     public ResponseEntity<ApiResponse<SignInResponse>> login(SignInRequest signinRequest, HttpServletRequest request) {
         try {
             Authentication authentication = authenticateUser(signinRequest);
             AccountDetailsImpl accountDetails = (AccountDetailsImpl) authentication.getPrincipal();
+            if (!accountDetails.getRoleName().equals("ROLE_USER")) {
+                throw new AppException(ErrorCode.LOGIN_FAILED);
+            }
             Long accountId = accountDetails.getAccount().getId();
 
             LocalDateTime now = LocalDateTime.now();
@@ -82,6 +93,42 @@ public class AuthService implements IAuthService {
                     .isActive(accountDetails.getAccount().getTrangThai() == 1 ? true : false)
                     .roleName(accountDetails.getRoleName())
                     .idGioHang(gioHang.getId())
+                    .build();
+
+            ApiResponse<SignInResponse> apiResponse = ApiResponse.<SignInResponse>builder()
+                    .data(signinResponse)
+                    .message("Login success")
+                    .build();
+
+            return ResponseEntity.status(HttpStatus.OK).body(apiResponse);
+        } catch (Exception e) {
+            throw new AppException(ErrorCode.LOGIN_FAILED);
+        }
+    }
+
+    @Override
+    public ResponseEntity<ApiResponse<SignInResponse>> loginAdmin(SignInRequest signinRequest, HttpServletRequest request) {
+        try {
+            Authentication authentication = authenticateUser(signinRequest);
+            AccountDetailsImpl accountDetails = (AccountDetailsImpl) authentication.getPrincipal();
+            if (accountDetails.getRoleName().equals("ROLE_USER")) {
+                throw new AppException(ErrorCode.LOGIN_FAILED);
+            }
+            Long accountId = accountDetails.getAccount().getId();
+
+            LocalDateTime now = LocalDateTime.now();
+
+
+            String accountToken = jwtUtils.generateTokenByUsername(accountDetails.getUsername());
+
+            SignInResponse signinResponse = SignInResponse.builder()
+                    .id(accountId)
+                    .type("Bearer")
+                    .accessToken(accountToken)
+                    .username(accountDetails.getUsername())
+                    .email(accountDetails.getAccount().getEmail())
+                    .isActive(accountDetails.getAccount().getTrangThai() == 1 ? true : false)
+                    .roleName(accountDetails.getRoleName())
                     .build();
 
             ApiResponse<SignInResponse> apiResponse = ApiResponse.<SignInResponse>builder()
@@ -162,7 +209,6 @@ public class AuthService implements IAuthService {
     }
 
 
-
     @Override
     public int sendCodeToEmail(String to, String subject, String content) {
         try {
@@ -226,6 +272,17 @@ public class AuthService implements IAuthService {
                 .build();
     }
 
+    @Override
+    public ApiResponse<?> getProfileAdmin() {
+        Optional<NhanVien> nhanVien = nhanVienRepository.findById(SecurityUtils.getCurrentUserId());
+        if (nhanVien.isEmpty()) {
+            throw new AppException(ErrorCode.NHANVIEN_NOT_FOUND);
+        }
+        return ApiResponse.<Profile>builder()
+                .data(profileMapper.toProfileAdmin(nhanVien.get()))
+                .build();
+    }
+
     private Authentication authenticateUser(SignInRequest signinRequest) {
         return authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(signinRequest.getUsername(), signinRequest.getPassword()));
     }
@@ -242,106 +299,121 @@ public class AuthService implements IAuthService {
         return accountCode;
     }
 
-//    @Override
-//    public String sendTokenForgotPassword(String email) throws MessagingException {
-//        Optional<Account> optional = accountRepository.findByEmail(email);
-//        if (optional.isEmpty()) {
-//            throw new AppException(ErrorCode.ACCOUNT_NOT_FOUND);
-//        }
-//        Account account = optional.get();
-//        String token = jwtProvider.generateForgotPasswordTokenByUsername(account.getUser().getUsername());
-//
-//        account.setForgotPasswordToken(token);
-//        accountRepository.saveAndFlush(account);
-//
-//        String subtitle = "Forgot Password";
-//        String passwordResetLink = "http://localhost:5173/forgot-password?token=" + token;
-//        MimeMessage message = javaMailSender.createMimeMessage();
-//        MimeMessageHelper helper = new MimeMessageHelper(message, true);
-//
-//        String html = "<!DOCTYPE html>\n" +
-//                "<html lang=\"en\">\n" +
-//                "<head>\n" +
-//                "  <meta charset=\"UTF-8\">\n" +
-//                "  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n" +
-//                "  <title>Password Reset</title>\n" +
-//                "  <style>\n" +
-//                "    body {\n" +
-//                "      font-family: Arial, sans-serif;\n" +
-//                "      background-color: #f4f4f4;\n" +
-//                "      color: #333;\n" +
-//                "      margin: 0;\n" +
-//                "      padding: 0;\n" +
-//                "    }\n" +
-//                "    .container {\n" +
-//                "      max-width: 600px;\n" +
-//                "      margin: 0 auto;\n" +
-//                "      background-color: #ffffff;\n" +
-//                "      padding: 20px;\n" +
-//                "      border-radius: 5px;\n" +
-//                "      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);\n" +
-//                "    }\n" +
-//                "  </style>\n" +
-//                "</head>\n" +
-//                "<body>\n" +
-//                "  <div class=\"container\">\n" +
-//                "    <h2>Password Reset Request</h2>\n" +
-//                "    <p>Hello,</p>\n" +
-//                "    <p>We received a request to reset your password. Click the button below to set a new password:</p>\n" +
-//                "    <p><a href=\"{{passwordResetLink}}\" style=\"display: inline-block; padding: 10px 20px; color: #ffffff; background-color: #007bff; border-radius: 5px; text-decoration: none;\">Reset Password</a></p>\n" +
-//                "    <p>If you didn’t request a password reset, please ignore this email.</p>\n" +
-//                "    <p>Thank you, <br>Your Website Team</p>\n" +
-//                "  </div>\n" +
-//                "</body>\n" +
-//                "</html>\n";
-//
-//
-//        html = html.replace("{{passwordResetLink}}", passwordResetLink);
-//
-//        helper.setTo(email);
-//        helper.setSubject(subtitle);
-//        helper.setText(html, true);
-//
-//        javaMailSender.send(message);
-//        return "send token to reset password successfully";
-//    }
-//
-//    @Override
-//    public AccountResponse resetPassword(ChangePasswordRequest changePasswrodRequest) {
-//        String username = jwtProvider.getKeyByValueFromJWT(jwtProvider.getJWT_SECRET_FORGOT_PASSWORD_TOKEN(), "username", changePasswrodRequest.getToken(), String.class);
-//        Optional<Account> optional = accountRepository.findByUser_Username(username);
-//        if (optional.isEmpty()) {
-//            throw new AppException(ErrorCode.TOKEN_RESET_PASSWORD_INVALID);
-//        }
-//        Account account = optional.get();
-//
-//        if (account.getForgotPasswordToken() == null) {
-//            throw new AppException(ErrorCode.TOKEN_RESET_PASSWORD_INVALID);
-//        }
-//
-//        if (!validateToken(jwtProvider.getJWT_SECRET_FORGOT_PASSWORD_TOKEN(), changePasswrodRequest.getToken())) {
-//            throw new AppException(ErrorCode.TOKEN_RESET_PASSWORD_INVALID);
-//        }
-//
-//        Date expDate = jwtProvider.getKeyByValueFromJWT(
-//                jwtProvider.getJWT_SECRET_FORGOT_PASSWORD_TOKEN(),
-//                "exp",
-//                changePasswrodRequest.getToken(),
-//                Date.class
-//        );
-//
-//        if (expDate == null) {
-//            throw new AppException(ErrorCode.TOKEN_RESET_PASSWORD_INVALID);
-//        }
-//        LocalDateTime exp = expDate.toInstant()
-//                .atZone(ZoneOffset.UTC)
-//                .toLocalDateTime();
-//        if (exp.isBefore(LocalDateTime.now())) {
-//            throw new AppException(ErrorCode.TOKEN_RESET_PASSWORD_EXPIRED);
-//        }
-//
-//        account.setPassword(passwordEncoder.encode(changePasswrodRequest.getNewPasswrod()));
-//        account.setForgotPasswordToken(null);
-//        return accountMapper.toResponse(accountRepository.save(account));
-//    }
+    @Override
+    public String sendTokenForgotPassword(String email) throws MessagingException {
+        Optional<TaiKhoan> optional = taiKhoanRepository.findByEmail(email);
+
+        if (!isValidEmail(email.trim())) {
+            throw new AppException(ErrorCode.EMAIL_INCORRECT_FORMAT);
+        }
+        if (optional.isEmpty()) {
+            throw new AppException(ErrorCode.TAIKHOAN_NOT_FOUND);
+        }
+        TaiKhoan account = optional.get();
+        String token = jwtProvider.generateForgotPasswordTokenByUsername(account.getTenDangNhap());
+
+        account.setForgotPasswordToken(token);
+        taiKhoanRepository.saveAndFlush(account);
+
+        String subtitle = "Forgot Password";
+        String passwordResetLink = "http://localhost:5173/auth/reset-password?token=" + token;
+        MimeMessage message = javaMailSender.createMimeMessage();
+        MimeMessageHelper helper = new MimeMessageHelper(message, true);
+
+        String html = "<!DOCTYPE html>\n" +
+                "<html lang=\"en\">\n" +
+                "<head>\n" +
+                "  <meta charset=\"UTF-8\">\n" +
+                "  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n" +
+                "  <title>Password Reset</title>\n" +
+                "  <style>\n" +
+                "    body {\n" +
+                "      font-family: Arial, sans-serif;\n" +
+                "      background-color: #f4f4f4;\n" +
+                "      color: #333;\n" +
+                "      margin: 0;\n" +
+                "      padding: 0;\n" +
+                "    }\n" +
+                "    .container {\n" +
+                "      max-width: 600px;\n" +
+                "      margin: 0 auto;\n" +
+                "      background-color: #ffffff;\n" +
+                "      padding: 20px;\n" +
+                "      border-radius: 5px;\n" +
+                "      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);\n" +
+                "    }\n" +
+                "  </style>\n" +
+                "</head>\n" +
+                "<body>\n" +
+                "  <div class=\"container\">\n" +
+                "    <h2>Password Reset Request</h2>\n" +
+                "    <p>Hello,</p>\n" +
+                "    <p>We received a request to reset your password. Click the button below to set a new password:</p>\n" +
+                "    <p><a href=\"{{passwordResetLink}}\" style=\"display: inline-block; padding: 10px 20px; color: #ffffff; background-color: #007bff; border-radius: 5px; text-decoration: none;\">Reset Password</a></p>\n" +
+                "    <p>If you didn’t request a password reset, please ignore this email.</p>\n" +
+                "    <p>Thank you, <br>3HST Shooes Shop</p>\n" +
+                "  </div>\n" +
+                "</body>\n" +
+                "</html>\n";
+
+
+        html = html.replace("{{passwordResetLink}}", passwordResetLink);
+
+        helper.setTo(email);
+        helper.setSubject(subtitle);
+        helper.setText(html, true);
+
+        javaMailSender.send(message);
+        return "send token to reset password successfully";
+    }
+
+    @Override
+    public TaiKhoanResponse resetPassword(ChangePasswordRequest changePasswrodRequest) {
+        String username = jwtProvider.getKeyByValueFromJWT(jwtProvider.getJWT_SECRET_FORGOT_PASSWORD_TOKEN(), "username", changePasswrodRequest.getToken(), String.class);
+        Optional<TaiKhoan> optional = taiKhoanRepository.findByEmailAndUsername(username);
+        if (optional.isEmpty()) {
+            throw new AppException(ErrorCode.TOKEN_RESET_PASSWORD_INVALID);
+        }
+        TaiKhoan account = optional.get();
+
+        if (account.getForgotPasswordToken() == null) {
+            throw new AppException(ErrorCode.TOKEN_RESET_PASSWORD_INVALID);
+        }
+
+        if (!validateToken(jwtProvider.getJWT_SECRET_FORGOT_PASSWORD_TOKEN(), changePasswrodRequest.getToken())) {
+            throw new AppException(ErrorCode.TOKEN_RESET_PASSWORD_INVALID);
+        }
+
+        Date expDate = jwtProvider.getKeyByValueFromJWT(
+                jwtProvider.getJWT_SECRET_FORGOT_PASSWORD_TOKEN(),
+                "exp",
+                changePasswrodRequest.getToken(),
+                Date.class
+        );
+
+        if (expDate == null) {
+            throw new AppException(ErrorCode.TOKEN_RESET_PASSWORD_INVALID);
+        }
+        LocalDateTime exp = expDate.toInstant()
+                .atZone(ZoneOffset.UTC)
+                .toLocalDateTime();
+
+        if (expDate.toInstant().isBefore(Instant.now())) {
+            throw new AppException(ErrorCode.TOKEN_RESET_PASSWORD_INVALID);
+        }
+
+        account.setMatKhau(passwordEncoder.encode(changePasswrodRequest.getNewPasswrod()));
+        account.setForgotPasswordToken(null);
+        return taiKhoanMapper.toTaiKhoanResponse(taiKhoanRepository.save(account));
+    }
+
+    public boolean validateToken(String jwtTokenSecret, String token) {
+        try {
+            Jwts.parser().setSigningKey(jwtTokenSecret).parseClaimsJws(token);
+            return true;
+        } catch (ExpiredJwtException e) {
+            return false;
+        }
+    }
+
 }

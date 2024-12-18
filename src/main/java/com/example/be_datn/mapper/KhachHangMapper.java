@@ -13,9 +13,9 @@ import java.util.List;
 public class KhachHangMapper {
     public  KhachHangResponse toKhachHangResponse(KhachHang khachHang) {
 
-        DiaChi diaChi = (khachHang.getDiaChiList() != null && !khachHang.getDiaChiList().isEmpty())
-                ? khachHang.getDiaChiList().get(0)
-                : null;
+//        DiaChi diaChi = (khachHang.getDiaChiList() != null && !khachHang.getDiaChiList().isEmpty())
+//                ? khachHang.getDiaChiList().get(0)
+//                : null;
         return KhachHangResponse.builder()
                 .id(khachHang.getId())
                 .ten(khachHang.getTen())
@@ -26,7 +26,8 @@ public class KhachHangMapper {
                 .ngaySinh(khachHang.getNgaySinh())
                 .gioiTinh(khachHang.getGioiTinh())
                 .trangThai(khachHang.getTrangThai())
-                .diaChi(DiaChiResponse.toResponse(diaChi))
+                .diaChiStr(khachHang.getDiaChi())
+//                .diaChi(DiaChiResponse.toResponse(diaChi))
                 .build();
     }
 

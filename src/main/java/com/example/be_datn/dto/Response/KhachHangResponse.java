@@ -28,40 +28,6 @@ public class KhachHangResponse {
     LocalDate ngaySinh;
     Boolean gioiTinh;
     Integer trangThai;
-    DiaChiResponse diaChi;
-
-
-    public static KhachHangResponse toResponse(KhachHang khachHang) {
-        if (khachHang == null) {
-            return null;
-        }
-
-        DiaChiResponse diaChiResponse = null;
-        if (khachHang.getDiaChiList() != null) {
-            Optional<DiaChiResponse> diaChiOptional = khachHang.getDiaChiList().stream()
-                    .filter(diaChi -> diaChi.isTrang_thai() == true)
-                    .map(DiaChiResponse::toResponse)
-                    .findFirst();
-            diaChiResponse = diaChiOptional.orElse(
-                    khachHang.getDiaChiList().stream()
-                            .map(DiaChiResponse::toResponse)
-                            .findFirst()
-                            .orElse(null)
-            );
-        }
-
-        return KhachHangResponse.builder()
-                .id(khachHang.getId())
-                .ten(khachHang.getTen())
-                .email(khachHang.getEmail())
-                .sdt(khachHang.getSdt())
-                .avatar(khachHang.getAvatar())
-                .ma(khachHang.getMa())
-                .ngaySinh(khachHang.getNgaySinh())
-                .gioiTinh(khachHang.getGioiTinh())
-                .trangThai(khachHang.getTrangThai())
-                .diaChi(diaChiResponse)
-                .build();
-    }
+    String diaChiStr;
 
 }
