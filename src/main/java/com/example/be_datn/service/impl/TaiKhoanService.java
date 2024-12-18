@@ -86,6 +86,11 @@ public class TaiKhoanService implements ITaiKhoanService, UserDetailsService {
         return false;
     }
 
+    @Override
+    public TaiKhoanResponse getTaiKhoanByIDOwner(String email) {
+        return taiKhoanMapper.toTaiKhoanResponse(taiKhoanRepository.findByOwnerID(email).orElseThrow(() -> new AppException(ErrorCode.TAIKHOAN_NOT_FOUND)));
+    }
+
 
     public String generateCodeAccount() {
         StringBuilder billCode = new StringBuilder();

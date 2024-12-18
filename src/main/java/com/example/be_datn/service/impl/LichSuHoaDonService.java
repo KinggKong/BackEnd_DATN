@@ -28,12 +28,26 @@ public class LichSuHoaDonService implements ILichSuHoaDonService {
     private final HoaDonChiTietRepository hoaDonChiTietRepository;
     private final SanPhamChiTietRepository sanPhamChiTietRepository;
     private final VoucherRepository voucherRepository;
+    private final GioHangChiTietRepository gioHangChiTietRepository;
 
     @Override
     public LichSuHoaDonResponse insertLichSuHoaDon(StatusBillRequest statusBillRequest) {
         NhanVien nhanVien = new NhanVien();
         if (statusBillRequest.getStatus().equals(StatusPayment.CANCELLED.toString())) {
-            updateAfterCancel(statusBillRequest.getIdHoaDon());
+            HoaDon hoaDon = hoaDonRepository.findById(statusBillRequest.getIdHoaDon()).orElseThrow(() -> new AppException(ErrorCode.HOA_DON_NOT_FOUND));
+            if (hoaDon.getTrangThai().equals(StatusPayment.ACCEPTED.toString())) {
+                updateAfterCancel(statusBillRequest.getIdHoaDon());
+            }
+            if (hoaDon.getVoucher() != null) {
+                Voucher voucher = voucherRepository.findById(hoaDon.getVoucher().getId()).orElseThrow(() -> new AppException(ErrorCode.VOUCHER_NOT_FOUND));
+                if (voucher != null) {
+                    voucher.setSoLuong(voucher.getSoLuong() + 1);
+                    voucherRepository.saveAndFlush(voucher);
+                }
+            }
+        }
+        if (statusBillRequest.getStatus().equals(StatusPayment.ACCEPTED.toString())) {
+            handleUpdateAfterBuy(statusBillRequest.getIdHoaDon());
         }
 
         if (statusBillRequest.getIdNhanvien() == null) {
@@ -108,4 +122,30 @@ public class LichSuHoaDonService implements ILichSuHoaDonService {
         sanPhamChiTietRepository.saveAll(newSanPhamChiTiets);
     }
 
+    public void handleUpdateAfterBuy(Long idHoaDon) {
+        if (idHoaDon == null) {
+            throw new AppException(ErrorCode.HOA_DON_NOT_FOUND);
+        }
+
+        List<HoaDonCT> hoaDonCTs = hoaDonChiTietRepository.findByHoaDon_Id(idHoaDon);
+        if (hoaDonCTs.isEmpty()) {
+            throw new AppException(ErrorCode.HOA_DON_CHI_TIET_NOT_FOUND_LIST);
+        }
+
+        List<SanPhamChiTiet> updatedProducts = new ArrayList<>();
+        for (HoaDonCT hoaDonCT : hoaDonCTs) {
+            SanPhamChiTiet sanPhamChiTiet = hoaDonCT.getSanPhamChiTiet();
+            int soLuongTonKho = sanPhamChiTiet.getSoLuong();
+            int soLuongTrongGio = hoaDonCT.getSoLuong();
+
+            if (soLuongTonKho < soLuongTrongGio) {
+                throw new AppException(ErrorCode.SOLUONG_SANPHAM_KHONG_DU);
+            }
+
+            sanPhamChiTiet.setSoLuong(soLuongTonKho - soLuongTrongGio);
+            updatedProducts.add(sanPhamChiTiet);
+        }
+
+        sanPhamChiTietRepository.saveAll(updatedProducts);
+    }
 }

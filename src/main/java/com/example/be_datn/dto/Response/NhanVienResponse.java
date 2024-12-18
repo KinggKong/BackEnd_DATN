@@ -26,6 +26,7 @@ public class NhanVienResponse {
     private Boolean gioiTinh;
     private Integer trangThai;
 
+
     // Phương thức chuyển đổi từ NhanVien sang NhanVienResponse
     public static NhanVienResponse fromNhanVien(NhanVien nhanVien) {
         return NhanVienResponse.builder()
@@ -38,6 +39,7 @@ public class NhanVienResponse {
                 .diaChi(nhanVien.getDiaChi())
                 .gioiTinh(nhanVien.getGioiTinh())
                 .trangThai(nhanVien.getTrangThai())
+
                 .build();
     }
 }

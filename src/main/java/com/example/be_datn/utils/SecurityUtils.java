@@ -14,6 +14,10 @@ public class SecurityUtils {
         return getCurrentUser().getAccount().getTenDangNhap();
     }
 
+    public static String getCurrentRole() {
+        return getCurrentUser().getAccount().getVaiTro().getTenVaiTro();
+    }
+
     public static AccountDetailsImpl getCurrentUser() {
         if (getCurrentAuthentication() != null)
             return (AccountDetailsImpl) getCurrentAuthentication().getPrincipal();

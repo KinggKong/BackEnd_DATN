@@ -17,4 +17,5 @@ public interface IHoaDonChiTietService {
     HoaDonCTResponse update(HoaDonChiTietUpdateRequest request, Long id);
     Page<HoaDonCTResponse> getAllHdct(Pageable pageable, Long idHoaDonCT);
     List<HoaDonCTResponse> getAllHdctByIdHoaDon(Long hoaDonId);
+    void updateGiaHoaDonCT_Sale(Long id);
 }

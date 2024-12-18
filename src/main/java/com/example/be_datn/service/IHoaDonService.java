@@ -18,8 +18,8 @@ public interface IHoaDonService {
     Long createHoaDon();
     String deleteHoaDon(Long id);
     String updateHoaDon(Long id, HoaDonUpdateRequest request);
-    String updateCustomer(HoaDon hoaDon, Long idKhachHang);
-    String completeHoaDon(Long id, String method,String diaChi, Double tienShip);
+    String updateCustomer(Long idHoaDon, Long idKhachHang);
+    String completeHoaDon(Long id, String method,String diaChi, Double tienShip,String tenNguoiNhan, String sdt, String ghiChu);
     HoaDonResponse findByMaHoaDon(String maHoaDon);
     void changeTypeBill(Long idHoaDon);
 }

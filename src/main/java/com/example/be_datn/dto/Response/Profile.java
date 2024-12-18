@@ -3,7 +3,6 @@ package com.example.be_datn.dto.Response;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
-import java.time.Instant;
 import java.time.LocalDate;
 
 @Getter
@@ -22,4 +21,5 @@ public class Profile {
     private LocalDate ngaySinh;
     private Boolean gioiTinh;
     private Long idGioHang;
+    private String vaiTro;
 }

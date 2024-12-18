@@ -45,7 +45,11 @@ public class GioHangChiTietService implements IGioHangChiTietService {
         GioHang gioHang = gioHangRepository.findById(gioHangChiTietRequest.getIdGioHang()).orElseThrow(() -> new AppException(ErrorCode.GIO_HANG_NOT_FOUND));
         SanPhamChiTiet sanPhamChiTiet = sanPhamChiTietRepository.findById(gioHangChiTietRequest.getIdSanPhamChiTiet()).orElseThrow(() -> new AppException(ErrorCode.SANPHAM_NOT_FOUND));
         GioHangChiTiet existGioHangChiTiet = gioHangChiTietRepository.findByIdGiohangAndIdSanPhamChiTiet(gioHangChiTietRequest.getIdGioHang(), gioHangChiTietRequest.getIdSanPhamChiTiet());
+        int soLuongConLai = sanPhamChiTiet.getSoLuong();
         if (existGioHangChiTiet != null) {
+            if (existGioHangChiTiet.getSoLuong() + gioHangChiTietRequest.getSoLuong() > soLuongConLai) {
+                throw new AppException(ErrorCode.SO_LUONG_SAN_PHAM_KHONG_DU);
+            }
             existGioHangChiTiet.setSoLuong(existGioHangChiTiet.getSoLuong() + gioHangChiTietRequest.getSoLuong());
             existGioHangChiTiet.setGiaTien(gioHangChiTietRequest.getGiaTien());
             existGioHangChiTiet.setThoiGianGiamGia(gioHangChiTietRequest.getThoiGianGiamGia());

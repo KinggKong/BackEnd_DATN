@@ -64,6 +64,7 @@ public class HoaDonService implements IHoaDonService {
     private final HoaDonChiTietMapper  hoaDonChiTietMapper;
     private final InvoicePdfGenerator invoicePdfGenerator;
     private final NhanVienRepository nhanVienRepository;
+    private final HoaDonChiTietService hoaDonChiTietService;
 
     public String generateInvoiceCode() {
         String date = new SimpleDateFormat("yyyyMMdd").format(new Date());
@@ -87,6 +88,17 @@ public class HoaDonService implements IHoaDonService {
         KhachHang khachHang = hoaDon.getKhachHang();
         Voucher voucher = hoaDon.getVoucher();
 
+        hoaDonChiTietService.updateGiaHoaDonCT_Sale(id);
+        List<HoaDonCT> hoaDonCTList = hoaDon.getChiTietList();
+        Double tongTien = 0.0;
+        for (HoaDonCT hoaDonCT : hoaDonCTList) {
+            tongTien += hoaDonCT.getSoLuong() * hoaDonCT.getGiaTien();
+        }
+        hoaDon.setTongTien(tongTien);
+        hoaDon.setTienSauGiam(tongTien - hoaDon.getSoTienGiam());
+        hoaDonRepository.save(hoaDon);
+
+
         return new HoaDonResponse(
                 hoaDon.getId(),
                 hoaDon.getMaHoaDon(),
@@ -106,7 +118,9 @@ public class HoaDonService implements IHoaDonService {
                 voucher != null ? voucher.getMaVoucher() : null,
                 hoaDon.getSoTienGiam(),
                 hoaDon.getCreated_at(),
-                hoaDon.getUpdated_at()
+                hoaDon.getUpdated_at(),
+                voucher != null ? voucher.getId() : null
+
         );
     }
 
@@ -150,6 +164,8 @@ public class HoaDonService implements IHoaDonService {
         hoaDon.setTienSauGiam(0.0);
         hoaDon.setTienShip(0.0);
         hoaDon.setTongTien(0.0);
+        hoaDon.setSoTienGiam(0.0);
+
         HoaDon hd = hoaDonRepository.save(hoaDon);
         NhanVien nhanVien = nhanVienRepository.findById(SecurityUtils.getCurrentUserId())
                 .orElseThrow(() -> new AppException(ErrorCode.NHANVIEN_NOT_FOUND));
@@ -226,12 +242,14 @@ public class HoaDonService implements IHoaDonService {
     }
 
     @Override
-    public String updateCustomer(HoaDon hoaDon, Long idKhachHang) {
+    public String updateCustomer(Long idHoaDon, Long idKhachHang) {
         KhachHang khachHang = khachHangRepository.findById(idKhachHang)
                 .orElseThrow(() -> new AppException(ErrorCode.KHACH_HANG_NOT_FOUND));
+        HoaDon hoaDon = hoaDonRepository.findById(idHoaDon)
+                        .orElseThrow(() -> new AppException(ErrorCode.HOA_DON_NOT_FOUND));
         hoaDon.setKhachHang(khachHang);
         hoaDon.setTenNguoiNhan(khachHang.getTen());
-        hoaDon.setSdt(khachHang.getSdt());
+        hoaDon.setSdt(khachHang.getSdt() ==null ? "" : khachHang.getSdt().toString());
         hoaDon.setEmail(khachHang.getEmail());
         hoaDonRepository.save(hoaDon);
         return "Update customer success";
@@ -239,16 +257,38 @@ public class HoaDonService implements IHoaDonService {
 
     @Override
     @Transactional
-    public String completeHoaDon(Long id, String method,String diaChi, Double tienShip) {
+    public String completeHoaDon(Long id, String method,String diaChi, Double tienShip,String tenNguoiNhan, String sdt, String ghiChu) {
         // Retrieve the HoaDon object
         HoaDon hoaDon = hoaDonRepository.findById(id)
                 .orElseThrow(() -> new AppException(ErrorCode.HOA_DON_NOT_FOUND));
-        if(diaChi != null) {
-            hoaDon.setDiaChiNhan(diaChi);
-        }
-        if(tienShip != null) {
-            hoaDon.setTienShip(tienShip);
-        }
+
+        hoaDon.setDiaChiNhan(diaChi);
+        hoaDon.setTienShip(tienShip);
+        hoaDon.setTenNguoiNhan(tenNguoiNhan);
+        hoaDon.setSdt(sdt);
+        hoaDon.setGhiChu(ghiChu);
+
+
+//        //Check voucher
+//        if(hoaDon.getVoucher() != null) {
+//            Voucher voucher = voucherRepository.findById(hoaDon.getVoucher().getId())
+//                    .orElseThrow(() -> new AppException(ErrorCode.VOUCHER_NOT_FOUND));
+//            if(voucher.getSoLuong() <= 0) {
+//                throw new AppException(ErrorCode.VOUCHER_EXPIRED);
+//            }
+//            if(voucher.getTrangThai()==0){
+//                throw new AppException(ErrorCode.VOUCHER_EXPIRED);
+//            }
+//
+//            voucher.setSoLuong(voucher.getSoLuong() - 1);
+//            voucherRepository.save(voucher);
+//            double discount = hoaDon.getSoTienGiam();
+//            hoaDon.setTienSauGiam(hoaDon.getTongTien() - discount);
+//        } else {
+//            throw new AppException(ErrorCode.VOUCHER_NOT_FOUND);
+//        }
+
+
 
         if(hoaDon.getNhanVien() != null) {
             NhanVien nhanVien = nhanVienRepository.findById(hoaDon.getNhanVien().getId())
@@ -271,11 +311,13 @@ public class HoaDonService implements IHoaDonService {
             voucher.setSoLuong(voucher.getSoLuong() - 1);
             voucherRepository.save(voucher);
             double discount = hoaDon.getSoTienGiam();
-            hoaDon.setTienSauGiam(hoaDon.getTongTien() - discount);
+            hoaDon.setTienSauGiam(hoaDon.getTongTien() - discount + tienShip);
         } else {
             hoaDon.setSoTienGiam(0.0);
-            hoaDon.setTienSauGiam(hoaDon.getTongTien());
+            hoaDon.setTienSauGiam(hoaDon.getTongTien()+tienShip);
         }
+        hoaDon.setTienShip(tienShip);
+        hoaDon.setGhiChu(ghiChu);
         hoaDon.setHinhThucThanhToan(method);
         hoaDon.setTrangThai(StatusPayment.DONE.toString());
 
@@ -295,7 +337,7 @@ public class HoaDonService implements IHoaDonService {
 
         // Log payment transaction (LichSuThanhToan)
         LichSuThanhToan lichSuThanhToan = LichSuThanhToan.builder()
-                .soTien(updatedHoaDon.getTongTien())
+                .soTien(updatedHoaDon.getTongTien() -updatedHoaDon.getSoTienGiam()+tienShip)
                 .paymentMethod(updatedHoaDon.getHinhThucThanhToan())
                 .type(hoaDon.getLoaiHoaDon())
                 .hoaDon(updatedHoaDon)

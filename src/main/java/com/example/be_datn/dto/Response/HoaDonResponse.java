@@ -1,6 +1,7 @@
 package com.example.be_datn.dto.Response;
 
 import com.example.be_datn.entity.HoaDon;
+import com.example.be_datn.entity.Voucher;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -33,6 +34,7 @@ public class HoaDonResponse {
     Double soTienGiam;
     LocalDateTime createdAt;
     LocalDateTime updatedAt;
+    Long idVoucher;
 
 
     public static HoaDonResponse from(HoaDon hoaDon) {
@@ -78,6 +80,7 @@ public class HoaDonResponse {
                     .trangThai(hoaDon.getTrangThai())
                     .createdAt(hoaDon.getCreated_at() != null ? hoaDon.getCreated_at() : LocalDateTime.now()) // Default value if null
                     .updatedAt(hoaDon.getUpdated_at())
+                    .idVoucher(hoaDon.getVoucher() != null ? hoaDon.getVoucher().getId() : null)
                     .build();
         }
 

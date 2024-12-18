@@ -41,34 +41,32 @@ public class HoaDonController {
     private LichSuHoaDonRepository lichSuHoaDonRepository;
 
 
-
     @GetMapping
     public ApiResponse<?> getAllHoaDon(
             @RequestParam(defaultValue = "1") Integer pageNo,
-            @RequestParam(defaultValue = "5") Integer pageSize)
-    {
-        Pageable pageable = PageRequest.of(pageNo-1, pageSize);
+            @RequestParam(defaultValue = "5") Integer pageSize) {
+        Pageable pageable = PageRequest.of(pageNo - 1, pageSize);
         ApiResponse<Page<HoaDonResponse>> apiResponse = new ApiResponse<>();
         apiResponse.setData(hoaDonRepository.findAllHoaDon(pageable));
         return apiResponse;
     }
 
     @GetMapping("/{id}")
-    public ApiResponse<?> getHoaDonById(@PathVariable Long id){
+    public ApiResponse<?> getHoaDonById(@PathVariable Long id) {
         ApiResponse<HoaDonResponse> apiResponse = new ApiResponse<>();
         apiResponse.setData(hoaDonService.getHoaDonById(id));
         return apiResponse;
     }
 
     @PostMapping
-    public ApiResponse<?> create(){
+    public ApiResponse<?> create() {
         ApiResponse<Long> apiResponse = new ApiResponse<>();
         apiResponse.setData(hoaDonService.createHoaDon());
         return apiResponse;
     }
 
     @DeleteMapping("/{id}")
-    private ApiResponse<?> delete(@PathVariable Long id){
+    private ApiResponse<?> delete(@PathVariable Long id) {
         ApiResponse<String> apiResponse = new ApiResponse<>();
         apiResponse.setData(hoaDonService.deleteHoaDon(id));
         return apiResponse;
@@ -78,16 +76,18 @@ public class HoaDonController {
     public ApiResponse<?> update(
             @PathVariable Long id,
             @RequestBody HoaDonUpdateRequest request
-    ){
+    ) {
         ApiResponse<String> apiResponse = new ApiResponse<>();
         apiResponse.setData(hoaDonService.updateHoaDon(id, request));
         return apiResponse;
     }
 
     @PatchMapping("/complete/{id}")
-    public ApiResponse<?> completeOrder(@PathVariable Long id, @RequestParam String method, @RequestParam String diaChi, @RequestParam Double tienShip){
+    public ApiResponse<?> completeOrder(@PathVariable Long id, @RequestParam String method, @RequestParam String diaChi
+            , @RequestParam Double tienShip,
+                                        @RequestParam String tenKhachHang,  @RequestParam String sdt, @RequestParam String ghiChu) {
         ApiResponse<String> apiResponse = new ApiResponse<>();
-        apiResponse.setData(hoaDonService.completeHoaDon(id, method, diaChi, tienShip));
+        apiResponse.setData(hoaDonService.completeHoaDon(id, method, diaChi, tienShip, tenKhachHang, sdt, ghiChu));
         apiResponse.setCode(200);
         apiResponse.setMessage("Thanh toán thành công !");
         return apiResponse;
@@ -95,7 +95,7 @@ public class HoaDonController {
 
 
     @PutMapping("/updateSoLuongAndTongTien/{id}")
-    public ApiResponse<?> updateSoLuongAndTongTien(@PathVariable Long id){
+    public ApiResponse<?> updateSoLuongAndTongTien(@PathVariable Long id) {
         ApiResponse<String> apiResponse = new ApiResponse<>();
         apiResponse.setData(hoaDonChiTietService.updateHoaDon(id));
         return apiResponse;
@@ -120,9 +120,18 @@ public class HoaDonController {
     }
 
     @PutMapping("/changeTypeBill/{id}")
-    public ApiResponse<?> changeTypeBill(@PathVariable Long id){
+    public ApiResponse<?> changeTypeBill(@PathVariable Long id) {
         ApiResponse<String> apiResponse = new ApiResponse<>();
         hoaDonService.changeTypeBill(id);
+        return apiResponse;
+    }
+    @PutMapping("/addKhachHang")
+    public ApiResponse<?> addCustomer(
+            @RequestParam Long idHoaDon,
+            @RequestParam Long idKhachHang
+    ) {
+        ApiResponse<String> apiResponse = new ApiResponse<>();
+        apiResponse.setData(hoaDonService.updateCustomer(idHoaDon, idKhachHang));
         return apiResponse;
     }
 

@@ -1,6 +1,7 @@
 package com.example.be_datn.service.impl;
 
 import com.example.be_datn.dto.Response.HoaDonChiTietResponse;
+import com.example.be_datn.dto.Response.HoaDonResponse;
 import com.example.be_datn.dto.Response.InfoOrder;
 import com.example.be_datn.dto.Response.SanPhamChiTietResponse;
 import com.example.be_datn.service.IEmailService;
@@ -67,6 +68,9 @@ public class EmailService implements IEmailService {
             helper.setTo(to);
             helper.setSubject(subject);
 
+            HoaDonResponse hoaDon = infoOrder.getHoaDonResponse();
+            String orderItemsHtml = generateOrderItemsHtml(infoOrder.getHoaDonChiTietResponse());
+
             String html = String.format("""
                             <!DOCTYPE html>
                             <html lang="vi">
@@ -88,7 +92,7 @@ public class EmailService implements IEmailService {
                             
                                 <div style="background-color: #f8f9fa; padding: 15px; border-radius: 5px; margin: 20px 0;">
                                     <h3 style="color: #333333; margin-top: 0;">Thông tin đơn hàng:</h3>
-                                    <p style="margin: 5px 0;"><strong>Mã đơn hàng:</strong> #%s</p>
+                                    <p style="margin: 5px 0;"><strong>Mã đơn hàng:</strong> %s</p>
                                     <p style="margin: 5px 0;"><strong>Ngày đặt:</strong> %s</p>
                                     <p style="margin: 5px 0;"><strong>Tổng giá trị:</strong> %s₫</p>
                                     <p style="margin: 5px 0;"><strong>Ghi chú:</strong> %s</p>
@@ -146,28 +150,27 @@ public class EmailService implements IEmailService {
                                     <div style="text-align: center; color: #6c757d; font-size: 12px;">
                                         <p style="margin: 5px 0;">Email này được gửi tự động từ 3HST Shoes.</p>
                                         <p style="margin: 5px 0;">© 2024 3HST Shoes. All rights reserved.</p>
-                                        <p style="margin: 5px 0;">Địa chỉ: 456 Đường DEF, Phường GHI, Quận 2, TP. Hồ Chí Minh</p>
+                                        <p style="margin: 5px 0;">13 P. Trịnh Văn Bô, Xuân Phương, Nam Từ Liêm, Hà Nội, Việt Nam</p>
                                     </div>
                                 </div>
                             </div>
                             </body>
                             </html>
                             """,
-                    infoOrder.getHoaDonResponse().getTenNguoiNhan(),
-                    infoOrder.getHoaDonResponse().getMaHoaDon(),
-                    formatDate(infoOrder.getHoaDonResponse().getCreatedAt().toString()),
-                    formatCurrency(infoOrder.getHoaDonResponse().getTongTien()),
-                    infoOrder.getHoaDonResponse().getGhiChu(),
-                    infoOrder.getHoaDonResponse().getMaHoaDon(),
-                    generateOrderItemsHtml(infoOrder.getHoaDonChiTietResponse()),
-                    formatCurrency(infoOrder.getHoaDonResponse().getTongTien() - infoOrder.getHoaDonResponse().getTienShip() + infoOrder.getHoaDonResponse().getSoTienGiam()),
-                    formatCurrency(infoOrder.getHoaDonResponse().getTienShip()),
-                    formatCurrency(infoOrder.getHoaDonResponse().getSoTienGiam()),
-                    formatCurrency(infoOrder.getHoaDonResponse().getTienSauGiam()),
-                    infoOrder.getHoaDonResponse().getTenNguoiNhan(),
-                    infoOrder.getHoaDonResponse().getDiaChiNhan(),
-                    infoOrder.getHoaDonResponse().getSdt(),
-                    getPaymentMethodText(infoOrder.getHoaDonResponse().getHinhThucThanhToan())
+                    hoaDon.getTenNguoiNhan(),
+                    hoaDon.getMaHoaDon(),
+                    formatDate(hoaDon.getCreatedAt().toString()),
+                    formatCurrency(hoaDon.getTongTien() - hoaDon.getSoTienGiam()),
+                    hoaDon.getGhiChu() == null ? "" : hoaDon.getGhiChu(),
+                    orderItemsHtml,
+                    formatCurrency(hoaDon.getTongTien() - hoaDon.getTienShip()),
+                    formatCurrency(hoaDon.getTienShip()),
+                    formatCurrency(hoaDon.getSoTienGiam()),
+                    formatCurrency(hoaDon.getTienSauGiam()),
+                    hoaDon.getTenNguoiNhan(),
+                    hoaDon.getDiaChiNhan(),
+                    hoaDon.getSdt(),
+                    getPaymentMethodText(hoaDon.getHinhThucThanhToan())
             );
 
             helper.setText(html, true);
