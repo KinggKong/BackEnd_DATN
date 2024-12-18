@@ -16,9 +16,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
+
 import java.util.Comparator;
 import java.util.List;
+
+import java.time.LocalDateTime;
 
 
 @Service
@@ -69,6 +71,10 @@ public class VoucherService implements IVoucherService {
         Voucher voucher = voucherRepository.findById(idVoucher)
                 .orElseThrow(() -> new AppException(ErrorCode.VOUCHER_NOT_FOUND));
 
+        // Lưu trạng thái trước của voucher
+        int oldTrangThai = voucher.getTrangThai();
+
+        // Cập nhật thông tin voucher từ yêu cầu
         voucher.setTenVoucher(voucherRequest.getTenVoucher());
         voucher.setHinhThucGiam(voucherRequest.getHinhThucGiam());
         voucher.setGiaTriGiam(voucherRequest.getGiaTriGiam());
@@ -79,49 +85,99 @@ public class VoucherService implements IVoucherService {
         voucher.setGiaTriDonHangToiThieu(voucherRequest.getGiaTriDonHangToiThieu());
         voucher.setGiaTriGiamToiDa(voucherRequest.getGiaTriGiamToiDa());
         voucher.setSoLuong(voucherRequest.getSoLuong());
-        if (voucher.getTrangThai() != 1) {
-            updateVoucherForInvoices(voucher.getId());
+
+        // Nếu trạng thái voucher thay đổi thành 0, xử lý các hóa đơn đang sử dụng voucher này
+        if (voucher.getTrangThai() == 0 && oldTrangThai != 0) {
+            disableVoucherInInvoices(voucher.getId());
         }
 
+        // Nếu trạng thái voucher thay đổi từ 0 thành 1, áp dụng voucher cho các hóa đơn nếu phù hợp
+        if (voucher.getTrangThai() == 1 && oldTrangThai == 0) {
+            enableVoucherForInvoices(voucher.getId());
+        }
 
         return VoucherResponse.fromVoucher(voucherRepository.save(voucher));
     }
+
+    public void enableVoucherForInvoices(Long idVoucher) {
+        LocalDateTime now = LocalDateTime.now();
+        Voucher voucher = voucherRepository.findById(idVoucher)
+                .orElseThrow(() -> new AppException(ErrorCode.VOUCHER_NOT_FOUND));
+
+        List<HoaDon> affectedInvoices = hoaDonRepository.findHoaDonAndAddVoucher(voucher.getGiaTriDonHangToiThieu());
+
+        // Lọc các hóa đơn phù hợp và áp dụng voucher
+        for (HoaDon hoaDon : affectedInvoices) {
+            // Kiểm tra tính hợp lệ của voucher và áp dụng nếu hợp lệ
+            if (isVoucherValid(voucher, hoaDon.getTongTien(), now)) {
+                double discount = calculateDiscount(hoaDon.getTongTien(), voucher);
+                hoaDon.setVoucher(voucher);  // Áp dụng voucher
+                hoaDon.setSoTienGiam(discount);
+                hoaDon.setTienSauGiam(hoaDon.getTongTien() - discount);
+                hoaDonRepository.save(hoaDon);  // Lưu hóa đơn đã cập nhật
+
+            } else {
+
+            }
+        }
+    }
+
+    private boolean isVoucherValid(Voucher voucher, double tongTien, LocalDateTime now) {
+        return voucher.getTrangThai() == 1 &&  // Voucher đang hoạt động
+                voucher.getSoLuong() > 0 &&   // Voucher còn đủ số lượng
+                voucher.getNgayBatDau().isBefore(now) &&  // Voucher đã bắt đầu
+                voucher.getNgayKetThuc().isAfter(now) &&  // Voucher chưa hết hạn
+                tongTien >= voucher.getGiaTriDonHangToiThieu();  // Tổng tiền hóa đơn đủ điều kiện
+    }
+
+
+    public void disableVoucherInInvoices(Long idVoucher) {
+        LocalDateTime now = LocalDateTime.now();
+        Voucher voucher = voucherRepository.findById(idVoucher)
+                .orElseThrow(() -> new AppException(ErrorCode.VOUCHER_NOT_FOUND));
+
+        // Lấy danh sách các hóa đơn đang sử dụng voucher này
+        List<HoaDon> affectedInvoices = hoaDonRepository.findByVoucher(voucher);
+
+        for (HoaDon hoaDon : affectedInvoices) {
+            // Xóa voucher khỏi hóa đơn và đặt giá trị giảm giá về 0
+            hoaDon.setVoucher(null);
+            hoaDon.setSoTienGiam(0.0);
+            hoaDon.setTienSauGiam(hoaDon.getTongTien());
+
+            // Kiểm tra các voucher thay thế còn hiệu lực cho hóa đơn này
+            List<Voucher> availableVouchers = voucherRepository.findAvailableVouchers(hoaDon.getTongTien());
+            Voucher bestVoucher = availableVouchers.stream()
+                    .filter(vo ->
+                            vo.getTrangThai() == 1 && // Voucher đang hoạt động
+                                    vo.getSoLuong() >= 1 && // Voucher còn đủ số lượng
+                                    vo.getNgayBatDau().isBefore(now) && // Voucher đã bắt đầu
+                                    vo.getNgayKetThuc().isAfter(now) && // Voucher chưa hết hạn
+                                    hoaDon.getTongTien() >= vo.getGiaTriDonHangToiThieu() // Tổng tiền hóa đơn đủ điều kiện
+                    )
+                    .sorted(Comparator.comparingDouble((Voucher v) -> calculateDiscount(hoaDon.getTongTien(), v))
+                            .reversed()) // Sắp xếp voucher theo mức giảm (tối đa)
+                    .findFirst()
+                    .orElse(null);
+
+            // Nếu tìm thấy voucher thay thế, áp dụng voucher mới cho hóa đơn
+            if (bestVoucher != null) {
+                double discount = calculateDiscount(hoaDon.getTongTien(), bestVoucher);
+                hoaDon.setVoucher(bestVoucher);
+                hoaDon.setSoTienGiam(discount);
+                hoaDon.setTienSauGiam(hoaDon.getTongTien() - discount);
+            }
+
+            hoaDonRepository.save(hoaDon); // Lưu hóa đơn đã cập nhật
+        }
+    }
+
 
     @Override
     public String deleteVoucher(Long id) {
         getVoucherById(id);
         voucherRepository.deleteById(id);
         return "deleted successfully";
-    }
-
-    public void updateVoucherForInvoices(Long idVoucher) {
-        Voucher voucher = voucherRepository.findById(idVoucher)
-                .orElseThrow(() -> new AppException(ErrorCode.VOUCHER_NOT_FOUND));
-
-        if (voucher.getTrangThai() != 1) {
-            List<HoaDon> affectedInvoices = hoaDonRepository.findByVoucher(voucher);
-
-            for (HoaDon hoaDon : affectedInvoices) {
-                List<Voucher> availableVouchers = voucherRepository.findAvailableVouchers(hoaDon.getTongTien());
-                Voucher bestVoucher = availableVouchers.stream()
-                        .sorted(Comparator.comparingDouble((Voucher v) -> calculateDiscount(hoaDon.getTongTien(), v))
-                                .reversed())
-                        .findFirst()
-                        .orElse(null);
-
-                if (bestVoucher != null) {
-                    double discount = calculateDiscount(hoaDon.getTongTien(), bestVoucher);
-                    hoaDon.setVoucher(bestVoucher);
-                    hoaDon.setSoTienGiam(discount);
-                    hoaDon.setTienSauGiam(hoaDon.getTongTien() - discount);
-                } else {
-                    hoaDon.setVoucher(null);
-                    hoaDon.setSoTienGiam(0.0);
-                    hoaDon.setTienSauGiam(hoaDon.getTongTien());
-                }
-                hoaDonRepository.save(hoaDon);
-            }
-        }
     }
 
     private double calculateDiscount(double totalAmount, Voucher voucher) {
@@ -135,7 +191,7 @@ public class VoucherService implements IVoucherService {
 
         // Check if the discount exceeds the maximum allowable discount (giaTriGiamToiDa)
         if (voucher.getGiaTriGiamToiDa() != null && discount > voucher.getGiaTriGiamToiDa()) {
-            return voucher.getGiaTriGiamToiDa(); // Apply the max discount if exceeded
+            return voucher.getGiaTriGiamToiDa();
         }
 
         return discount;

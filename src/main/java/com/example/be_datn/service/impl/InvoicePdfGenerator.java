@@ -114,7 +114,7 @@ public class InvoicePdfGenerator {
             // Payment information
             Paragraph paymentInfo = new Paragraph(
                     "\nHình thức thanh toán: " + hoaDon.getHinhThucThanhToan() +
-                            "\nTrạng thái: " + (hoaDon.getTrangThai().equals("DONE") ? "Hoàn thành" : ""),
+                            "\nTrạng thái: " + (hoaDon.getTrangThai().equalsIgnoreCase("DONE") ? "Thành công" : ""),
                     NORMAL_FONT
             );
             document.add(paymentInfo);

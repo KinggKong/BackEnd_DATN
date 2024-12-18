@@ -4,6 +4,7 @@ import com.example.be_datn.dto.Response.ApiResponse;
 import com.example.be_datn.dto.Request.KhachHangRequest1;
 import com.example.be_datn.dto.Response.KhachHangResponse1;
 import com.example.be_datn.service.IKhachHangService;
+import jakarta.mail.MessagingException;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -32,7 +33,7 @@ public class KhachHangController1 {
 
     // Tạo mới khách hàng
     @PostMapping("")
-    ApiResponse<KhachHangResponse1> createKhachHang(@RequestBody @Valid KhachHangRequest1 khachHangRequest) {
+    ApiResponse<KhachHangResponse1> createKhachHang(@RequestBody @Valid KhachHangRequest1 khachHangRequest) throws MessagingException {
         ApiResponse<KhachHangResponse1> apiResponse = new ApiResponse<>();
         apiResponse.setMessage("Thêm mới thành công khách hàng " + khachHangRequest.getTen());
         apiResponse.setData(khachHangService.createKhachHang(khachHangRequest));

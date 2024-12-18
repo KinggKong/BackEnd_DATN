@@ -55,9 +55,5 @@ public class KhachHang {
     @Column(name = "dia_chi")
     private String diaChi;
 
-    @OneToMany(mappedBy = "khachHang")
-    @JsonIgnore
-    private List<DiaChi> diaChiList;
-
 
 }
