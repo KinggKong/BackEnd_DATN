@@ -34,6 +34,7 @@ public class KhachHangService implements IKhachHangService {
     KhachHangRepository khachHangRepository;
     TaiKhoanRepository taikhoanRepository;
     VaiTroRepository vaiTroRepository;
+    GioHangService gioHangService;
 
     @Override
     public Page<KhachHangResponse1> getAllKhachHangPageable(String ten, Pageable pageable) {
@@ -57,7 +58,7 @@ public class KhachHangService implements IKhachHangService {
         // Tạo khách hàng mới từ dữ liệu request
         KhachHang khachHang = KhachHang.builder()
                 .ten(khachHangRequest.getTen())
-                .ma(maKhachHang) // Sử dụng mã tự sinh
+                .ma(maKhachHang)
                 .email(khachHangRequest.getEmail())
                 .sdt(khachHangRequest.getSdt())
                 .avatar(khachHangRequest.getAvatar())
@@ -72,6 +73,9 @@ public class KhachHangService implements IKhachHangService {
 
         // Tạo tài khoản cho khách hàng mới
         createAccount(savedKhachHang);
+
+        // Tạo giỏ hàng cho khách hàng mới
+        gioHangService.themGioHang(savedKhachHang.getId());
 
         return KhachHangResponse1.fromKhachHang(savedKhachHang);
     }
